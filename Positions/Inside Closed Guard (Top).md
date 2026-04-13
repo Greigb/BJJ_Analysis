@@ -16,7 +16,7 @@ tags: [position, guard-top]
 - [[Can opener (illegal in some rulesets)]]
 
 ## Transitions
-**To:** [[Half Guard (Top)]], [[Headquarters / Passing Position]], [[Side Control (Top)]]
+**To:** [[Half Guard (Top)]], [[Headquarters / Passing Position]], [[Side Control (Top)]], [[Pass in Progress]]
 **From:** [[Standing - Neutral]]
 
 ## My Notes

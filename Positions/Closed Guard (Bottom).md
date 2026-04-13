@@ -18,8 +18,8 @@ tags: [position, guard-bottom]
 - [[Omoplata]]
 
 ## Transitions
-**To:** [[Half Guard (Bottom)]], [[Open Guard (generic)]], [[Mount (Top)]], [[Back Mount / Back Control]]
-**From:** [[Standing - Neutral]], [[Clinch / Collar Tie]], [[Half Guard (Bottom)]], [[Bottom Side Control]], [[Bottom Mount]], [[Back Taken (Defending)]], [[Front Headlock / Guillotine Position]]
+**To:** [[Half Guard (Bottom)]], [[Open Guard (generic)]], [[Mount (Top)]], [[Back Mount / Back Control]], [[Sweep in Progress]]
+**From:** [[Standing - Neutral]], [[Clinch / Collar Tie]], [[Half Guard (Bottom)]], [[Bottom Side Control]], [[Bottom Mount]], [[Back Taken (Defending)]], [[Front Headlock / Guillotine Position]], [[Guard Recovery (in progress)]], [[Submission Defence (escaping)]]
 
 ## My Notes
 

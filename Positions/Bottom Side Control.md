@@ -16,7 +16,7 @@ tags: [position, inferior-bottom]
 - [[Shrimp to half guard]]
 
 ## Transitions
-**To:** [[Half Guard (Bottom)]], [[Closed Guard (Bottom)]], [[Turtle (Bottom)]]
+**To:** [[Half Guard (Bottom)]], [[Closed Guard (Bottom)]], [[Turtle (Bottom)]], [[Guard Recovery (in progress)]]
 **From:** [[Half Guard (Bottom)]]
 
 ## My Notes

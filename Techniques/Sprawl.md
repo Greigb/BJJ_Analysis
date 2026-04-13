@@ -6,7 +6,7 @@ tags: [technique]
 
 ## Used from
 
-- [[Scramble (No Clear Position)]]
+- [[Wrestling Scramble]]
 
 ## Description
 

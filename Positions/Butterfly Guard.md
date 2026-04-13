@@ -16,8 +16,8 @@ tags: [position, guard-bottom]
 - [[X-guard entry]]
 
 ## Transitions
-**To:** [[Single Leg X / Ashi Garami]], [[Back Mount / Back Control]]
-**From:** [[Open Guard (generic)]]
+**To:** [[Single Leg X / Ashi Garami]], [[Back Mount / Back Control]], [[Inside Sankaku (Honeyhole/Saddle)]], [[Sweep in Progress]]
+**From:** [[Open Guard (generic)]], [[Guard Recovery (in progress)]]
 
 ## My Notes
 

@@ -16,8 +16,8 @@ tags: [position, inferior-bottom]
 - [[Guard recovery]]
 
 ## Transitions
-**To:** [[Half Guard (Bottom)]]
-**From:** [[Bottom Side Control]], [[Back Taken (Defending)]]
+**To:** [[Half Guard (Bottom)]], [[Guard Recovery (in progress)]], [[Back Exposure (partially turned)]]
+**From:** [[Bottom Side Control]], [[Back Taken (Defending)]], [[Wrestling Scramble]], [[Back Exposure (partially turned)]]
 
 ## My Notes
 

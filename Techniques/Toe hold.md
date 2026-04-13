@@ -7,8 +7,11 @@ tags: [technique]
 ## Used from
 
 - [[50/50]]
-- [[Leg Entanglement]]
+- [[Backside 50/50]]
+- [[Cross Ashi Garami]]
+- [[Outside Ashi Garami]]
 - [[Single Leg X / Ashi Garami]]
+- [[Straight Ashi Garami]]
 
 ## Description
 

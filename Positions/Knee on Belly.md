@@ -17,7 +17,7 @@ tags: [position, dominant-top]
 - [[Mount transition]]
 
 ## Transitions
-**From:** [[Headquarters / Passing Position]], [[Side Control (Top)]]
+**From:** [[Headquarters / Passing Position]], [[Side Control (Top)]], [[Pass in Progress]]
 
 ## My Notes
 

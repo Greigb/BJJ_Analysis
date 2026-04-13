@@ -19,7 +19,7 @@ tags: [position, dominant-top]
 
 ## Transitions
 **To:** [[Mount (Top)]], [[Knee on Belly]], [[North-South (Top)]], [[Back Mount / Back Control]]
-**From:** [[Clinch / Collar Tie]], [[Inside Closed Guard (Top)]], [[Half Guard (Bottom)]], [[Half Guard (Top)]], [[Headquarters / Passing Position]], [[Mount (Top)]], [[Front Headlock / Guillotine Position]]
+**From:** [[Clinch / Collar Tie]], [[Inside Closed Guard (Top)]], [[Half Guard (Bottom)]], [[Half Guard (Top)]], [[Headquarters / Passing Position]], [[Mount (Top)]], [[Front Headlock / Guillotine Position]], [[Pass in Progress]], [[Sweep in Progress]]
 
 ## My Notes
 

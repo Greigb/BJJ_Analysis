@@ -17,8 +17,8 @@ tags: [position, guard-bottom]
 - [[Dogfight]]
 
 ## Transitions
-**To:** [[Closed Guard (Bottom)]], [[Bottom Side Control]], [[Side Control (Top)]]
-**From:** [[Clinch / Collar Tie]], [[Closed Guard (Bottom)]], [[Bottom Side Control]], [[Bottom Mount]], [[Turtle (Bottom)]]
+**To:** [[Closed Guard (Bottom)]], [[Bottom Side Control]], [[Side Control (Top)]], [[Dogfight / Underhook Battle]], [[Single Leg X / Ashi Garami]], [[Guard Recovery (in progress)]]
+**From:** [[Clinch / Collar Tie]], [[Closed Guard (Bottom)]], [[Bottom Side Control]], [[Bottom Mount]], [[Turtle (Bottom)]], [[Dogfight / Underhook Battle]], [[Guard Recovery (in progress)]]
 
 ## My Notes
 

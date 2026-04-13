@@ -7,6 +7,7 @@ tags: [technique]
 ## Used from
 
 - [[Open Guard (generic)]]
+- [[Scramble (generic)]]
 
 ## Description
 

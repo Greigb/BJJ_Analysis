@@ -1,13 +1,13 @@
 ---
-category: "Guard (Bottom)"
-dominance: 1
+category: "Leg Entanglement"
+dominance: 0
 position_id: single_leg_x
-tags: [position, guard-bottom]
+tags: [position, leg-entanglement]
 ---
 
 # Single Leg X / Ashi Garami
 
-**Category:** Guard (Bottom)
+**Category:** Leg Entanglement
 
 ## Techniques from here
 - [[Straight ankle lock]]
@@ -17,8 +17,8 @@ tags: [position, guard-bottom]
 - [[Honey hole entry]]
 
 ## Transitions
-**To:** [[50/50]], [[Leg Entanglement]]
-**From:** [[Butterfly Guard]], [[De La Riva Guard]]
+**To:** [[Straight Ashi Garami]], [[Inside Sankaku (Honeyhole/Saddle)]], [[50/50]], [[Outside Ashi Garami]], [[Sweep in Progress]]
+**From:** [[Half Guard (Bottom)]], [[Open Guard (generic)]], [[Butterfly Guard]], [[De La Riva Guard]], [[Dogfight / Underhook Battle]], [[Straight Ashi Garami]]
 
 ## My Notes
 

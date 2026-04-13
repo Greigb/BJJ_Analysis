@@ -16,7 +16,7 @@ tags: [position, guard-top]
 - [[Backstep to leg lock]]
 
 ## Transitions
-**To:** [[Side Control (Top)]], [[Half Guard (Top)]], [[Knee on Belly]]
+**To:** [[Side Control (Top)]], [[Half Guard (Top)]], [[Knee on Belly]], [[Pass in Progress]]
 **From:** [[Inside Closed Guard (Top)]]
 
 ## My Notes

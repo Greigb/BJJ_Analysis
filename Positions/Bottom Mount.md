@@ -15,7 +15,7 @@ tags: [position, inferior-bottom]
 - [[Heel drag escape]]
 
 ## Transitions
-**To:** [[Half Guard (Bottom)]], [[Closed Guard (Bottom)]]
+**To:** [[Half Guard (Bottom)]], [[Closed Guard (Bottom)]], [[Guard Recovery (in progress)]]
 
 ## My Notes
 

@@ -6,7 +6,8 @@ tags: [technique]
 
 ## Used from
 
-- [[Scramble (No Clear Position)]]
+- [[Dogfight / Underhook Battle]]
+- [[Wrestling Scramble]]
 
 ## Description
 

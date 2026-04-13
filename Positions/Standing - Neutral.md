@@ -16,7 +16,8 @@ tags: [position, standing]
 - [[Arm drag]]
 
 ## Transitions
-**To:** [[Clinch / Collar Tie]], [[Closed Guard (Bottom)]], [[Open Guard (generic)]], [[Inside Closed Guard (Top)]], [[Passing Open Guard (Top)]]
+**To:** [[Clinch / Collar Tie]], [[Closed Guard (Bottom)]], [[Open Guard (generic)]], [[Inside Closed Guard (Top)]], [[Passing Open Guard (Top)]], [[Wrestling Scramble]]
+**From:** [[50/50]]
 
 ## My Notes
 

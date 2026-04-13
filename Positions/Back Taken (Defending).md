@@ -16,7 +16,8 @@ tags: [position, inferior-bottom]
 - [[Turn to guard]]
 
 ## Transitions
-**To:** [[Turtle (Bottom)]], [[Closed Guard (Bottom)]]
+**To:** [[Turtle (Bottom)]], [[Closed Guard (Bottom)]], [[Submission Defence (escaping)]]
+**From:** [[Back Exposure (partially turned)]]
 
 ## My Notes
 

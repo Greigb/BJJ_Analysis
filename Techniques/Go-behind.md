@@ -7,7 +7,7 @@ tags: [technique]
 ## Used from
 
 - [[Front Headlock / Guillotine Position]]
-- [[Scramble (No Clear Position)]]
+- [[Wrestling Scramble]]
 
 ## Description
 

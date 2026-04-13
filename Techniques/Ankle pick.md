@@ -8,6 +8,7 @@ tags: [technique]
 
 - [[Clinch / Collar Tie]]
 - [[Open Guard (generic)]]
+- [[Scramble (generic)]]
 - [[Unclear / Cannot Determine]]
 
 ## Description

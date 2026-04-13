@@ -17,8 +17,8 @@ tags: [position, scramble]
 - [[Go-behind]]
 
 ## Transitions
-**To:** [[Side Control (Top)]], [[Back Mount / Back Control]], [[Closed Guard (Bottom)]]
-**From:** [[Turtle Attack (Top)]]
+**To:** [[Side Control (Top)]], [[Back Mount / Back Control]], [[Closed Guard (Bottom)]], [[Submission Defence (escaping)]]
+**From:** [[Clinch / Collar Tie]], [[Turtle Attack (Top)]], [[Dogfight / Underhook Battle]], [[Wrestling Scramble]]
 
 ## My Notes
 

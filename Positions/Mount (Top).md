@@ -17,7 +17,7 @@ tags: [position, dominant-top]
 
 ## Transitions
 **To:** [[Back Mount / Back Control]], [[Side Control (Top)]]
-**From:** [[Closed Guard (Bottom)]], [[Half Guard (Top)]], [[Side Control (Top)]]
+**From:** [[Closed Guard (Bottom)]], [[Half Guard (Top)]], [[Side Control (Top)]], [[Sweep in Progress]]
 
 ## My Notes
 

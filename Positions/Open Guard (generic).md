@@ -15,8 +15,8 @@ tags: [position, guard-bottom]
 - [[Ankle pick]]
 
 ## Transitions
-**To:** [[Butterfly Guard]], [[De La Riva Guard]], [[Spider / Lasso Guard]]
-**From:** [[Standing - Neutral]], [[Closed Guard (Bottom)]]
+**To:** [[Butterfly Guard]], [[De La Riva Guard]], [[Spider / Lasso Guard]], [[Single Leg X / Ashi Garami]], [[Straight Ashi Garami]]
+**From:** [[Standing - Neutral]], [[Closed Guard (Bottom)]], [[Guard Recovery (in progress)]]
 
 ## My Notes
 

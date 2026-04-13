@@ -6,8 +6,10 @@ tags: [technique]
 
 ## Used from
 
-- [[Leg Entanglement]]
+- [[Cross Ashi Garami]]
+- [[Outside Ashi Garami]]
 - [[Single Leg X / Ashi Garami]]
+- [[Straight Ashi Garami]]
 
 ## Description
 

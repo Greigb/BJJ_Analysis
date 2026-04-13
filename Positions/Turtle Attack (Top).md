@@ -16,7 +16,8 @@ tags: [position, scramble]
 - [[Snap down to front headlock]]
 
 ## Transitions
-**To:** [[Back Mount / Back Control]], [[Front Headlock / Guillotine Position]]
+**To:** [[Back Mount / Back Control]], [[Front Headlock / Guillotine Position]], [[Back Exposure (partially turned)]]
+**From:** [[Wrestling Scramble]]
 
 ## My Notes
 

@@ -6,10 +6,13 @@ tags: [technique]
 
 ## Used from
 
+- [[Back Exposure (partially turned)]]
 - [[Back Mount / Back Control]]
 - [[Closed Guard (Bottom)]]
 - [[Crucifix]]
 - [[Knee on Belly]]
+- [[Pass in Progress]]
+- [[Sweep in Progress]]
 
 ## Description
 

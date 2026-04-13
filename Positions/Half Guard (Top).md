@@ -16,8 +16,8 @@ tags: [position, guard-top]
 - [[Smash pass]]
 
 ## Transitions
-**To:** [[Side Control (Top)]], [[Mount (Top)]]
-**From:** [[Inside Closed Guard (Top)]], [[Headquarters / Passing Position]]
+**To:** [[Side Control (Top)]], [[Mount (Top)]], [[Pass in Progress]], [[Dogfight / Underhook Battle]]
+**From:** [[Inside Closed Guard (Top)]], [[Headquarters / Passing Position]], [[Dogfight / Underhook Battle]], [[Pass in Progress]]
 
 ## My Notes
 

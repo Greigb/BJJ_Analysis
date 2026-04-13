@@ -16,8 +16,8 @@ tags: [position, standing]
 - [[Knee tap]]
 
 ## Transitions
-**To:** [[Side Control (Top)]], [[Half Guard (Bottom)]], [[Closed Guard (Bottom)]]
-**From:** [[Standing - Neutral]]
+**To:** [[Side Control (Top)]], [[Half Guard (Bottom)]], [[Closed Guard (Bottom)]], [[Front Headlock / Guillotine Position]], [[Wrestling Scramble]]
+**From:** [[Standing - Neutral]], [[Wrestling Scramble]]
 
 ## My Notes
 

@@ -16,7 +16,7 @@ tags: [position, guard-bottom]
 - [[Back take]]
 
 ## Transitions
-**To:** [[Back Mount / Back Control]], [[Single Leg X / Ashi Garami]]
+**To:** [[Back Mount / Back Control]], [[Single Leg X / Ashi Garami]], [[Outside Ashi Garami]], [[Sweep in Progress]]
 **From:** [[Open Guard (generic)]]
 
 ## My Notes

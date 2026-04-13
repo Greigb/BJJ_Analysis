@@ -78,6 +78,22 @@ const taxonomy = [
     ],
   },
   {
+    id: "leg-entanglement",
+    label: "Leg Entanglements",
+    color: "#F97316",
+    icon: "🦵",
+    positions: [
+      { name: "Single Leg X / Ashi Garami", techniques: ["Straight ankle lock", "Inside heel hook", "Toe hold", "Transition to inside sankaku", "Sweep"] },
+      { name: "Straight Ashi Garami", techniques: ["Straight ankle lock", "Toe hold", "Transition to inside sankaku", "Transition to outside ashi"] },
+      { name: "Outside Ashi Garami", techniques: ["Kneebar", "Outside heel hook", "Toe hold", "Transition to outside sankaku"] },
+      { name: "Inside Sankaku (Honeyhole/Saddle)", techniques: ["Inside heel hook", "Toe hold", "Calf slicer", "Transition to backside 50/50"] },
+      { name: "Outside Sankaku (411)", techniques: ["Outside heel hook", "Kneebar", "Toe hold", "Transition to cross ashi"] },
+      { name: "Cross Ashi Garami", techniques: ["Inside heel hook", "Outside heel hook", "Kneebar", "Transition to inside sankaku"] },
+      { name: "50/50", techniques: ["Heel hook", "Kneebar", "Toe hold", "Sweep to top 50/50", "Transition to backside 50/50"] },
+      { name: "Backside 50/50", techniques: ["Heel hook", "Calf slicer", "Back take", "Transition to inside sankaku"] },
+    ],
+  },
+  {
     id: "scrambles",
     label: "Scrambles & Transitions",
     color: "#8B5CF6",
@@ -85,9 +101,13 @@ const taxonomy = [
     positions: [
       { name: "Turtle (top — attacking)", techniques: ["Clock choke", "Seatbelt → back take", "Truck entry", "Snap down to front headlock"] },
       { name: "Front Headlock / Guillotine", techniques: ["Guillotine choke", "D'Arce choke", "Anaconda choke", "Snap to front headlock", "Go-behind"] },
-      { name: "Leg Entanglement (neutral)", techniques: ["Inside heel hook", "Outside heel hook", "Kneebar", "Toe hold", "Calf slicer"] },
       { name: "Dogfight / Underhook Battle", techniques: ["Single leg finish", "Back take", "Front headlock", "Sweep"] },
-      { name: "Wrestling Scramble (no clear position)", techniques: ["Re-shot", "Sprawl", "Go-behind", "Front headlock"] },
+      { name: "Wrestling Scramble", techniques: ["Re-shot", "Sprawl", "Go-behind", "Front headlock"] },
+      { name: "Guard Recovery (in progress)", techniques: ["Shrimp to guard", "Granby roll", "Inversion", "Frame and reguard"] },
+      { name: "Pass in Progress", techniques: ["Knee slide", "Leg drag", "Smash pass", "Toreando"] },
+      { name: "Sweep in Progress", techniques: ["Hook sweep", "Scissor sweep", "Pendulum sweep", "Technical standup"] },
+      { name: "Back Exposure (partially turned)", techniques: ["Seatbelt → back take", "Harness control", "Truck entry", "Guard recovery"] },
+      { name: "Submission Defence (escaping)", techniques: ["Hand fight", "Hitchhiker escape", "Stack defence", "Posture break"] },
     ],
   },
 ];
