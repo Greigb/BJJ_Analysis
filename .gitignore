@@ -1,0 +1,27 @@
+# Obsidian workspace (user-specific, changes constantly)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Video files (too large for git)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wmv
+
+# Temp frame extraction directories
+bjj_frames_*
+
+# Analysis outputs (generated, not source)
+*_report.html
+*_analysis.json

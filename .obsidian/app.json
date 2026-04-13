@@ -1,0 +1,12 @@
+{
+  "useMarkdownLinks": false,
+  "newLinkFormat": "shortest",
+  "attachmentFolderPath": "assets",
+  "userIgnoreFilters": [
+    "tools/",
+    "docs/"
+  ],
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "current",
+  "showUnsupportedFiles": false
+}
