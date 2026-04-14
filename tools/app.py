@@ -339,15 +339,19 @@ Return ONLY valid JSON, no markdown, no backticks."""
 
     client = Groq(api_key=groq_key)
     model = "meta-llama/llama-4-scout-17b-16e-instruct"
-    batch_size = 4
+    batch_size = 3  # Reduced from 4 to lower tokens per request
     timeline = []
     context = "This is the start of the session."
+    failed_batches = 0
+    total_batches = (len(frames) + batch_size - 1) // batch_size
     progress = st.progress(0, text="Analysing frames...")
+    status_text = st.empty()
 
     for batch_start in range(0, len(frames), batch_size):
         batch = frames[batch_start:batch_start + batch_size]
-        pct = (batch_start + len(batch)) / len(frames)
-        progress.progress(pct, text=f"Analysing frames {batch[0]['frame_num']}-{batch[-1]['frame_num']}...")
+        batch_num = batch_start // batch_size + 1
+        pct = batch_num / total_batches
+        progress.progress(pct, text=f"Batch {batch_num}/{total_batches} (frames {batch[0]['frame_num']}-{batch[-1]['frame_num']})")
 
         content = [{
             "type": "text",
@@ -362,7 +366,8 @@ Return ONLY valid JSON, no markdown, no backticks."""
             content.append({"type": "text", "text": f"--- Frame {fr['frame_num']} ({fr['timestamp']:.1f}s) ---"})
             content.append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{fr['base64']}"}})
 
-        for attempt in range(3):
+        batch_success = False
+        for attempt in range(4):  # More retries with longer waits
             try:
                 resp = client.chat.completions.create(
                     model=model,
@@ -378,7 +383,6 @@ Return ONLY valid JSON, no markdown, no backticks."""
                 results = json.loads(raw)
                 if isinstance(results, dict):
                     results = [results]
-                # Attach frame images to results for thumbnail display
                 for idx, result in enumerate(results):
                     if idx < len(batch):
                         result["frame_base64"] = batch[idx]["base64"]
@@ -386,45 +390,79 @@ Return ONLY valid JSON, no markdown, no backticks."""
                 if results:
                     last = results[-1]
                     context = f"At {last.get('timestamp_sec', '?')}s: Player A in {last.get('player_a_position', '?')}, Player B in {last.get('player_b_position', '?')}. {last.get('notes', '')}"
+                batch_success = True
+                status_text.caption(f"Analysed {len(timeline)} frames so far...")
                 break
             except Exception as e:
                 err = str(e)
-                if "429" in err and attempt < 2:
-                    wait = 15 * (attempt + 1)
-                    progress.progress(pct, text=f"Rate limited — waiting {wait}s...")
+                if "429" in err and attempt < 3:
+                    wait = 20 * (attempt + 1)  # 20s, 40s, 60s
+                    progress.progress(pct, text=f"Rate limited — waiting {wait}s (attempt {attempt+2}/4)...")
                     time.sleep(wait)
+                elif "json" in err.lower() and attempt < 3:
+                    time.sleep(5)  # Quick retry on JSON parse error
                 else:
-                    st.warning(f"Batch error: {err[:100]}")
+                    st.warning(f"Batch {batch_num} failed: {err[:80]}")
                     break
 
-        # Rate limit: 30 RPM but 30k TPM — images are ~2k tokens each
-        # 4 images per batch = ~8k tokens, so max ~3-4 batches/min
+        if not batch_success:
+            failed_batches += 1
+            # Attach frames even without analysis so thumbnails show
+            for fr in batch:
+                timeline.append({
+                    "frame_number": fr["frame_num"],
+                    "timestamp_sec": fr["timestamp"],
+                    "player_a_position": "unclear",
+                    "player_b_position": "unclear",
+                    "notes": "Analysis failed for this frame (rate limited)",
+                    "frame_base64": fr["base64"],
+                })
+
+        # Wait between batches — 10s keeps us under 30k TPM with 3 images/batch
         if batch_start + batch_size < len(frames):
-            time.sleep(8)
+            time.sleep(10)
 
+    # Show partial result warning
+    if failed_batches > 0:
+        st.warning(f"{failed_batches}/{total_batches} batches failed due to rate limiting. Partial results shown below. Try reducing 'Max frames' or increasing 'Sample interval'.")
+
+    # Generate summary from whatever we have
     progress.progress(1.0, text="Generating summary...")
+    analysed_entries = [e for e in timeline if e.get("player_a_position") != "unclear"]
 
-    try:
-        resp = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": summary_prompt_tpl
-                .replace("{{timeline_json}}", json.dumps(timeline, indent=2))
-                .replace("{{duration}}", str(timedelta(seconds=int(duration))))
-                .replace("{{player_name}}", player_name)
-            }],
-            max_tokens=4096, temperature=0.3,
-        )
-        raw = resp.choices[0].message.content.strip()
-        if raw.startswith("```"):
-            raw = raw.split("\n", 1)[1]
-            if raw.endswith("```"):
-                raw = raw.rsplit("```", 1)[0]
-            raw = raw.strip()
-        summary = json.loads(raw)
-    except Exception:
-        summary = {"session_overview": "Summary generation failed", "overall_notes": ""}
+    if analysed_entries:
+        # Wait before summary to avoid rate limit
+        time.sleep(10)
+        for attempt in range(3):
+            try:
+                resp = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": summary_prompt_tpl
+                        .replace("{{timeline_json}}", json.dumps(analysed_entries, indent=2))
+                        .replace("{{duration}}", str(timedelta(seconds=int(duration))))
+                        .replace("{{player_name}}", player_name)
+                    }],
+                    max_tokens=4096, temperature=0.3,
+                )
+                raw = resp.choices[0].message.content.strip()
+                if raw.startswith("```"):
+                    raw = raw.split("\n", 1)[1]
+                    if raw.endswith("```"):
+                        raw = raw.rsplit("```", 1)[0]
+                    raw = raw.strip()
+                summary = json.loads(raw)
+                break
+            except Exception as e:
+                if "429" in str(e) and attempt < 2:
+                    time.sleep(20 * (attempt + 1))
+                else:
+                    summary = {"session_overview": f"Summary generation failed. {len(analysed_entries)} frames were analysed successfully.", "overall_notes": ""}
+                    break
+    else:
+        summary = {"session_overview": "No frames were successfully analysed. Try reducing the number of frames or increasing the sample interval.", "overall_notes": ""}
 
     progress.empty()
+    status_text.empty()
     return {"timeline": timeline, "summary": summary, "duration_sec": duration}, None
 
 
@@ -680,11 +718,19 @@ def main():
             if dl_error:
                 st.error(dl_error)
             elif tmp_path:
+                # Save video bytes for playback before analysis deletes the file
+                if not video_url:  # Uploaded file — save bytes for playback
+                    with open(tmp_path, "rb") as vf:
+                        st.session_state["uploaded_video_bytes"] = vf.read()
+
                 data, error = run_groq_analysis(tmp_path, player_name, auto_interval, auto_max, groq_key, taxonomy, player_description, player_b_description)
-                os.unlink(tmp_path)
+                try:
+                    os.unlink(tmp_path)
+                except OSError:
+                    pass
                 if error:
                     st.error(error)
-                elif data:
+                if data and data.get("timeline"):
                     json_input = json.dumps(data)
                     analyse_btn = True
                     st.session_state["auto_result"] = json_input
@@ -895,9 +941,9 @@ def main():
         # ─── Video embed (at top of results)
         vid_id = extract_youtube_id(video_url)
         if vid_id:
-            st.markdown(youtube_embed_html(video_url), unsafe_allow_html=True)
+            st.video(video_url)
         elif st.session_state.get("uploaded_video_bytes"):
-            st.video(st.session_state["uploaded_video_bytes"])
+            st.video(st.session_state["uploaded_video_bytes"], format="video/mp4")
 
         # ─── Summary
         if summary.get("session_overview"):
