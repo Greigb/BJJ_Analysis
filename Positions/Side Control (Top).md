@@ -30,14 +30,14 @@ Top person is lying PERPENDICULAR (90 degrees) across the bottom person's chest.
 
 *16 variations documented in GrappleMap database*
 
-- twister side w/ grapevine and fishnet
-- side control darce
 - bridged against judo side
-- side control double unders bridge
+- side control behind w/ double unders vs overhook
 - approaching turned away t-rex
-- turned in t-rex vs side vice
 - leg drag to side control
-- judo side w/ whizzer vs shitty underhook
+- side control vs turned away t-rex
+- near side side control kimura
+- countering upa side control escape
+- double unders side control vs headlock
 
 ## My Notes
 

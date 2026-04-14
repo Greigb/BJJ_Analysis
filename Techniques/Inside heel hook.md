@@ -9,6 +9,7 @@ tags: [technique]
 - [[Cross Ashi Garami]]
 - [[Inside Sankaku (Honeyhole/Saddle)]]
 - [[Single Leg X / Ashi Garami]]
+- [[Ushiro Ashi Garami (Rear Ashi)]]
 
 ## Description
 

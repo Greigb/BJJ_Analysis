@@ -7,6 +7,7 @@ tags: [technique]
 ## Used from
 
 - [[50/50]]
+- [[80/20 (Dominant 50/50)]]
 - [[Inside Sankaku (Honeyhole/Saddle)]]
 
 ## Description

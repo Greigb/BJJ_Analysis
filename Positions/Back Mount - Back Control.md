@@ -27,14 +27,14 @@ One person is BEHIND the other, chest-to-back. Usually has HOOKS IN (feet inside
 
 *15 variations documented in GrappleMap database*
 
+- seated back w/ seatbelt
 - seated back w/ hook on underhook side
-- turtle w/ seatbelt and near hook
-- mounted turtle w/ single hook & seatbelt
-- mounted turtle w/ seatbelt
-- side control w/ seatbelt and first hook
 - straight back w/ seatbelt
-- fetal w/ seat belt
+- mounted turtle w/ single hook & seatbelt
+- side control w/ seatbelt and first hook
+- mounted turtle w/ seatbelt
 - back on choke arm side w/ one leg trapped
+- fetal w/ seat belt
 
 ## My Notes
 

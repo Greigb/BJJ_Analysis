@@ -30,13 +30,13 @@ Bottom person is on their BACK with BOTH LEGS controlling ONE of the opponent's 
 *10 variations documented in GrappleMap database*
 
 - wide upright standing x
-- wide standing x-guard
-- x guard w/o underhook
-- x-guard push sweep start
-- top pulling away from x-guard
-- postured up single-x
 - x-guard on knee leaning forward
-- standing x vs near wrist control
+- top pulling away from x-guard
+- honey hole heel hook
+- x guard w/o underhook
+- wide standing x-guard
+- x-guard push sweep start
+- single leg x w/ overhook
 
 ## My Notes
 

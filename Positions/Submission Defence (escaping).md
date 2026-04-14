@@ -22,7 +22,7 @@ One person is actively defending a submission — hands are fighting at the neck
 
 ## Transitions
 **To:** [[Guard Recovery (in progress)]], [[Scramble (generic)]], [[Closed Guard (Bottom)]]
-**From:** [[Back Taken (Defending)]], [[Front Headlock / Guillotine Position]], [[Inside Sankaku (Honeyhole/Saddle)]], [[Outside Sankaku (411)]]
+**From:** [[Back Taken (Defending)]], [[Front Headlock / Guillotine Position]], [[Inside Sankaku (Honeyhole/Saddle)]], [[Outside Sankaku (411)]], [[80/20 (Dominant 50/50)]], [[Ushiro Ashi Garami (Rear Ashi)]]
 
 ## My Notes
 

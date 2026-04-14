@@ -21,8 +21,8 @@ Attacker is on their back/side with the opponent's leg trapped between their leg
 - [[Transition to outside ashi]]
 
 ## Transitions
-**To:** [[Inside Sankaku (Honeyhole/Saddle)]], [[Outside Ashi Garami]], [[Single Leg X / Ashi Garami]], [[50/50]]
-**From:** [[Open Guard (generic)]], [[Single Leg X / Ashi Garami]], [[Outside Ashi Garami]]
+**To:** [[Inside Sankaku (Honeyhole/Saddle)]], [[Outside Ashi Garami]], [[Single Leg X / Ashi Garami]], [[50/50]], [[Ushiro Ashi Garami (Rear Ashi)]]
+**From:** [[Open Guard (generic)]], [[Single Leg X / Ashi Garami]], [[Outside Ashi Garami]], [[Ushiro Ashi Garami (Rear Ashi)]]
 
 ## My Notes
 

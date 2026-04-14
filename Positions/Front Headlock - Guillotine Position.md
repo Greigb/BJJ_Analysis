@@ -32,9 +32,9 @@ One person has their arm wrapped around the OTHER person's HEAD/NECK from the fr
 
 *3 variations documented in GrappleMap database*
 
-- arm-out guillotine
 - bottom coming up into guillotine
 - arm-in guillotine
+- arm-out guillotine
 
 ## Instructional References
 

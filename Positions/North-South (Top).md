@@ -27,12 +27,12 @@ Top person is lying ON TOP but HEAD-TO-TOE (180 degrees). Both people's heads po
 
 *6 variations documented in GrappleMap database*
 
-- north/south kimura
-- north south
-- north/south darce
-- north/south vs elbow frame
-- backward roll north south escape
 - north/south choke
+- north/south vs elbow frame
+- north/south darce
+- north/south kimura
+- backward roll north south escape
+- north south
 
 ## My Notes
 

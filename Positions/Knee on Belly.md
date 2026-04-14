@@ -28,12 +28,12 @@ Top person has ONE KNEE planted on the bottom person's stomach/chest while the o
 
 *6 variations documented in GrappleMap database*
 
-- knee on belly w/ head&arm
-- KoB w/ collar tie and elbow
-- knee on belly center
-- knee on belly vs underhook
 - reverse knee on belly
 - knee on belly drape
+- knee on belly center
+- knee on belly w/ head&arm
+- knee on belly vs underhook
+- KoB w/ collar tie and elbow
 
 ## My Notes
 

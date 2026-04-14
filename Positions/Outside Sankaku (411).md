@@ -22,7 +22,7 @@ Attacker has legs triangled around the opponent's leg but from the OUTSIDE. The 
 
 ## Transitions
 **To:** [[Inside Sankaku (Honeyhole/Saddle)]], [[Cross Ashi Garami]], [[50/50]], [[Submission Defence (escaping)]]
-**From:** [[Outside Ashi Garami]], [[Inside Sankaku (Honeyhole/Saddle)]], [[Cross Ashi Garami]], [[50/50]]
+**From:** [[Outside Ashi Garami]], [[Inside Sankaku (Honeyhole/Saddle)]], [[Cross Ashi Garami]], [[50/50]], [[80/20 (Dominant 50/50)]]
 
 ## My Notes
 

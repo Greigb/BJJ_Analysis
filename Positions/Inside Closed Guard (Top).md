@@ -28,14 +28,14 @@ Person kneeling or postured INSIDE the other's CLOSED (locked ankles) guard. Tra
 
 *19 variations documented in GrappleMap database*
 
+- combat base back
+- half guard w/ underhook + wrist vs combat base
+- bottom starting to turn in
+- ¼ clinch
+- 50/50 vs combat base
 - combat base w/ single
-- turtle w/ seat- belt and knee under elbow
-- outside ashi vs combat base
-- knee slice vs t-rex
-- forward leaning leg drag vs t-rex
-- ¼ clinch knee battle
 - rolling toward hippo
-- sweep single
+- forward leaning leg drag vs t-rex
 
 ## My Notes
 

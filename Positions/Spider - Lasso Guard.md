@@ -27,8 +27,8 @@ Bottom person on back with FEET ON THE BICEPS of the top person, pushing the arm
 
 *2 variations documented in GrappleMap database*
 
-- spider guard w/ shins against biceps
 - spider guard w/ wrist control
+- spider guard w/ shins against biceps
 
 ## My Notes
 

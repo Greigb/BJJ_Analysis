@@ -28,14 +28,14 @@ Bottom person is SEATED UPRIGHT (not flat on back) with BOTH FEET hooked inside 
 
 *37 variations documented in GrappleMap database*
 
-- halfway butterfly overhook sweep
-- seated butterfly homie
+- seated butterfly w/ single underhook
 - posture broken seated butterfly w/ double unders
+- butterflies engaged w/ double unders
+- flattened butterfly w/ stiff arms
 - distance seated butterfly
-- combat base butterfly arm drag
-- distance supine butterfly
-- butterfly arm drag w/ leg grab
-- cocoon w/ overhook
+- over/under cocoon w/ head on underhook side
+- knee-pinned butterfly w/ wrist ctrl and overhook
+- top shooting for underhooks in butterfly
 
 ## My Notes
 

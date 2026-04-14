@@ -51,11 +51,15 @@ Step 1: Identify the CATEGORY first using these visual guides:
 Step 2: Once you know the category, identify the SPECIFIC POSITION:
 {taxonomy_positions}
 
+Step 2b: IF the category is LEG ENTANGLEMENT, use this decision tree:
+{leg_tree}
+
 Step 3: Verify — does your position match what you see?
 Common mistakes:
 - Closed guard requires ankles LOCKED behind the back (open legs = open guard)
 - Side control requires PERPENDICULAR chest-to-chest, NO legs between (leg trapped = half guard)
 - Inside sankaku requires legs TRIANGLED around ONE leg (mirrored = 50/50)
+- 50/50 is SYMMETRICAL (mirrored). If one player has outside leg over hip, it's 80/20.
 - Mount requires SITTING ON opponent (lying across = side control)
 - Turtle requires hands-and-knees face DOWN (on back = different position)
 
@@ -519,7 +523,9 @@ def main():
         lines.append("If appearances overlap or are unclear, use continuity from previous frames.")
         player_id_block = "\n".join(lines)
     category_guide = build_category_guide(taxonomy)
-    system_prompt = SYSTEM_PROMPT.format(taxonomy_positions=taxonomy_str, player_id_block=player_id_block, category_guide=category_guide)
+    leg_tree_path = Path(__file__).parent / "leg_entanglement_guide.txt"
+    leg_tree = leg_tree_path.read_text() if leg_tree_path.exists() else ""
+    system_prompt = SYSTEM_PROMPT.format(taxonomy_positions=taxonomy_str, player_id_block=player_id_block, category_guide=category_guide, leg_tree=leg_tree)
 
     # Step 1: Extract frames
     print(f"\nStep 1: Extracting frames from {args.video}")

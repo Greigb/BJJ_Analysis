@@ -184,49 +184,71 @@
       "id": "single_leg_x",
       "name": "Single Leg X / Ashi Garami",
       "category": "leg_entanglement",
-      "visual_cues": "Bottom person is on their BACK with BOTH LEGS controlling ONE of the opponent's legs. One foot is on the hip, the other hooks behind the knee. The opponent's leg is between the attacker's legs. The opponent is usually still standing or kneeling."
+      "visual_cues": "Bottom person is on their BACK with BOTH LEGS controlling ONE of the opponent's legs. One foot is on the hip, the other hooks behind the knee. The opponent's leg is between the attacker's legs. The opponent is usually still standing or kneeling.",
+      "distinguishing_features": "vs straight_ashi: SLX has one foot on the hip (elevated). Straight ashi has both legs on the same side with no foot on hip. vs butterfly_guard: in SLX the attacker is on their back controlling ONE leg. In butterfly the attacker is seated upright with BOTH feet hooking inside thighs."
     },
     {
       "id": "straight_ashi",
       "name": "Straight Ashi Garami",
       "category": "leg_entanglement",
-      "visual_cues": "Attacker is on their back/side with the opponent's leg trapped between their legs. Both of attacker's legs are on the SAME SIDE of the opponent's trapped leg. The attacker's hips are next to the opponent's knee. Basic outside leg position."
+      "visual_cues": "Attacker is on their back/side with the opponent's leg trapped between their legs. Both of attacker's legs are on the SAME SIDE of the opponent's trapped leg. The attacker's hips are next to the opponent's knee. Basic outside leg position.",
+      "distinguishing_features": "vs outside_ashi: in straight ashi the outside leg does NOT cross over the hip. In outside ashi it DOES cross over. vs single_leg_x: SLX has a foot on the hip. Straight ashi is more ground-based with hips beside the knee."
     },
     {
       "id": "outside_ashi",
       "name": "Outside Ashi Garami",
       "category": "leg_entanglement",
-      "visual_cues": "Similar to straight ashi but the attacker's OUTSIDE leg crosses OVER the opponent's body/hip. More control than straight ashi. The attacker's legs frame the opponent's knee from the outside."
+      "visual_cues": "Similar to straight ashi but the attacker's OUTSIDE leg crosses OVER the opponent's body/hip. More control than straight ashi. The attacker's legs frame the opponent's knee from the outside.",
+      "distinguishing_features": "vs straight_ashi: outside ashi has the OUTSIDE LEG crossing OVER the hip (more control). Straight ashi does not. vs eighty_twenty: outside ashi is one-sided control. 80/20 has mutual leg wrapping like 50/50 but with the dominant leg over."
     },
     {
       "id": "inside_sankaku",
       "name": "Inside Sankaku (Honeyhole/Saddle)",
       "category": "leg_entanglement",
-      "visual_cues": "Attacker has BOTH LEGS TRIANGLED (crossed/locked like a triangle) around the opponent's SINGLE LEG. The trapped leg goes BETWEEN the attacker's thighs. The attacker's legs form a triangle (figure-four) grip. This is the strongest heel hook position. The heel is typically being exposed/attacked."
+      "visual_cues": "Attacker has BOTH LEGS TRIANGLED (crossed/locked like a triangle) around the opponent's SINGLE LEG. The trapped leg goes BETWEEN the attacker's thighs. The attacker's legs form a triangle (figure-four) grip. This is the strongest heel hook position. The heel is typically being exposed/attacked.",
+      "distinguishing_features": "vs outside_sankaku: inside sankaku has the triangle on the INSIDE (leg goes between thighs). Outside sankaku has it on the OUTSIDE (attacker faces away). vs fifty_fifty: 50/50 has MIRRORED/symmetrical legs. Inside sankaku has an ASYMMETRIC triangle grip around ONE leg. vs cross_ashi: inside sankaku has a LOCKED triangle. Cross ashi does not have the triangle locked."
     },
     {
       "id": "outside_sankaku",
       "name": "Outside Sankaku (411)",
       "category": "leg_entanglement",
-      "visual_cues": "Attacker has legs triangled around the opponent's leg but from the OUTSIDE. The attacker's body faces AWAY from the opponent (belly-down relative to the opponent's leg). The triangle grip is on the outside of the thigh. Used for outside heel hooks."
+      "visual_cues": "Attacker has legs triangled around the opponent's leg but from the OUTSIDE. The attacker's body faces AWAY from the opponent (belly-down relative to the opponent's leg). The triangle grip is on the outside of the thigh. Used for outside heel hooks.",
+      "distinguishing_features": "vs inside_sankaku: outside sankaku has the attacker facing AWAY (belly-down). Inside sankaku has the attacker facing TOWARD the opponent. vs backside_fifty_fifty: outside sankaku has a TRIANGLE grip around ONE leg. Backside 50/50 has mutual mirrored wrapping."
     },
     {
       "id": "cross_ashi",
       "name": "Cross Ashi Garami",
       "category": "leg_entanglement",
-      "visual_cues": "Attacker controls the opponent's leg but their body is angled ACROSS — the attacker's legs cross to the opposite side of the opponent's body. A transitional position between inside and outside sankaku."
+      "visual_cues": "Attacker controls the opponent's leg but their body is angled ACROSS — the attacker's legs cross to the opposite side of the opponent's body. A transitional position between inside and outside sankaku.",
+      "distinguishing_features": "vs inside_sankaku: cross ashi does NOT have a locked triangle grip. The legs are crossing the body but not triangled. vs outside_ashi: cross ashi crosses the CENTRELINE to the opposite side. Outside ashi stays on the same side."
     },
     {
       "id": "fifty_fifty",
       "name": "50/50",
       "category": "leg_entanglement",
-      "visual_cues": "Both people have their legs EQUALLY entangled — each has one leg wrapped around the other's leg in a MIRROR image. Symmetrical position. Both people face the same direction with legs intertwined. Neither has a clear advantage."
+      "visual_cues": "Both people have their legs EQUALLY entangled — each has one leg wrapped around the other's leg in a MIRROR image. Symmetrical position. Both people face the same direction with legs intertwined. Neither has a clear advantage.",
+      "distinguishing_features": "vs eighty_twenty: in 50/50 NEITHER player has the outside leg crossing over (symmetrical). In 80/20 ONE player has the outside leg over the hip (asymmetric). vs inside_sankaku: 50/50 is MIRRORED mutual wrapping. Inside sankaku is ONE player triangling around ONE leg. vs backside_fifty_fifty: in 50/50 both face the SAME direction. In backside one faces AWAY."
     },
     {
       "id": "backside_fifty_fifty",
       "name": "Backside 50/50",
       "category": "leg_entanglement",
-      "visual_cues": "Like 50/50 but one person has rotated so they face AWAY from the other (back-to-back relative to the entangled legs). One person faces the opponent's feet, the other faces away. Asymmetric advantage."
+      "visual_cues": "Like 50/50 but one person has rotated so they face AWAY from the other (back-to-back relative to the entangled legs). One person faces the opponent's feet, the other faces away. Asymmetric advantage.",
+      "distinguishing_features": "vs 50/50: in 50/50 both face the SAME direction. In backside, one faces AWAY. vs inside_sankaku: backside 50/50 still has mirrored leg wrapping, sankaku has a triangle grip."
+    },
+    {
+      "id": "eighty_twenty",
+      "name": "80/20 (Dominant 50/50)",
+      "category": "leg_entanglement",
+      "visual_cues": "Looks like 50/50 but ONE player has their OUTSIDE LEG crossing OVER the opponent's hip/body, giving them dominant control. The dominant player's legs are higher on the opponent. Asymmetric — one player has significantly more control than the other.",
+      "distinguishing_features": "vs 50/50: in 50/50 neither has an advantage (symmetrical). In 80/20, one player's outside leg crosses over the hip, creating a dominant angle. vs outside_ashi: 80/20 still has mutual leg wrapping like 50/50, outside_ashi is a one-sided control."
+    },
+    {
+      "id": "ushiro_ashi",
+      "name": "Ushiro Ashi Garami (Rear Ashi)",
+      "category": "leg_entanglement",
+      "visual_cues": "Attacker is BEHIND the opponent's leg (facing the back of the knee). The attacker's body is oriented towards the opponent's back/rear. The trapped leg goes behind the attacker. Often used to attack the heel hook from a rear angle.",
+      "distinguishing_features": "vs straight_ashi: in straight ashi the attacker faces the FRONT of the opponent's knee. In ushiro ashi the attacker faces the BACK. vs outside_ashi: ushiro is from directly behind, outside ashi is from the side."
     },
 
     {
@@ -452,6 +474,17 @@
 
     ["backside_fifty_fifty", "fifty_fifty"],
     ["backside_fifty_fifty", "inside_sankaku"],
-    ["backside_fifty_fifty", "back_mount"]
+    ["backside_fifty_fifty", "back_mount"],
+
+    ["fifty_fifty", "eighty_twenty"],
+    ["eighty_twenty", "outside_sankaku"],
+    ["eighty_twenty", "fifty_fifty"],
+    ["eighty_twenty", "outside_ashi"],
+    ["eighty_twenty", "submission_defence"],
+
+    ["straight_ashi", "ushiro_ashi"],
+    ["ushiro_ashi", "straight_ashi"],
+    ["ushiro_ashi", "outside_ashi"],
+    ["ushiro_ashi", "submission_defence"]
   ]
 }

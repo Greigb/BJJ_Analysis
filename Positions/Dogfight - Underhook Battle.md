@@ -28,11 +28,11 @@ Both people are on their KNEES facing each other, chest-to-chest, fighting for u
 
 *5 variations documented in GrappleMap database*
 
-- dogfight w/o leg control
-- dogfight w/ double unders
 - dogfight w/o whizzer
-- half and half
+- dogfight w/o leg control
 - power dogfight
+- dogfight w/ double unders
+- half and half
 
 ## My Notes
 

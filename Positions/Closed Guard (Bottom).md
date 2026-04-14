@@ -30,14 +30,14 @@ Person on their BACK with LEGS WRAPPED around the other person's waist. Ankles a
 
 *65 variations documented in GrappleMap database*
 
-- closed guard w/ overhook + collar tie
-- full guard w/ bicep control vs double collar
-- hip bump sweep w/ hand post
-- closed guard w/ overhook vs arm pin
-- boston handshake
-- double bagged chill dog
-- rat guard
+- 6 o'clock homie
+- closed guard w/ double under collar
+- full guard clinch
+- seated closed guard w/ double unders
+- new jersey w/ overhook
 - closed guard w/ double unders
+- double bagged chill dog
+- posture broken full guard w/ hand on mat
 
 ## My Notes
 

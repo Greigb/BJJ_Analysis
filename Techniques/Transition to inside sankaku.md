@@ -10,6 +10,7 @@ tags: [technique]
 - [[Cross Ashi Garami]]
 - [[Single Leg X / Ashi Garami]]
 - [[Straight Ashi Garami]]
+- [[Ushiro Ashi Garami (Rear Ashi)]]
 
 ## Description
 

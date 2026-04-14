@@ -28,14 +28,14 @@ Person is flat on their BACK with the opponent lying across their chest (perpend
 
 *27 variations documented in GrappleMap database*
 
-- side control w/ head&arm
-- electric cradle w/ open elbow
 - judo side vs t-rex
 - loose traditional side control
-- switching to regular side
-- entering side control w/ kimura
-- switching to judo side
-- side control w/ far underhook
+- side control w/ crossface vs t-rex
+- twister side control
+- jailbreak
+- judo side w/ head and near open elbow
+- side ctrl w/ near open elbow and crossface
+- side control w/ near bottom overhook and neck frame
 
 ## My Notes
 

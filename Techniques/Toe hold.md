@@ -7,11 +7,13 @@ tags: [technique]
 ## Used from
 
 - [[50/50]]
+- [[80/20 (Dominant 50/50)]]
 - [[Inside Sankaku (Honeyhole/Saddle)]]
 - [[Outside Ashi Garami]]
 - [[Outside Sankaku (411)]]
 - [[Single Leg X / Ashi Garami]]
 - [[Straight Ashi Garami]]
+- [[Ushiro Ashi Garami (Rear Ashi)]]
 
 ## Description
 

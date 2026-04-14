@@ -31,14 +31,14 @@ Both people standing upright, facing each other, no significant grip or contact.
 
 *103 variations documented in GrappleMap database*
 
-- standing vs outside ashi
-- air 300
-- standing w/ whizzer
+- standing single-leg turned away
+- single leg vs spladle
+- standing vs seated single w/ head outside
+- off balanced crab ride
+- level dropped
+- o-soto-gari
 - distant standing collar-tie
-- low double leg
-- te guruma
-- standing vs seated w/ knee pinned
-- standing arm drag on front leg side
+- duck under vs arm
 
 ## Instructional References
 

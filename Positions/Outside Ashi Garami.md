@@ -22,7 +22,7 @@ Similar to straight ashi but the attacker's OUTSIDE leg crosses OVER the opponen
 
 ## Transitions
 **To:** [[Outside Sankaku (411)]], [[Straight Ashi Garami]], [[Cross Ashi Garami]], [[50/50]]
-**From:** [[De La Riva Guard]], [[Single Leg X / Ashi Garami]], [[Straight Ashi Garami]]
+**From:** [[De La Riva Guard]], [[Single Leg X / Ashi Garami]], [[Straight Ashi Garami]], [[80/20 (Dominant 50/50)]], [[Ushiro Ashi Garami (Rear Ashi)]]
 
 ## My Notes
 

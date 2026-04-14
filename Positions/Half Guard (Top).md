@@ -28,12 +28,12 @@ Top person is on top but has ONE LEG trapped by the bottom person. Upper body ma
 
 *6 variations documented in GrappleMap database*
 
-- elbow half w/ weak underhook
-- octopus half guard
 - half guard arm drag
-- seated half w/ bottom underhook
-- arm-in guillotine vs single leg
 - side half w/ lockdown, overhook and pimp-arm
+- arm-in guillotine vs single leg
+- seated half w/ bottom underhook
+- octopus half guard
+- elbow half w/ weak underhook
 
 ## My Notes
 

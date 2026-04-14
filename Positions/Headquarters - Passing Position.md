@@ -32,19 +32,19 @@ Top person has ONE KNEE between the bottom person's legs (splitting them) and th
 
 *9 variations documented in GrappleMap database*
 
-- mini stomp one
-- sliced guard vs cross grip and wrist pin
-- stepping back from knee slice
 - smashed ¼ vs whizzer
+- stepping back from knee slice
+- knee slice vs de la riva
 - coming up on close single-leg
-- sliced knee
-- standing half guard knee slice start
 - flat ¼ w/ head+arm
+- sliced guard vs cross grip and wrist pin
+- mini stomp one
+- sliced knee
 
 ## Instructional References
 
-- Pablo Popovitch "NoGi Exposed", DVD 2: Guard Passing, Volume 10: Half Guard Series, Section 13: Knee Cross Pass @ 1:22:08
 - Ryan Hall "Arm Triangles", Volume 2: Creating Openings & Finishing, Technique 9: Half Guard Top: Brabo @ 1:01:53
+- Pablo Popovitch "NoGi Exposed", DVD 2: Guard Passing, Volume 10: Half Guard Series, Section 13: Knee Cross Pass @ 1:22:08
 - Eddie Bravo "Mastering the System" Episode 82 @ 37:26
 - Pablo Popovitch "NoGi Exposed", DVD 1: Guard Passing, Volume 4: Cross Grip Series, Section 4: Knee Through Pass
 

@@ -8,6 +8,7 @@ tags: [technique]
 
 - [[Dogfight / Underhook Battle]]
 - [[Single Leg X / Ashi Garami]]
+- [[Ushiro Ashi Garami (Rear Ashi)]]
 
 ## Description
 

@@ -29,14 +29,14 @@ Person on their back or side with ONE LEG trapped between their legs (not both).
 
 *40 variations documented in GrappleMap database*
 
-- z guard toe hold threat
+- electric underhooks
+- z guard vs wrist pin
+- back step pass
+- upright z
+- z guard w/ wrist and collar tie
+- twister pass w/ far arm stuffed
 - smashed half above knees
-- smashed half w/ double unders vs crossface
-- half guard kimura
-- deep half vs head&arm
-- elbow half w/ deep underhook
-- half guard shell
-- half guard w/ double unders vs crossface
+- kneeling darce vs half guard w/ underhook
 
 ## My Notes
 

@@ -245,6 +245,8 @@ def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, t
         player_id_block = "\n".join(lines)
 
     category_guide = build_category_prompt(taxonomy)
+    leg_tree_path = Path(__file__).parent / "leg_entanglement_guide.txt"
+    leg_tree = leg_tree_path.read_text() if leg_tree_path.exists() else ""
 
     system_prompt = f"""You are an expert Brazilian Jiu-Jitsu analyst with black belt-level knowledge.
 You are analysing keyframes extracted from a rolling/sparring session.
@@ -263,11 +265,15 @@ Step 1: Identify the CATEGORY first using these visual guides:
 Step 2: Once you know the category, identify the SPECIFIC POSITION using these visual guides:
 {taxonomy_str}
 
+Step 2b: IF the category is LEG ENTANGLEMENT, use this decision tree:
+{leg_tree}
+
 Step 3: Verify your answer — does your position match what you actually see?
 Common mistakes to avoid:
 - Closed guard requires ankles LOCKED behind the back (if legs are open, it's open guard)
 - Side control requires PERPENDICULAR chest-to-chest with NO legs between (if a leg is trapped, it's half guard)
 - Inside sankaku requires legs TRIANGLED around ONE leg (if legs are mirrored, it's 50/50)
+- 50/50 is SYMMETRICAL (mirrored legs). If one player has outside leg over hip, it's 80/20.
 - Mount requires SITTING ON the opponent (if lying across, it's side control)
 - Turtle requires hands-and-knees face DOWN (if on their back, it's a different position)
 

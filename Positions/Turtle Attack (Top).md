@@ -28,9 +28,9 @@ One person is on top of or beside the turtled person (who is on hands and knees)
 
 *3 variations documented in GrappleMap database*
 
-- front headlock vs single
-- gator roll
 - double leg from knees vs sprawl
+- gator roll
+- front headlock vs single
 
 ## My Notes
 

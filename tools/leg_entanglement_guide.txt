@@ -1,0 +1,48 @@
+LEG ENTANGLEMENT DECISION TREE
+================================
+When you identify the category as "leg_entanglement" (both players' legs are
+intertwined/tangled, legs are the central focus), use this decision tree to
+identify the SPECIFIC position:
+
+QUESTION 1: Are both players' legs MIRRORED (symmetrical wrapping)?
+  Each person has one leg wrapped around the other's leg in a similar way.
+
+  YES (symmetrical/mutual wrapping) →
+    QUESTION 2: Are both players facing the SAME direction?
+      YES → QUESTION 3: Does one player have their outside leg crossing OVER the opponent's hip?
+        YES → "eighty_twenty" (80/20 — the player with the leg over has dominant control)
+        NO  → "fifty_fifty" (50/50 — symmetrical, neither has advantage)
+      NO (one player facing away) → "backside_fifty_fifty"
+
+  NO (asymmetric — one player has dominant leg control) →
+    QUESTION 2: Are the attacker's legs TRIANGLED (crossed/figure-four locked) around ONE of the opponent's legs?
+
+      YES (triangle/figure-four grip around one leg) →
+        QUESTION 3: Is the attacker facing TOWARD the opponent?
+          YES → "inside_sankaku" (Honeyhole/Saddle — strongest heel hook position.
+                 The trapped leg goes BETWEEN the attacker's thighs.)
+          NO (attacker facing AWAY / belly-down) → "outside_sankaku" (411 —
+                 used for outside heel hooks. Triangle is on the outside of the thigh.)
+
+      NO (no triangle grip) →
+        QUESTION 3: Is the attacker on their BACK with one foot on the opponent's HIP?
+          YES → "single_leg_x" (SLX/Ashi Garami — one foot on hip, one hooking
+                 behind knee. Opponent usually standing or kneeling.)
+          NO →
+            QUESTION 4: Does the attacker's OUTSIDE leg cross OVER the opponent's body/hip?
+              YES → "outside_ashi" (Outside Ashi — more control than straight ashi)
+              NO →
+                QUESTION 5: Is the attacker BEHIND the opponent's leg (facing the back of the knee)?
+                  YES → "ushiro_ashi" (Rear Ashi — attacking from behind the leg)
+                  NO →
+                    QUESTION 6: Are the attacker's legs crossing to the OPPOSITE side of the opponent's body?
+                      YES → "cross_ashi" (Cross Ashi — transitional position)
+                      NO  → "straight_ashi" (Straight Ashi — basic position,
+                             both legs on same side, hips beside the knee)
+
+COMMON MISTAKES TO AVOID:
+- 50/50 vs inside_sankaku: 50/50 is SYMMETRICAL (mirrored). Inside sankaku is ASYMMETRIC (one person has triangle grip).
+- 80/20 vs 50/50: Look for the outside leg crossing over the hip. If one player has it, it's 80/20. If neither does, it's 50/50.
+- inside_sankaku vs outside_sankaku: Inside = attacker faces TOWARD opponent. Outside = attacker faces AWAY.
+- straight_ashi vs outside_ashi: Outside ashi has the outside leg crossing OVER the hip. Straight ashi does NOT.
+- single_leg_x vs straight_ashi: SLX has a foot on the hip (elevated position). Straight ashi is flat with hips beside the knee.

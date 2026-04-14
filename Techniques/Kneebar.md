@@ -7,6 +7,7 @@ tags: [technique]
 ## Used from
 
 - [[50/50]]
+- [[80/20 (Dominant 50/50)]]
 - [[Cross Ashi Garami]]
 - [[Outside Ashi Garami]]
 - [[Outside Sankaku (411)]]

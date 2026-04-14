@@ -28,14 +28,14 @@ Person is on their HANDS AND KNEES, curled up, face DOWN, protecting their neck.
 
 *23 variations documented in GrappleMap database*
 
-- mounted turtle w/ double wrist control
-- mounting turtle
-- turtle body lock
-- lower-back mounted turtle
+- sprawl vs turtle w/ single
 - turtle shoulder roll w/ leg
-- turtle w/ lower back control
-- shrugged turtle
+- mounted turtle w/ double wrist control
+- turtle w/ open elbow vs vice
+- lower-back mounted turtle
+- parallel turtle w/ seatbelt
 - turtle w/ single-leg vs vice grip
+- coming up on posting turtle's leg
 
 ## My Notes
 

@@ -26,14 +26,14 @@ Person is flat on their BACK with the opponent SITTING ON THEM, straddling their
 
 *14 variations documented in GrappleMap database*
 
-- mounted triangle
-- high mount w/ one arm trapped
-- gangsta-lean
+- postured up mount
+- mount
 - mount w/ head&arm
-- gangsta- lean w/  head&armpit
+- high mount w/ one arm trapped
+- mount w/ double unders
+- strike threat from mount
+- top gogo
 - mount vs body lock
-- low mount
-- mounted arm triangle
 
 ## My Notes
 
