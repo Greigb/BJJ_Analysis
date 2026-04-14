@@ -1,0 +1,258 @@
+{
+  "timeline": [
+    {
+      "timestamp": "0:00", "timestamp_sec": 0,
+      "player_a_position": "standing_neutral", "player_b_position": "standing_neutral",
+      "confidence": 0.7, "active_technique": null,
+      "visual_reasoning": "Open mat at Tempo Jiu Jitsu. Greig (black top/shorts) and Anthony (red shorts) walking onto the mat. Multiple other pairs visible. Round about to start.",
+      "notes": "Pre-roll. Walking onto the mat at Tempo Jiu Jitsu.", "coaching_tip": null
+    },
+    {
+      "timestamp": "0:07", "timestamp_sec": 7,
+      "player_a_position": "open_guard_top", "player_b_position": "open_guard",
+      "confidence": 0.75, "active_technique": "standing_passing",
+      "visual_reasoning": "Anthony (red shorts) sits to guard. Greig (black) standing over him. Greig is the top player looking to pass. Anthony seated with legs in front.",
+      "notes": "Anthony sits to guard. Greig standing, looking to engage and pass.", "coaching_tip": "When opponent sits to guard, don't rush in. Control the feet and ankles first, then work your passing entries."
+    },
+    {
+      "timestamp": "0:15", "timestamp_sec": 15,
+      "player_a_position": "open_guard_top", "player_b_position": "open_guard",
+      "confidence": 0.7, "active_technique": "guard_engagement",
+      "visual_reasoning": "Greig (black) engaging with Anthony (red) who is pulling guard. Greig leaning in, hands on Anthony. Transitioning to the ground.",
+      "notes": "Greig engaging with Anthony's guard. Working to establish passing grips.", "coaching_tip": "When engaging a seated guard player, grip the knees or ankles to control their leg movement before committing your weight forward."
+    },
+    {
+      "timestamp": "0:23", "timestamp_sec": 23,
+      "player_a_position": "scramble_generic", "player_b_position": "scramble_generic",
+      "confidence": 0.6, "active_technique": "scramble",
+      "visual_reasoning": "Scramble. Anthony (red) is inverting or rolling. Greig (black) trying to stabilise on top. Dynamic movement — both fighting for position.",
+      "notes": "Scramble as Anthony inverts. Greig trying to maintain top position.", "coaching_tip": "When your opponent inverts, backstep away and disengage rather than following them into the inversion — you'll end up in a leg entanglement."
+    },
+    {
+      "timestamp": "0:31", "timestamp_sec": 31,
+      "player_a_position": "open_guard_top", "player_b_position": "open_guard",
+      "confidence": 0.7, "active_technique": "pass_attempt",
+      "visual_reasoning": "Greig (black) on top, kneeling. Anthony (red) on back with feet active, retaining guard. Greig pressuring forward trying to pass.",
+      "notes": "Greig working to pass Anthony's open guard. Anthony defending with active feet.", "coaching_tip": "Against active open guard feet, use toreando (bull-fighter) passing — grip both ankles and throw the legs to one side."
+    },
+    {
+      "timestamp": "0:39", "timestamp_sec": 39,
+      "player_a_position": "closed_guard_top", "player_b_position": "closed_guard_bottom",
+      "confidence": 0.75, "active_technique": "guard_break_attempt",
+      "visual_reasoning": "Both on the ground, chest to chest. Anthony (red) has legs wrapped around Greig (black). Greig is inside Anthony's closed guard, driving forward.",
+      "notes": "Greig caught inside Anthony's closed guard. Working to open and pass.", "coaching_tip": "Priority one in closed guard: posture up. Get your hands on their hips, drive your hips back, and stand to break the guard open."
+    },
+    {
+      "timestamp": "0:47", "timestamp_sec": 47,
+      "player_a_position": "closed_guard_top", "player_b_position": "closed_guard_bottom",
+      "confidence": 0.7, "active_technique": "posture_battle",
+      "visual_reasoning": "Greig (black) still inside Anthony's (red) closed guard. Both flat on the mat. Greig trying to posture, Anthony pulling him down. Grinding position.",
+      "notes": "Stuck inside closed guard. Anthony controlling Greig's posture.", "coaching_tip": "Don't accept broken posture. Stand up in the guard — put one foot up, drive your hips forward, and break the legs open."
+    },
+    {
+      "timestamp": "0:55", "timestamp_sec": 55,
+      "player_a_position": "side_control_top", "player_b_position": "side_control_bottom",
+      "confidence": 0.7, "active_technique": "pass_complete",
+      "visual_reasoning": "Greig (black) has passed! He is on top, perpendicular across Anthony (red). Guard pass successful — Greig in side control.",
+      "notes": "Greig passes Anthony's guard and achieves side control.", "coaching_tip": "Good pass. Now stabilise — crossface, underhook the far arm, keep hips heavy. Don't rush to the next position."
+    },
+    {
+      "timestamp": "1:03", "timestamp_sec": 63,
+      "player_a_position": "side_control_top", "player_b_position": "side_control_bottom",
+      "confidence": 0.7, "active_technique": "pressure",
+      "visual_reasoning": "Greig (black) maintaining side control on top. Driving weight into Anthony (red). Heavy pressure. Dominant position held.",
+      "notes": "Greig maintaining heavy side control. Good pressure.", "coaching_tip": "From side control, look for submission opportunities — americana on the near arm, or transition to mount/knee on belly."
+    },
+    {
+      "timestamp": "1:11", "timestamp_sec": 71,
+      "player_a_position": "half_guard_top", "player_b_position": "half_guard_bottom",
+      "confidence": 0.65, "active_technique": "guard_recovery_defence",
+      "visual_reasoning": "Anthony (red) has recovered to half guard — one leg is back inside, trapping Greig's (black) leg. Greig still on top but the full pass has been undone. Someone walking past camera.",
+      "notes": "Anthony recovers half guard. Greig's pass partially undone.", "coaching_tip": "When opponent recovers half guard, immediately crossface and underhook to flatten them. Don't let them get to their side."
+    },
+    {
+      "timestamp": "1:19", "timestamp_sec": 79,
+      "player_a_position": "closed_guard_top", "player_b_position": "closed_guard_bottom",
+      "confidence": 0.6, "active_technique": "reguard",
+      "visual_reasoning": "View partially blocked. Anthony (red) appears to have recovered to closed guard. Greig (black) back inside the guard. Position reset to where they were before the pass.",
+      "notes": "Anthony recovers to full closed guard. Greig back to square one.", "coaching_tip": "This is the key issue: after passing, need to consolidate the position better before Anthony can reguard. Stay heavy, don't give space."
+    },
+    {
+      "timestamp": "1:27", "timestamp_sec": 87,
+      "player_a_position": "half_guard_top", "player_b_position": "half_guard_bottom",
+      "confidence": 0.65, "active_technique": "pass_attempt",
+      "visual_reasoning": "Greig (black) on top in half guard. Anthony (red) has one leg trapped. Greig working to free the leg and complete the pass.",
+      "notes": "Greig in top half guard, working to pass again.", "coaching_tip": "In top half guard: crossface to flatten, then knee slide or smash pass to clear the trapped leg."
+    },
+    {
+      "timestamp": "1:35", "timestamp_sec": 95,
+      "player_a_position": "half_guard_top", "player_b_position": "half_guard_bottom",
+      "confidence": 0.65, "active_technique": "crossface_pressure",
+      "visual_reasoning": "Greig (black) applying pressure from top half guard. Using crossface. Anthony (red) being flattened underneath.",
+      "notes": "Greig applying crossface pressure from top half guard. Good control.", "coaching_tip": "Good pressure. Now work the knee slide — slide the trapped knee across Anthony's body while maintaining the crossface."
+    },
+    {
+      "timestamp": "1:43", "timestamp_sec": 103,
+      "player_a_position": "side_control_top", "player_b_position": "side_control_bottom",
+      "confidence": 0.65, "active_technique": "pass_complete",
+      "visual_reasoning": "Greig (black) appears to have completed the pass again. On top in side control. Anthony (red) underneath.",
+      "notes": "Second guard pass — Greig back in side control.", "coaching_tip": "This time, look to advance to mount or knee on belly rather than staying in side control where Anthony can reguard."
+    },
+    {
+      "timestamp": "1:51", "timestamp_sec": 111,
+      "player_a_position": "turtle_top", "player_b_position": "turtle_bottom",
+      "confidence": 0.65, "active_technique": "turtle_attack",
+      "visual_reasoning": "Anthony (red) has turned to turtle — hands and knees, face down. Greig (black) is on top/beside, controlling. Looking for back take or front headlock.",
+      "notes": "Anthony turtles. Greig attacking the turtle — looking for back take.", "coaching_tip": "Against turtle: get the seatbelt grip (one arm over shoulder, one under armpit), then work to insert hooks for back control."
+    },
+    {
+      "timestamp": "1:59", "timestamp_sec": 119,
+      "player_a_position": "half_guard_top", "player_b_position": "half_guard_bottom",
+      "confidence": 0.6, "active_technique": "guard_recovery",
+      "visual_reasoning": "Anthony (red) has escaped turtle and recovered to half guard again. Greig (black) on top. Cycle repeating — pass, recover, pass, recover.",
+      "notes": "Anthony recovers from turtle to half guard. Resilient guard recovery.", "coaching_tip": "Anthony keeps recovering guard. Need to be more decisive: when in side control, advance to mount immediately rather than allowing the reguard cycle."
+    },
+    {
+      "timestamp": "2:07", "timestamp_sec": 127,
+      "player_a_position": "half_guard_top", "player_b_position": "half_guard_bottom",
+      "confidence": 0.65, "active_technique": "underhook_battle",
+      "visual_reasoning": "Greig (black) and Anthony (red) in a half guard battle. Both fighting for underhooks. Close-quarters grappling.",
+      "notes": "Half guard underhook battle. Both competing for inside position.", "coaching_tip": "Win this underhook battle — if you get the underhook from top, you can smash pass or mount. If he gets it, he'll sweep or reguard."
+    },
+    {
+      "timestamp": "2:15", "timestamp_sec": 135,
+      "player_a_position": "open_guard_top", "player_b_position": "open_guard",
+      "confidence": 0.7, "active_technique": "passing",
+      "visual_reasoning": "Greig (black) in base position on top. Anthony (red) on back with legs between them — open guard. Greig looking to pass again.",
+      "notes": "Open guard exchange. Greig working to pass, Anthony retaining.", "coaching_tip": "Mix up your passing attacks — if one style isn't working, switch between pressure passing and speed passing."
+    },
+    {
+      "timestamp": "2:23", "timestamp_sec": 143,
+      "player_a_position": "headquarters", "player_b_position": "open_guard",
+      "confidence": 0.65, "active_technique": "knee_slide_setup",
+      "visual_reasoning": "Greig (black) appears to have one knee splitting Anthony's guard — headquarters position. Working to complete a knee slide or smash pass.",
+      "notes": "Greig in headquarters position. Setting up the pass.", "coaching_tip": "From headquarters: commit to the knee slide. Drive the knee across, get the crossface, and pin the far shoulder."
+    },
+    {
+      "timestamp": "2:31", "timestamp_sec": 151,
+      "player_a_position": "closed_guard_top", "player_b_position": "closed_guard_bottom",
+      "confidence": 0.7, "active_technique": "guard_recovery",
+      "visual_reasoning": "Anthony (red) has pulled Greig (black) back into closed guard again. Legs wrapped. Third time being caught in closed guard.",
+      "notes": "Anthony recovers to closed guard again. Pass denied.", "coaching_tip": "Getting caught in closed guard repeatedly is a pattern. When passing, don't let your hips get close enough for legs to lock — maintain distance and pass from standing."
+    },
+    {
+      "timestamp": "2:39", "timestamp_sec": 159,
+      "player_a_position": "scramble_generic", "player_b_position": "sweep_in_progress",
+      "confidence": 0.6, "active_technique": "sweep",
+      "visual_reasoning": "Anthony (red) is sweeping! His legs are high, body twisting. Greig (black) is being off-balanced. Dynamic movement — Anthony executing a sweep from guard.",
+      "notes": "Anthony hits a sweep on Greig! Positions about to reverse.", "coaching_tip": "The sweep came from closed guard — need to maintain better posture and base. When you feel the sweep coming, post your hand or leg wide."
+    },
+    {
+      "timestamp": "2:47", "timestamp_sec": 167,
+      "player_a_position": "mount_bottom", "player_b_position": "mount_top",
+      "confidence": 0.7, "active_technique": "sweep_complete",
+      "visual_reasoning": "Roles reversed. Anthony (red) is on TOP — legs are elevated, he's coming over Greig. Greig (black) is underneath. The sweep has been completed. Anthony is in a dominant position.",
+      "notes": "Sweep completed! Anthony on top, Greig underneath. Roles reversed.", "coaching_tip": "When swept, immediately frame and work to recover guard. Don't accept the bottom position — hip escape immediately."
+    },
+    {
+      "timestamp": "2:55", "timestamp_sec": 175,
+      "player_a_position": "side_control_bottom", "player_b_position": "side_control_top",
+      "confidence": 0.6, "active_technique": "control",
+      "visual_reasoning": "Anthony (red, partially visible on top) appears to be in a dominant position over Greig (black, on bottom). View partially blocked but Anthony is controlling.",
+      "notes": "Anthony on top after the sweep. Greig on bottom defending.", "coaching_tip": "From bottom: create frames, shrimp your hips, and fight to get your knees back inside. Don't stay flat."
+    },
+    {
+      "timestamp": "3:03", "timestamp_sec": 183,
+      "player_a_position": "side_control_bottom", "player_b_position": "side_control_top",
+      "confidence": 0.65, "active_technique": "pin",
+      "visual_reasoning": "Anthony (red) on top in side control. Greig (black) underneath being controlled. Anthony has good pressure.",
+      "notes": "Anthony maintaining side control. Greig working to escape.", "coaching_tip": "Don't panic from bottom side control. Create your frames, bridge and shrimp, and get the knee inside for half guard."
+    },
+    {
+      "timestamp": "3:11", "timestamp_sec": 191,
+      "player_a_position": "mount_bottom", "player_b_position": "mount_top",
+      "confidence": 0.65, "active_technique": "mount_transition",
+      "visual_reasoning": "Anthony (red) appears to have advanced to mount on Greig (black). Straddling position on top. Greig flat on his back underneath.",
+      "notes": "Anthony advances to mount. Greig in a bad spot.", "coaching_tip": "From bottom mount: trap an arm and a foot on the same side, bridge (upa) to roll them over. Or elbow-knee escape to half guard."
+    },
+    {
+      "timestamp": "3:19", "timestamp_sec": 199,
+      "player_a_position": "back_taken", "player_b_position": "back_mount",
+      "confidence": 0.6, "active_technique": "back_take",
+      "visual_reasoning": "View partially blocked by person walking past with 'HUMBLE AND GENTLE' on back. Anthony appears to be behind/on top of Greig. Possible back take in progress.",
+      "notes": "Anthony potentially taking Greig's back. Dangerous position.", "coaching_tip": "If they're taking the back: fight the hands immediately. Don't let the seatbelt get locked. Shoulder walk and get your back to the mat."
+    },
+    {
+      "timestamp": "3:27", "timestamp_sec": 207,
+      "player_a_position": "open_guard", "player_b_position": "open_guard_top",
+      "confidence": 0.6, "active_technique": "guard_recovery",
+      "visual_reasoning": "Greig (black) appears to have escaped back to guard. On his back with legs active towards Anthony. Recovery from bad position.",
+      "notes": "Greig recovers guard after being in bottom mount/back taken. Good escape.", "coaching_tip": "Good recovery. Now re-establish your guard game and look for sweeps to get back on top."
+    },
+    {
+      "timestamp": "3:35", "timestamp_sec": 215,
+      "player_a_position": "open_guard", "player_b_position": "open_guard_top",
+      "confidence": 0.65, "active_technique": "leg_entanglement_attempt",
+      "visual_reasoning": "Greig (black, on back) with legs engaging Anthony's (red) legs. Possible leg entry attempt. Anthony on top trying to pass.",
+      "notes": "Greig playing open guard, looking for entries.", "coaching_tip": "From open guard, look for shin-to-shin or collar drag entries to get to a more offensive guard."
+    },
+    {
+      "timestamp": "3:43", "timestamp_sec": 223,
+      "player_a_position": "open_guard", "player_b_position": "open_guard_top",
+      "confidence": 0.5, "active_technique": null,
+      "visual_reasoning": "Greig (black shorts, red patterned top nearby) close to camera. Appears to be end of round. Both on the mat.",
+      "notes": "End of roll.", "coaching_tip": null
+    }
+  ],
+  "summary": {
+    "session_overview": "Open mat roll at Tempo Jiu Jitsu. Greig (black) played top position for the first 2:30, passing Anthony's (red) guard multiple times but struggling to hold side control — Anthony kept recovering guard. The roll turned at 2:39 when Anthony swept from closed guard. Anthony then advanced through side control to mount while Greig worked to escape from bottom. A competitive roll that exposed both passing consolidation issues and bottom game escapes.",
+    "key_moments": [
+      {
+        "timestamp": "0:55",
+        "description": "Greig passes guard for the first time and achieves side control.",
+        "assessment": "good",
+        "suggestion": "Good pass. But need to consolidate faster — advance to mount or knee on belly immediately to prevent the reguard."
+      },
+      {
+        "timestamp": "1:11",
+        "description": "Anthony recovers from side control to half guard, then back to closed guard.",
+        "assessment": "bad",
+        "suggestion": "This is the main pattern to fix: passing but not holding. Use more crossface pressure and underhook control to prevent reguarding."
+      },
+      {
+        "timestamp": "1:51",
+        "description": "Anthony turtles — Greig on top attacking the turtle.",
+        "assessment": "good",
+        "suggestion": "Good pressure forcing the turtle. Work on seatbelt grip → hook insertion for back takes from this position."
+      },
+      {
+        "timestamp": "2:39",
+        "description": "Anthony sweeps Greig from closed guard. The turning point.",
+        "assessment": "bad",
+        "suggestion": "Got swept because of broken posture in closed guard. Must maintain posture — hands on hips, head up, base wide. Never let your weight get pulled forward."
+      },
+      {
+        "timestamp": "3:11",
+        "description": "Anthony advances to mount after the sweep.",
+        "assessment": "bad",
+        "suggestion": "After being swept, recovery was too slow. Need to immediately frame and shrimp rather than accepting bottom position."
+      }
+    ],
+    "top_3_improvements": [
+      "Passing consolidation: You passed guard 2-3 times but couldn't hold side control. After passing, immediately advance to mount or knee on belly — don't stay in side control where the opponent can reguard. Use heavy crossface and hip pressure.",
+      "Closed guard posture: Got caught in closed guard 3 times and eventually swept from it. Work on standing guard breaks — stand up with one leg posted, break the legs open, then pass from standing. Don't stay kneeling inside closed guard.",
+      "Bottom game recovery after sweep: Once swept at 2:39, gave up too much position too quickly (side control → mount). From bottom, immediately frame and hip escape. Don't let the top player settle."
+    ],
+    "strengths_observed": [
+      "Persistent top pressure: Kept working for passes even after being reguarded multiple times. Good work ethic and pressure on top.",
+      "Guard passing variety: Used multiple passing approaches (pressure pass, headquarters, knee slide). The passing itself is solid — it's the consolidation that needs work."
+    ],
+    "guard_retention_score": 4,
+    "guard_retention_reason": "Once swept to bottom at 2:39, guard was passed relatively quickly. Didn't show strong bottom guard retention skills — gave up position from side control to mount without strong resistance.",
+    "positional_awareness_score": 6,
+    "positional_awareness_reason": "Good awareness of when to pass and good top pressure. Lost points for repeatedly getting caught in closed guard and not recognising the sweep setup. Also slow to recover after being swept.",
+    "transition_quality_score": 5,
+    "transition_quality_reason": "Passes were solid but not consolidated. The transition from side control to mount (on top) was never completed in the first half — kept cycling back to guard. After being swept, the transition from bottom was poor — gave up positions too easily.",
+    "overall_notes": "This roll tells a clear story: Greig's top passing game is developing well (the passes themselves are clean) but the missing piece is consolidation — holding dominant position after achieving it. The pattern of pass → reguard → pass → reguard happened 3+ times. The fix is simple but requires drilling: after every pass, immediately advance. Side control is a transition, not a destination. Move to mount, knee on belly, or back take within 3-5 seconds of achieving side control. The second half showed the bottom game needs work — being swept from closed guard is a posture issue that can be fixed with standing guard breaks. Overall a competitive roll with clear, specific areas to improve."
+  }
+}
