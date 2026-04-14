@@ -2,7 +2,7 @@
 """
 BJJ Analysis Importer — Convert AI Studio JSON to Obsidian Report
 ==================================================================
-Takes a JSON analysis (from Gemini AI Studio or any source) and generates
+Takes a JSON analysis (from Claude Vision or any source) and generates
 a full Obsidian report with position timeline, scores, and coaching feedback.
 
 Usage:
@@ -100,8 +100,8 @@ def generate_report(data, player_name, video_name, output_path, video_url=None):
         f"guard_retention: {summary.get('guard_retention_score', '')}",
         f"positional_awareness: {summary.get('positional_awareness_score', '')}",
         f"transition_quality: {summary.get('transition_quality_score', '')}",
-        f"method: gemini-ai-studio",
-        f"tags: [roll, gemini-analysis]",
+        f"method: claude-vision",
+        f"tags: [roll, claude-analysis]",
         "---",
         "",
         f"# Roll Analysis - {video_name or today}",
@@ -109,7 +109,7 @@ def generate_report(data, player_name, video_name, output_path, video_url=None):
         f"**Player:** {player_name}",
         f"**Duration:** {duration_str}",
         f"**Moments analysed:** {len(timeline)}",
-        f"**Method:** Gemini AI Studio",
+        f"**Method:** Claude Vision",
     ]
     if video_url:
         lines.append(f"**Video:** [{video_url}]({video_url})")
@@ -293,7 +293,7 @@ def main():
     video_label = args.video_name or "AI Studio Analysis"
     roll_log_dir = Path(__file__).parent.parent / "Roll Log"
     roll_log_dir.mkdir(exist_ok=True)
-    out_path = args.output or str(roll_log_dir / f"{today} - {video_label} (gemini).md")
+    out_path = args.output or str(roll_log_dir / f"{today} - {video_label}.md")
 
     report_path = generate_report(data, args.player_name, video_label, out_path, args.video_url)
 
