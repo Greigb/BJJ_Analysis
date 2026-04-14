@@ -113,6 +113,31 @@ def generate_report(data, player_name, video_name, output_path, video_url=None):
     ]
     if video_url:
         lines.append(f"**Video:** [{video_url}]({video_url})")
+
+    # Detect roll start/end events
+    roll_start = None
+    roll_end = None
+    resets = []
+    for entry in timeline:
+        event = entry.get("event")
+        ts_sec = entry.get("timestamp_sec", 0)
+        if event == "slap_bump" and roll_start is None:
+            roll_start = ts_sec
+        elif event == "tap":
+            roll_end = ts_sec
+        elif event == "reset":
+            resets.append(ts_sec)
+
+    if roll_start is not None:
+        lines.append(f"**Roll starts:** {format_timestamp(roll_start)}")
+    if roll_end is not None:
+        lines.append(f"**Roll ends:** {format_timestamp(roll_end)} (tap)")
+    if roll_start is not None and roll_end is not None:
+        actual_duration = roll_end - roll_start
+        lines.append(f"**Actual roll time:** {format_timestamp(actual_duration)}")
+    if resets:
+        lines.append(f"**Resets:** {', '.join(format_timestamp(r) for r in resets)}")
+
     lines.append("")
 
     # Summary
@@ -226,7 +251,14 @@ def generate_report(data, player_name, video_name, output_path, video_url=None):
         tech = entry.get("active_technique") or ""
         notes = entry.get("notes", "")
         tip = entry.get("coaching_tip") or ""
+        event = entry.get("event")
         note_text = notes
+        if event == "slap_bump":
+            note_text = "**ROLL START (slap/bump)** " + note_text
+        elif event == "tap":
+            note_text = "**TAP (submission)** " + note_text
+        elif event == "reset":
+            note_text = "**RESET** " + note_text
         if tip:
             note_text += f" *Tip: {tip}*"
         lines.append(f"| {ts_link} | [[{pos_a}]] | [[{pos_b}]] | {tech} | {note_text} |")

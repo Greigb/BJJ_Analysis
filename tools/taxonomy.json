@@ -1,4 +1,18 @@
 {
+  "events": {
+    "slap_bump": {
+      "name": "Slap/Bump (Roll Start)",
+      "visual_cues": "Both players reach out and SLAP or BUMP hands/fists. Brief hand-to-hand contact. Done from standing or seated. Immediately followed by engaging. This marks the START of the roll."
+    },
+    "tap": {
+      "name": "Tap (Submission/End)",
+      "visual_cues": "One player rapidly TAPS/SLAPS the mat, their own body, or the opponent's body with an OPEN HAND. Usually 2-3 rapid taps in quick succession. The tapping player has conceded. The other player releases their grip immediately after. This marks the END of the roll."
+    },
+    "reset": {
+      "name": "Reset (Break/Restart)",
+      "visual_cues": "Players separate and return to starting positions. May be prompted by going off the mat, a referee instruction, or mutual agreement to restart. Both players disengage and create distance."
+    }
+  },
   "categories": {
     "standing": {
       "label": "Standing",

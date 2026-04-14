@@ -63,10 +63,16 @@ Common mistakes:
 - Mount requires SITTING ON opponent (lying across = side control)
 - Turtle requires hands-and-knees face DOWN (on back = different position)
 
+EVENT DETECTION — also detect these critical events:
+- "slap_bump": Both players touch/slap/bump hands → marks ROLL START
+- "tap": One player rapidly taps mat or opponent with open hand → marks SUBMISSION/END
+- "reset": Players separate and return to neutral → marks BREAK/RESTART
+
 For EACH frame, return a JSON object:
 {{
   "frame_number": <int>,
   "timestamp_sec": <float>,
+  "event": "<slap_bump|tap|reset|null>",
   "category": "<category_id>",
   "player_a_position": "<position_id>",
   "player_b_position": "<position_id>",
