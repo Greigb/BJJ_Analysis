@@ -591,13 +591,14 @@ def main():
                 with st.spinner("Downloading YouTube video..."):
                     try:
                         import subprocess
-                        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
-                            tmp_path = tmp.name
+                        tmp_dir = tempfile.mkdtemp(prefix="bjj_dl_")
+                        out_template = os.path.join(tmp_dir, "video.mp4")
                         result = subprocess.run(
                             ["yt-dlp", "-f", "best[height<=480]",
                              "--max-filesize", "50M",
-                             "-o", tmp_path,
+                             "-o", out_template,
                              "--no-warnings", "--quiet",
+                             "--force-overwrites",
                              yt_url_input],
                             capture_output=True, text=True, timeout=120,
                         )
@@ -607,16 +608,19 @@ def main():
                                 ["yt-dlp", "-f", "best[height<=480]",
                                  "--max-filesize", "50M",
                                  "--cookies-from-browser", "chrome",
-                                 "-o", tmp_path,
+                                 "-o", out_template,
                                  "--no-warnings", "--quiet",
+                                 "--force-overwrites",
                                  yt_url_input],
                                 capture_output=True, text=True, timeout=120,
                             )
-                        if result.returncode != 0:
+                        # Find the downloaded file (yt-dlp may change extension)
+                        downloaded = [f for f in os.listdir(tmp_dir) if os.path.isfile(os.path.join(tmp_dir, f))]
+                        if result.returncode != 0 or not downloaded:
                             dl_error = f"Failed to download video. Error: {result.stderr[:200]}"
-                            if tmp_path and os.path.exists(tmp_path):
-                                os.unlink(tmp_path)
                             tmp_path = None
+                        else:
+                            tmp_path = os.path.join(tmp_dir, downloaded[0])
                     except FileNotFoundError:
                         dl_error = "yt-dlp not installed. Run: brew install yt-dlp"
                         tmp_path = None
