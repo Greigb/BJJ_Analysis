@@ -456,6 +456,8 @@ def main():
                         help="Output raw JSON instead of markdown")
     parser.add_argument("--player-description", default="",
                         help="Visual description of Player A (e.g. 'white gi', 'blue shorts')")
+    parser.add_argument("--opponent-description", default="",
+                        help="Visual description of Player B (e.g. 'black gi', 'red rash guard')")
     args = parser.parse_args()
 
     print("\n--- BJJ Groq Analyser (Free Tier) ---")
@@ -476,10 +478,15 @@ def main():
     taxonomy = load_taxonomy()
     taxonomy_str = build_taxonomy_string(taxonomy)
     player_id_block = ""
-    if args.player_description:
-        player_id_block = f"""Player A visual identification: {args.player_description}
-Use this description to consistently identify Player A across ALL frames.
-If Player A's appearance changes (e.g. position shift), maintain tracking based on continuity."""
+    if args.player_description or args.opponent_description:
+        lines = []
+        if args.player_description:
+            lines.append(f"Player A visual identification: {args.player_description}")
+        if args.opponent_description:
+            lines.append(f"Player B visual identification: {args.opponent_description}")
+        lines.append("Use these descriptions to consistently identify each player across ALL frames.")
+        lines.append("If appearances overlap or are unclear, use continuity from previous frames.")
+        player_id_block = "\n".join(lines)
     system_prompt = SYSTEM_PROMPT.format(taxonomy_positions=taxonomy_str, player_id_block=player_id_block)
 
     # Step 1: Extract frames

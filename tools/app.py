@@ -175,7 +175,7 @@ def extract_first_frame(video_path):
         return None
 
 
-def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, taxonomy, player_description=""):
+def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, taxonomy, player_description="", player_b_description=""):
     """Run fully automated Groq analysis on a video file. Returns (data, error)."""
     try:
         import cv2
@@ -187,11 +187,15 @@ def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, t
     taxonomy_str = build_taxonomy_string(taxonomy)
 
     player_id_block = ""
-    if player_description:
-        player_id_block = f"""
-Player A visual identification: {player_description}
-Use this description to consistently identify Player A across ALL frames.
-If Player A's appearance changes (e.g. position shift), maintain tracking based on continuity."""
+    if player_description or player_b_description:
+        lines = []
+        if player_description:
+            lines.append(f"Player A visual identification: {player_description}")
+        if player_b_description:
+            lines.append(f"Player B visual identification: {player_b_description}")
+        lines.append("Use these descriptions to consistently identify each player across ALL frames.")
+        lines.append("If appearances overlap or are unclear, use continuity from previous frames.")
+        player_id_block = "\n".join(lines)
 
     system_prompt = f"""You are an expert Brazilian Jiu-Jitsu analyst with black belt-level knowledge.
 You are analysing keyframes extracted from a rolling/sparring session.
@@ -561,12 +565,20 @@ def main():
             uploaded_video = st.file_uploader("Upload video file", type=["mp4", "mov", "avi", "mkv"])
 
         # Player identification
-        st.markdown("#### Identify Player A")
-        player_description = st.text_input(
-            "Describe Player A so the model can track them",
-            placeholder="e.g. 'white gi', 'blue shorts, no shirt', 'the taller person'",
-            help="This helps the AI consistently track the right person, especially when multiple people are in frame.",
-        )
+        st.markdown("#### Identify the Players")
+        col_pa, col_pb = st.columns(2)
+        with col_pa:
+            player_description = st.text_input(
+                "Player A (you)",
+                placeholder="e.g. 'white gi', 'blue shorts, no shirt'",
+                help="Describe your appearance so the model tracks you consistently.",
+            )
+        with col_pb:
+            player_b_description = st.text_input(
+                "Player B (opponent)",
+                placeholder="e.g. 'black gi', 'red rash guard'",
+                help="Describe your training partner.",
+            )
 
         col_int, col_max = st.columns(2)
         with col_int:
@@ -622,7 +634,7 @@ def main():
             if dl_error:
                 st.error(dl_error)
             elif tmp_path:
-                data, error = run_groq_analysis(tmp_path, player_name, auto_interval, auto_max, groq_key, taxonomy, player_description)
+                data, error = run_groq_analysis(tmp_path, player_name, auto_interval, auto_max, groq_key, taxonomy, player_description, player_b_description)
                 os.unlink(tmp_path)
                 if error:
                     st.error(error)
