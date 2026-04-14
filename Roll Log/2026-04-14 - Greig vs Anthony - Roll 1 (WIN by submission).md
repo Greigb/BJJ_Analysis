@@ -177,10 +177,38 @@ One knee splitting. Setting up the final pass.
 
 ---
 
-### 2:22 — Heavy Side Control (Submission Building)
+### 2:10 — Closed Guard (Anthony Reguards)
+![[assets/greig_v3_annotated/f_45_130s.jpg]]
+**Position:** [[Inside Closed Guard (Top)]] vs [[Closed Guard (Bottom)]]
+Anthony wraps legs around Greig. Back in closed guard. **Tip:** Stand up to break — don't stay kneeling.
+
+---
+
+### 2:13 — Open Guard / Re-engaging
+![[assets/greig_v3_annotated/f_46_133s.jpg]]
+**Position:** [[Passing Open Guard (Top)]] vs [[Open Guard (generic)]]
+Anthony opens guard. Greig re-engaging to pass. Working from kneeling.
+
+---
+
+### 2:16 — Half Guard / Near Pass
+![[assets/greig_v3_annotated/f_47_136s.jpg]]
+**Position:** [[Half Guard (Top)]] vs [[Half Guard (Bottom)]]
+Greig driving through. Very close to completing the pass. Heavy pressure.
+
+---
+
+### 2:19 — Side Control LOCKED IN
+![[assets/greig_v3_annotated/f_48_139s.jpg]]
+**Position:** [[Side Control (Top)]] vs [[Bottom Side Control]]
+Side control established. Greig is HEAVY. Anthony flat. This is the submission position building. **The pressure from here leads to the tap 7 seconds later.**
+
+---
+
+### 2:22 — Heavy Side Control (Submission Pressure)
 ![[assets/greig_v3_annotated/f_49_142s.jpg]]
 **Position:** [[Side Control (Top)]] vs [[Bottom Side Control]]
-Very heavy pressure. The submission is coming.
+Maximum pressure. Greig driving weight down. Anthony being smothered. The submission is imminent.
 
 ---
 
