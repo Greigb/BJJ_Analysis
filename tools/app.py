@@ -273,30 +273,40 @@ Return ONLY valid JSON, no markdown, no backticks."""
             content.append({"type": "text", "text": f"--- Frame {fr['frame_num']} ({fr['timestamp']:.1f}s) ---"})
             content.append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{fr['base64']}"}})
 
-        try:
-            resp = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": content}],
-                max_tokens=4096, temperature=0.2,
-            )
-            raw = resp.choices[0].message.content.strip()
-            if raw.startswith("```"):
-                raw = raw.split("\n", 1)[1]
-                if raw.endswith("```"):
-                    raw = raw.rsplit("```", 1)[0]
-                raw = raw.strip()
-            results = json.loads(raw)
-            if isinstance(results, dict):
-                results = [results]
-            timeline.extend(results)
-            if results:
-                last = results[-1]
-                context = f"At {last.get('timestamp_sec', '?')}s: Player A in {last.get('player_a_position', '?')}, Player B in {last.get('player_b_position', '?')}. {last.get('notes', '')}"
-        except Exception as e:
-            st.warning(f"Batch error: {str(e)[:100]}")
+        for attempt in range(3):
+            try:
+                resp = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": content}],
+                    max_tokens=4096, temperature=0.2,
+                )
+                raw = resp.choices[0].message.content.strip()
+                if raw.startswith("```"):
+                    raw = raw.split("\n", 1)[1]
+                    if raw.endswith("```"):
+                        raw = raw.rsplit("```", 1)[0]
+                    raw = raw.strip()
+                results = json.loads(raw)
+                if isinstance(results, dict):
+                    results = [results]
+                timeline.extend(results)
+                if results:
+                    last = results[-1]
+                    context = f"At {last.get('timestamp_sec', '?')}s: Player A in {last.get('player_a_position', '?')}, Player B in {last.get('player_b_position', '?')}. {last.get('notes', '')}"
+                break
+            except Exception as e:
+                err = str(e)
+                if "429" in err and attempt < 2:
+                    wait = 15 * (attempt + 1)
+                    progress.progress(pct, text=f"Rate limited — waiting {wait}s...")
+                    time.sleep(wait)
+                else:
+                    st.warning(f"Batch error: {err[:100]}")
+                    break
 
+        # Rate limit: 15 req/min = 1 every 4s, use 5s for safety
         if batch_start + batch_size < len(frames):
-            time.sleep(3)
+            time.sleep(5)
 
     progress.progress(1.0, text="Generating summary...")
 
@@ -550,9 +560,12 @@ def main():
                     except subprocess.TimeoutExpired:
                         dl_error = "Download timed out. Try a shorter video."
             elif uploaded_video:
+                video_bytes = uploaded_video.read()
                 with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
-                    tmp.write(uploaded_video.read())
+                    tmp.write(video_bytes)
                     tmp_path = tmp.name
+                # Save video bytes for playback
+                st.session_state["uploaded_video_bytes"] = video_bytes
 
             if dl_error:
                 st.error(dl_error)
@@ -757,10 +770,12 @@ def main():
 
         st.markdown("---")
 
-        # ─── Video embed (sticky, at top of results)
+        # ─── Video embed (at top of results)
         vid_id = extract_youtube_id(video_url)
         if vid_id:
             st.markdown(youtube_embed_html(video_url), unsafe_allow_html=True)
+        elif st.session_state.get("uploaded_video_bytes"):
+            st.video(st.session_state["uploaded_video_bytes"])
 
         # ─── Summary
         if summary.get("session_overview"):
