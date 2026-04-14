@@ -14,11 +14,13 @@ import json
 import time
 import os
 import sys
+import re
 import base64
 from pathlib import Path
 from collections import Counter
 from datetime import timedelta
 from io import BytesIO
+from streamlit_agraph import agraph, Node, Edge, Config
 
 # Add tools dir to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
@@ -276,6 +278,60 @@ def build_taxonomy_string(taxonomy):
     return "\n".join(lines)
 
 
+# ─── Graph Data Helpers ───────────────────────────────────────────────────────
+
+@st.cache_data
+def load_jsx_techniques():
+    """Parse technique lists from the JSX taxonomy component."""
+    jsx_path = Path(__file__).parent / "components" / "bjj-position-taxonomy.jsx"
+    if not jsx_path.exists():
+        return {}
+    text = jsx_path.read_text()
+    result = {}
+    pattern = r'name:\s*"([^"]+)",\s*techniques:\s*\[([^\]]+)\]'
+    for match in re.finditer(pattern, text):
+        name = match.group(1)
+        techs = [t.strip().strip('"').strip("'") for t in match.group(2).split(",")]
+        result[name] = [t for t in techs if t]
+    return result
+
+
+@st.cache_data
+def load_jsx_youtube_links():
+    """Parse YouTube links from the JSX graph component."""
+    jsx_path = Path(__file__).parent / "components" / "bjj-position-graph.jsx"
+    if not jsx_path.exists():
+        return {}
+    text = jsx_path.read_text()
+    result = {}
+    # Match: id: "xxx", ... yt: "url", ytTitle: "title"
+    node_pattern = r'id:\s*"([^"]+)".*?yt:\s*"([^"]+)".*?ytTitle:\s*"([^"]+)"'
+    for match in re.finditer(node_pattern, text, re.DOTALL):
+        result[match.group(1)] = {"url": match.group(2), "title": match.group(3)}
+    return result
+
+
+def match_position_to_techniques(pos_name, jsx_techniques):
+    """Fuzzy match a taxonomy position name to JSX technique list."""
+    pos_lower = pos_name.lower()
+    best_match = None
+    best_score = 0
+    for jsx_name, techs in jsx_techniques.items():
+        jsx_lower = jsx_name.lower()
+        if pos_lower in jsx_lower or jsx_lower in pos_lower:
+            score = len(set(pos_lower.split()) & set(jsx_lower.split()))
+            if score > best_score:
+                best_score = score
+                best_match = techs
+        pos_words = set(pos_lower.replace("(", "").replace(")", "").split())
+        jsx_words = set(jsx_lower.replace("(", "").replace(")", "").split())
+        overlap = len(pos_words & jsx_words)
+        if overlap > best_score:
+            best_score = overlap
+            best_match = techs
+    return best_match or []
+
+
 # ─── Analysis Prompt ──────────────────────────────────────────────────────────
 
 def build_prompt(taxonomy):
@@ -490,8 +546,8 @@ def main():
     json_input = ""
     analyse_btn = False
 
-    tab_auto, tab_paste, tab_upload, tab_previous = st.tabs([
-        "🤖 Auto-Analyse Video", "📋 Paste JSON", "📁 Upload JSON", "📂 Previous"
+    tab_auto, tab_graph, tab_paste, tab_upload, tab_previous = st.tabs([
+        "🤖 Auto-Analyse Video", "🗺️ Position Map", "📋 Paste JSON", "📁 Upload JSON", "📂 Previous"
     ])
 
     with tab_auto:
@@ -597,6 +653,168 @@ def main():
             analyse_btn = True
             if st.session_state.get("video_url"):
                 video_url = st.session_state["video_url"]
+
+    with tab_graph:
+        st.markdown("### BJJ Position Map")
+        st.caption(f"{len(taxonomy['positions'])} positions · {len(taxonomy['valid_transitions'])} transitions")
+
+        # Category filter
+        all_cats = list(taxonomy["categories"].keys())
+        cat_labels = {k: v["label"] for k, v in taxonomy["categories"].items()}
+
+        selected_cats = st.multiselect(
+            "Filter by category",
+            options=all_cats,
+            default=all_cats,
+            format_func=lambda x: cat_labels.get(x, x),
+        )
+
+        # Build graph
+        pos_map = {p["id"]: p for p in taxonomy["positions"]}
+        jsx_techniques = load_jsx_techniques()
+        yt_links = load_jsx_youtube_links()
+
+        # Check if we have analysis data to highlight
+        analysis_positions = Counter()
+        analysis_edges = set()
+        if st.session_state.get("auto_result") or st.session_state.get("data"):
+            try:
+                adata = st.session_state.get("data") or json.loads(st.session_state.get("auto_result", "{}"))
+                atimeline = adata.get("timeline", [])
+                prev_pos = None
+                for entry in atimeline:
+                    pos_a = entry.get("player_a_position", "")
+                    if pos_a in pos_map:
+                        analysis_positions[pos_a] += 1
+                    if prev_pos and pos_a and prev_pos != pos_a:
+                        analysis_edges.add((prev_pos, pos_a))
+                    prev_pos = pos_a
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        # Build nodes
+        nodes = []
+        for pos in taxonomy["positions"]:
+            if pos["category"] not in selected_cats:
+                continue
+            cat = taxonomy["categories"][pos["category"]]
+            colour = CAT_COLOURS.get(cat["label"], "#666")
+            is_active = pos["id"] in analysis_positions
+            size = 25 + (analysis_positions.get(pos["id"], 0) * 5) if is_active else 20
+            size = min(size, 45)
+
+            nodes.append(Node(
+                id=pos["id"],
+                label=pos["name"],
+                size=size,
+                color=colour if is_active or not analysis_positions else f"{colour}44",
+                font={"color": "#E5E7EB" if is_active or not analysis_positions else "#4B5563", "size": 11},
+                borderWidth=3 if is_active else 1,
+                borderWidthSelected=4,
+            ))
+
+        # Build edges
+        edges = []
+        for a, b in taxonomy["valid_transitions"]:
+            if a not in pos_map or b not in pos_map:
+                continue
+            if pos_map[a]["category"] not in selected_cats or pos_map[b]["category"] not in selected_cats:
+                continue
+            is_traversed = (a, b) in analysis_edges
+            edges.append(Edge(
+                source=a,
+                target=b,
+                color="#D4A843" if is_traversed else "#1E2030",
+                width=3 if is_traversed else 1,
+            ))
+
+        # Graph config
+        config = Config(
+            width="100%",
+            height=600,
+            directed=True,
+            physics=True,
+            hierarchical=False,
+            nodeHighlightBehavior=True,
+            highlightColor="#D4A843",
+            collapsible=False,
+            node={"highlightStrokeColor": "#D4A843"},
+            link={"highlightColor": "#D4A843"},
+            backgroundColor="#0B0C0F",
+        )
+
+        # Render graph
+        selected_node = agraph(nodes=nodes, edges=edges, config=config)
+
+        # Legend
+        legend_cols = st.columns(len(CAT_COLOURS))
+        for col, (label, colour) in zip(legend_cols, CAT_COLOURS.items()):
+            col.markdown(f"<span style='color:{colour}'>●</span> {label}", unsafe_allow_html=True)
+
+        # Analysis overlay info
+        if analysis_positions:
+            st.caption(f"Highlighted: {sum(analysis_positions.values())} frames across {len(analysis_positions)} positions from loaded analysis")
+
+        # Detail panel for selected node
+        if selected_node and selected_node in pos_map:
+            pos = pos_map[selected_node]
+            cat = taxonomy["categories"][pos["category"]]
+            colour = CAT_COLOURS.get(cat["label"], "#666")
+
+            st.markdown("---")
+            st.markdown(f"### <span style='color:{colour}'>{pos['name']}</span>", unsafe_allow_html=True)
+            st.caption(f"Category: {cat['label']} · Position ID: {pos['id']}")
+
+            col_tech, col_trans = st.columns(2)
+
+            with col_tech:
+                techniques = match_position_to_techniques(pos["name"], jsx_techniques)
+                if techniques:
+                    st.markdown("**Techniques**")
+                    for t in techniques:
+                        st.markdown(f"- {t}")
+                else:
+                    st.markdown("*No techniques listed yet*")
+
+            with col_trans:
+                # Transitions
+                to_positions = [pos_map[b]["name"] for a, b in taxonomy["valid_transitions"]
+                                if a == selected_node and b in pos_map]
+                from_positions = [pos_map[a]["name"] for a, b in taxonomy["valid_transitions"]
+                                  if b == selected_node and a in pos_map]
+
+                if to_positions:
+                    st.markdown("**Transitions to**")
+                    st.markdown(", ".join(to_positions))
+                if from_positions:
+                    st.markdown("**Transitions from**")
+                    st.markdown(", ".join(from_positions))
+
+            # YouTube link
+            # Try matching by node ID patterns
+            yt_id_map = {
+                "standing_neutral": "standing", "standing_clinch": "clinch",
+                "closed_guard_bottom": "closedGuard", "half_guard_bottom": "halfGuard",
+                "open_guard": "openGuard", "butterfly_guard": "butterfly",
+                "de_la_riva": "dlr", "single_leg_x": "singleLegX",
+                "fifty_fifty": "fiftyFifty", "closed_guard_top": "closedGuardTop",
+                "half_guard_top": "halfGuardTop", "headquarters": "hq",
+                "side_control_top": "sideControl", "mount_top": "mount",
+                "back_mount": "backMount", "knee_on_belly": "kneeOnBelly",
+                "north_south_top": "northSouth", "turtle_top": "turtle",
+                "front_headlock": "frontHead", "side_control_bottom": "bottomSide",
+                "mount_bottom": "bottomMount", "turtle_bottom": "turtleBottom",
+                "back_taken": "backTaken",
+            }
+            jsx_id = yt_id_map.get(selected_node)
+            if jsx_id and jsx_id in yt_links:
+                yt = yt_links[jsx_id]
+                st.markdown(f"**📺 [{yt['title']}]({yt['url']})**")
+
+            # Analysis count
+            if selected_node in analysis_positions:
+                count = analysis_positions[selected_node]
+                st.info(f"This position appeared **{count} time(s)** in the loaded analysis")
 
     with tab_paste:
         pasted = st.text_area(
