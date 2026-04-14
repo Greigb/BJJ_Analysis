@@ -14,9 +14,11 @@ import json
 import time
 import os
 import sys
+import base64
 from pathlib import Path
 from collections import Counter
 from datetime import timedelta
+from io import BytesIO
 
 # Add tools dir to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
@@ -89,6 +91,189 @@ CAT_EMOJI = {
     "Leg Entanglement": "🟧",
     "Scramble / Transition": "🟪",
 }
+
+
+# ─── Groq Auto-Analysis ───────────────────────────────────────────────────────
+
+def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, taxonomy):
+    """Run fully automated Groq analysis on a video file. Returns (data, error)."""
+    try:
+        import cv2
+        from PIL import Image
+        from groq import Groq
+    except ImportError as e:
+        return None, f"Missing dependency: {e}. Install with: pip install groq opencv-python Pillow"
+
+    taxonomy_str = build_taxonomy_string(taxonomy)
+    system_prompt = f"""You are an expert Brazilian Jiu-Jitsu analyst with black belt-level knowledge.
+You are analysing keyframes extracted from a rolling/sparring session.
+
+POSITION TAXONOMY — use ONLY these position IDs:
+{taxonomy_str}
+
+For EACH frame image provided, return a JSON object:
+{{
+  "frame_number": <int>,
+  "timestamp_sec": <float>,
+  "player_a_position": "<position_id from taxonomy>",
+  "player_b_position": "<position_id from taxonomy>",
+  "confidence": <float 0.0-1.0>,
+  "active_technique": "<technique being attempted or null>",
+  "notes": "<brief observation>",
+  "coaching_tip": "<one actionable suggestion or null>"
+}}
+
+Be SPECIFIC with leg entanglements — identify the exact ashi garami / sankaku position."""
+
+    batch_prompt_tpl = """Analyse these {{count}} sequential frames from a BJJ rolling session.
+The frames are {{interval}} seconds apart, starting at timestamp {{start_time}}s.
+Player A: {{player_name}}
+Context: {{context}}
+Return a JSON array with one object per frame. Return ONLY valid JSON, no markdown, no backticks."""
+
+    summary_prompt_tpl = """You are a BJJ black belt coach. Here is position data from a rolling session:
+{{timeline_json}}
+Session duration: {{duration}}. Player: {{player_name}}.
+
+Return a JSON object:
+{{
+  "session_overview": "<2-3 sentences>",
+  "key_moments": [{{"timestamp": "<mm:ss>", "description": "<what>", "assessment": "<good/bad/neutral>", "suggestion": "<advice>"}}],
+  "top_3_improvements": ["<1>", "<2>", "<3>"],
+  "strengths_observed": ["<1>", "<2>"],
+  "guard_retention_score": <1-10>,
+  "positional_awareness_score": <1-10>,
+  "transition_quality_score": <1-10>,
+  "overall_notes": "<remarks>"
+}}
+Return ONLY valid JSON, no markdown, no backticks."""
+
+    # Extract frames
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        return None, f"Could not open video: {video_path}"
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    total_frames_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    duration = total_frames_count / fps if fps > 0 else 0
+    frame_skip = int(fps * interval)
+
+    expected = int(duration / interval)
+    if expected > max_frames:
+        interval = duration / max_frames
+        frame_skip = int(fps * interval)
+
+    frames = []
+    frame_idx = 0
+    sample_count = 0
+
+    while cap.isOpened() and sample_count < max_frames:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        if frame_idx % frame_skip == 0:
+            timestamp = frame_idx / fps
+            h, w = frame.shape[:2]
+            scale = min(512 / w, 512 / h, 1.0)
+            if scale < 1.0:
+                frame = cv2.resize(frame, (int(w * scale), int(h * scale)))
+            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            pil_image = Image.fromarray(rgb)
+            buffer = BytesIO()
+            pil_image.save(buffer, format="JPEG", quality=70)
+            b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+            frames.append({"base64": b64, "timestamp": timestamp, "frame_num": sample_count + 1})
+            sample_count += 1
+        frame_idx += 1
+    cap.release()
+
+    if not frames:
+        return None, "No frames extracted from video"
+
+    # Analyse in batches
+    client = Groq(api_key=groq_key)
+    model = "meta-llama/llama-4-scout-17b-16e-instruct"
+    batch_size = 4
+    timeline = []
+    context = "This is the start of the session."
+    progress = st.progress(0, text="Analysing frames...")
+
+    for batch_start in range(0, len(frames), batch_size):
+        batch = frames[batch_start:batch_start + batch_size]
+        pct = (batch_start + len(batch)) / len(frames)
+        progress.progress(pct, text=f"Analysing frames {batch[0]['frame_num']}-{batch[-1]['frame_num']}...")
+
+        content = [{
+            "type": "text",
+            "text": batch_prompt_tpl
+                .replace("{{count}}", str(len(batch)))
+                .replace("{{interval}}", f"{interval:.1f}")
+                .replace("{{start_time}}", f"{batch[0]['timestamp']:.1f}")
+                .replace("{{player_name}}", player_name)
+                .replace("{{context}}", context),
+        }]
+        for fr in batch:
+            content.append({"type": "text", "text": f"--- Frame {fr['frame_num']} ({fr['timestamp']:.1f}s) ---"})
+            content.append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{fr['base64']}"}})
+
+        try:
+            resp = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": content}],
+                max_tokens=4096, temperature=0.2,
+            )
+            raw = resp.choices[0].message.content.strip()
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[1]
+                if raw.endswith("```"):
+                    raw = raw.rsplit("```", 1)[0]
+                raw = raw.strip()
+            results = json.loads(raw)
+            if isinstance(results, dict):
+                results = [results]
+            timeline.extend(results)
+            if results:
+                last = results[-1]
+                context = f"At {last.get('timestamp_sec', '?')}s: Player A in {last.get('player_a_position', '?')}, Player B in {last.get('player_b_position', '?')}. {last.get('notes', '')}"
+        except Exception as e:
+            st.warning(f"Batch error: {str(e)[:100]}")
+
+        if batch_start + batch_size < len(frames):
+            time.sleep(3)
+
+    progress.progress(1.0, text="Generating summary...")
+
+    # Summary
+    try:
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": summary_prompt_tpl
+                .replace("{{timeline_json}}", json.dumps(timeline, indent=2))
+                .replace("{{duration}}", str(timedelta(seconds=int(duration))))
+                .replace("{{player_name}}", player_name)
+            }],
+            max_tokens=4096, temperature=0.3,
+        )
+        raw = resp.choices[0].message.content.strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1]
+            if raw.endswith("```"):
+                raw = raw.rsplit("```", 1)[0]
+            raw = raw.strip()
+        summary = json.loads(raw)
+    except Exception:
+        summary = {"session_overview": "Summary generation failed", "overall_notes": ""}
+
+    progress.empty()
+    return {"timeline": timeline, "summary": summary, "duration_sec": duration}, None
+
+
+def build_taxonomy_string(taxonomy):
+    lines = []
+    for pos in taxonomy["positions"]:
+        cat = taxonomy["categories"][pos["category"]]["label"]
+        lines.append(f'  "{pos["id"]}" — {pos["name"]} [{cat}]')
+    return "\n".join(lines)
 
 
 # ─── Analysis Prompt ──────────────────────────────────────────────────────────
@@ -288,17 +473,12 @@ def main():
         video_url = st.text_input("YouTube URL (optional)", value="", placeholder="https://youtube.com/watch?v=...")
 
         st.divider()
-        st.header("How to use")
-        st.markdown("""
-        1. Paste a **YouTube link** above
-        2. Copy the **analysis prompt** below
-        3. Go to [AI Studio](https://aistudio.google.com), link the video, paste the prompt
-        4. Copy Gemini's **JSON response**
-        5. Paste it in the JSON box and click **Analyse**
-        """)
+        st.header("Groq API (free)")
+        groq_key = st.text_input("Groq API Key", type="password", placeholder="gsk_...")
+        st.caption("Free key from [console.groq.com/keys](https://console.groq.com/keys)")
 
         st.divider()
-        if st.button("📋 Copy Analysis Prompt"):
+        if st.button("📋 Copy AI Studio Prompt"):
             st.session_state["show_prompt"] = True
 
     # ─── Prompt display
@@ -307,15 +487,59 @@ def main():
             st.code(build_prompt(taxonomy), language=None)
 
     # ─── Main input
-    tab_paste, tab_upload, tab_previous = st.tabs(["📋 Paste JSON", "📁 Upload JSON File", "📂 Previous Analyses"])
+    json_input = ""
+    analyse_btn = False
+
+    tab_auto, tab_paste, tab_upload, tab_previous = st.tabs([
+        "🤖 Auto-Analyse Video", "📋 Paste JSON", "📁 Upload JSON", "📂 Previous"
+    ])
+
+    with tab_auto:
+        st.markdown("Upload a video and analyse it automatically with Groq (free).")
+        uploaded_video = st.file_uploader("Upload video file", type=["mp4", "mov", "avi", "mkv"])
+        col_int, col_max = st.columns(2)
+        with col_int:
+            auto_interval = st.slider("Sample interval (seconds)", 3, 15, 5)
+        with col_max:
+            auto_max = st.slider("Max frames", 10, 80, 30)
+
+        auto_btn = st.button("🚀 Analyse Video", type="primary", use_container_width=True, disabled=not (uploaded_video and groq_key))
+
+        if not groq_key:
+            st.info("Enter your free Groq API key in the sidebar to enable auto-analysis.")
+
+        if auto_btn and uploaded_video and groq_key:
+            # Save uploaded video to temp file
+            import tempfile
+            with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
+                tmp.write(uploaded_video.read())
+                tmp_path = tmp.name
+
+            data, error = run_groq_analysis(tmp_path, player_name, auto_interval, auto_max, groq_key, taxonomy)
+            os.unlink(tmp_path)
+
+            if error:
+                st.error(error)
+            elif data:
+                json_input = json.dumps(data)
+                analyse_btn = True
+                st.session_state["auto_result"] = json_input
+
+        # Restore previous auto result
+        if st.session_state.get("auto_result") and not analyse_btn:
+            json_input = st.session_state["auto_result"]
+            analyse_btn = True
 
     with tab_paste:
-        json_input = st.text_area(
-            "Paste Gemini JSON response here",
+        pasted = st.text_area(
+            "Paste JSON response from AI Studio or other source",
             height=200,
             placeholder='{"timeline": [...], "summary": {...}}',
         )
-        analyse_btn = st.button("🔍 Analyse", type="primary", use_container_width=True)
+        paste_btn = st.button("🔍 Analyse JSON", type="primary", use_container_width=True)
+        if paste_btn and pasted:
+            json_input = pasted
+            analyse_btn = True
 
     with tab_upload:
         uploaded = st.file_uploader("Upload a JSON analysis file", type=["json"])
@@ -324,18 +548,15 @@ def main():
             analyse_btn = True
 
     with tab_previous:
-        if ROLL_LOG_DIR.exists():
-            json_files = sorted(Path(__file__).parent.parent.glob("assets/*.json"), reverse=True)
-            if json_files:
-                selected = st.selectbox("Load previous analysis", [f.name for f in json_files])
-                if st.button("Load"):
-                    sel_path = Path(__file__).parent.parent / "assets" / selected
-                    json_input = sel_path.read_text()
-                    analyse_btn = True
-            else:
-                st.info("No previous analyses found in assets/")
+        json_files = sorted(Path(__file__).parent.parent.glob("assets/*.json"), reverse=True)
+        if json_files:
+            selected = st.selectbox("Load previous analysis", [f.name for f in json_files])
+            if st.button("Load"):
+                sel_path = Path(__file__).parent.parent / "assets" / selected
+                json_input = sel_path.read_text()
+                analyse_btn = True
         else:
-            st.info("No Roll Log directory found")
+            st.info("No previous analyses found in assets/")
 
     # ─── Process
     if analyse_btn and json_input:
