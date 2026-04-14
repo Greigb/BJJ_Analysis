@@ -2,6 +2,7 @@
 category: "Leg Entanglement"
 dominance: 0
 position_id: outside_ashi
+grapplemap_variations: 0
 tags: [position, leg-entanglement]
 ---
 
@@ -9,12 +10,15 @@ tags: [position, leg-entanglement]
 
 **Category:** Leg Entanglement
 
+## How to Identify
+
+Similar to straight ashi but the attacker's OUTSIDE leg crosses OVER the opponent's body/hip. More control than straight ashi. The attacker's legs frame the opponent's knee from the outside.
+
 ## Techniques from here
-- [[Straight ankle lock]]
-- [[Inside heel hook]]
+- [[Kneebar]]
 - [[Outside heel hook]]
 - [[Toe hold]]
-- [[Honey hole entry]]
+- [[Transition to outside sankaku]]
 
 ## Transitions
 **To:** [[Outside Sankaku (411)]], [[Straight Ashi Garami]], [[Cross Ashi Garami]], [[50/50]]

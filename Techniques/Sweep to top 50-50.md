@@ -7,7 +7,6 @@ tags: [technique]
 ## Used from
 
 - [[50/50]]
-- [[Backside 50/50]]
 
 ## Description
 

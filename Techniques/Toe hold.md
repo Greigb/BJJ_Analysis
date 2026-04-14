@@ -7,9 +7,9 @@ tags: [technique]
 ## Used from
 
 - [[50/50]]
-- [[Backside 50/50]]
-- [[Cross Ashi Garami]]
+- [[Inside Sankaku (Honeyhole/Saddle)]]
 - [[Outside Ashi Garami]]
+- [[Outside Sankaku (411)]]
 - [[Single Leg X / Ashi Garami]]
 - [[Straight Ashi Garami]]
 

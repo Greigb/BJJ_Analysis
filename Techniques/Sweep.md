@@ -7,6 +7,7 @@ tags: [technique]
 ## Used from
 
 - [[Dogfight / Underhook Battle]]
+- [[Single Leg X / Ashi Garami]]
 
 ## Description
 

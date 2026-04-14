@@ -6,6 +6,7 @@ tags: [technique]
 
 ## Used from
 
+- [[Pass in Progress]]
 - [[Passing Open Guard (Top)]]
 
 ## Description

@@ -127,7 +127,16 @@ def load_taxonomy():
         return json.load(f)
 
 
+def load_position_reference():
+    ref_path = Path(__file__).parent / "position_reference.json"
+    if ref_path.exists():
+        with open(ref_path) as f:
+            return json.load(f)
+    return {}
+
+
 def build_taxonomy_string(taxonomy):
+    ref = load_position_reference()
     lines = []
     for pos in taxonomy["positions"]:
         cat = taxonomy["categories"][pos["category"]]["label"]
@@ -135,6 +144,10 @@ def build_taxonomy_string(taxonomy):
         lines.append(f'  "{pos["id"]}" — {pos["name"]} [{cat}]')
         if cues:
             lines.append(f'    Visual: {cues}')
+        pos_ref = ref.get(pos["id"], {})
+        variations = pos_ref.get("grapplemap_variations", [])
+        if variations:
+            lines.append(f'    Also known as: {", ".join(variations[:4])}')
     return "\n".join(lines)
 
 

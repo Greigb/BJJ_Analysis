@@ -6,6 +6,7 @@ tags: [technique]
 
 ## Used from
 
+- [[Back Exposure (partially turned)]]
 - [[North-South (Bottom)]]
 - [[Turtle (Bottom)]]
 

@@ -2,6 +2,7 @@
 category: "Leg Entanglement"
 dominance: 0
 position_id: cross_ashi
+grapplemap_variations: 0
 tags: [position, leg-entanglement]
 ---
 
@@ -9,12 +10,15 @@ tags: [position, leg-entanglement]
 
 **Category:** Leg Entanglement
 
+## How to Identify
+
+Attacker controls the opponent's leg but their body is angled ACROSS — the attacker's legs cross to the opposite side of the opponent's body. A transitional position between inside and outside sankaku.
+
 ## Techniques from here
-- [[Straight ankle lock]]
 - [[Inside heel hook]]
 - [[Outside heel hook]]
-- [[Toe hold]]
-- [[Honey hole entry]]
+- [[Kneebar]]
+- [[Transition to inside sankaku]]
 
 ## Transitions
 **To:** [[Inside Sankaku (Honeyhole/Saddle)]], [[Outside Sankaku (411)]], [[50/50]]

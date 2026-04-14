@@ -8,8 +8,7 @@ tags: [technique]
 
 - [[Cross Ashi Garami]]
 - [[Outside Ashi Garami]]
-- [[Single Leg X / Ashi Garami]]
-- [[Straight Ashi Garami]]
+- [[Outside Sankaku (411)]]
 
 ## Description
 

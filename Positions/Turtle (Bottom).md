@@ -2,12 +2,17 @@
 category: "Inferior Position (Bottom)"
 dominance: -2
 position_id: turtle_bottom
+grapplemap_variations: 23
 tags: [position, inferior-bottom]
 ---
 
 # Turtle (Bottom)
 
 **Category:** Inferior Position (Bottom)
+
+## How to Identify
+
+Person is on their HANDS AND KNEES, curled up, face DOWN, protecting their neck. Looks like a ball or turtle shell. The opponent is on top or beside them trying to turn them or take the back.
 
 ## Techniques from here
 - [[Sit-out]]
@@ -18,6 +23,19 @@ tags: [position, inferior-bottom]
 ## Transitions
 **To:** [[Half Guard (Bottom)]], [[Guard Recovery (in progress)]], [[Back Exposure (partially turned)]]
 **From:** [[Bottom Side Control]], [[Back Taken (Defending)]], [[Wrestling Scramble]], [[Back Exposure (partially turned)]]
+
+## Known Variations (GrappleMap)
+
+*23 variations documented in GrappleMap database*
+
+- mounted turtle w/ double wrist control
+- mounting turtle
+- turtle body lock
+- lower-back mounted turtle
+- turtle shoulder roll w/ leg
+- turtle w/ lower back control
+- shrugged turtle
+- turtle w/ single-leg vs vice grip
 
 ## My Notes
 

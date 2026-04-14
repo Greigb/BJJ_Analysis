@@ -6,7 +6,8 @@ tags: [technique]
 
 ## Used from
 
-- [[Leg Entanglement]]
+- [[Backside 50/50]]
+- [[Inside Sankaku (Honeyhole/Saddle)]]
 
 ## Description
 

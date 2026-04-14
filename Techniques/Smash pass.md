@@ -8,6 +8,7 @@ tags: [technique]
 
 - [[Half Guard (Top)]]
 - [[Headquarters / Passing Position]]
+- [[Pass in Progress]]
 
 ## Description
 

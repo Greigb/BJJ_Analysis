@@ -96,25 +96,39 @@ def sanitize_filename(name):
     return re.sub(r'[/\\<>:"|?*]', '-', name).strip()
 
 
+def load_grapplemap_reference():
+    """Load GrappleMap position reference if available."""
+    ref_path = Path(__file__).parent / "position_reference.json"
+    if ref_path.exists():
+        with open(ref_path) as f:
+            return json.load(f)
+    return {}
+
+
 def generate_position_notes(taxonomy, transitions, technique_mapping):
     POSITIONS_DIR.mkdir(exist_ok=True)
 
     pos_map = {p["id"]: p for p in taxonomy["positions"]}
     cat_map = taxonomy["categories"]
+    gm_ref = load_grapplemap_reference()
 
     for pos in taxonomy["positions"]:
         cat = cat_map[pos["category"]]
         trans = transitions.get(pos["id"], {"to": [], "from": []})
         techniques = technique_mapping.get(pos["id"], [])
+        gm = gm_ref.get(pos["id"], {})
 
         filename = sanitize_filename(pos["name"]) + ".md"
         filepath = POSITIONS_DIR / filename
+
+        gm_var_count = gm.get("grapplemap_variation_count", 0)
 
         lines = [
             "---",
             f'category: "{cat["label"]}"',
             f"dominance: {cat['dominance']}",
             f"position_id: {pos['id']}",
+            f"grapplemap_variations: {gm_var_count}",
             f"tags: [position, {pos['category'].replace('_', '-')}]",
             "---",
             "",
@@ -124,11 +138,29 @@ def generate_position_notes(taxonomy, transitions, technique_mapping):
             "",
         ]
 
+        # Visual identification
+        visual_cues = pos.get("visual_cues", "")
+        if visual_cues:
+            lines.extend([
+                "## How to Identify",
+                "",
+                visual_cues,
+                "",
+            ])
+
         # Techniques
         if techniques:
             lines.append("## Techniques from here")
             for tech in techniques:
                 lines.append(f"- [[{tech}]]")
+            lines.append("")
+
+        # GrappleMap techniques
+        gm_techs = gm.get("techniques_from_here", [])
+        if gm_techs:
+            lines.append("## Additional Techniques (GrappleMap)")
+            for tech in gm_techs:
+                lines.append(f"- {tech}")
             lines.append("")
 
         # Transitions
@@ -143,6 +175,30 @@ def generate_position_notes(taxonomy, transitions, technique_mapping):
             if from_positions:
                 from_links = ", ".join(f"[[{name}]]" for name in from_positions)
                 lines.append(f"**From:** {from_links}")
+            lines.append("")
+
+        # GrappleMap variations
+        gm_vars = gm.get("grapplemap_variations", [])
+        if gm_vars:
+            lines.extend([
+                "## Known Variations (GrappleMap)",
+                "",
+                f"*{gm_var_count} variations documented in GrappleMap database*",
+                "",
+            ])
+            for var in gm_vars:
+                lines.append(f"- {var}")
+            lines.append("")
+
+        # Instructional references
+        gm_refs = gm.get("instructional_references", [])
+        if gm_refs:
+            lines.extend([
+                "## Instructional References",
+                "",
+            ])
+            for ref in gm_refs:
+                lines.append(f"- {ref}")
             lines.append("")
 
         # Personal notes section

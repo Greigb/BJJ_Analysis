@@ -7,6 +7,7 @@ tags: [technique]
 ## Used from
 
 - [[Headquarters / Passing Position]]
+- [[Pass in Progress]]
 - [[Passing Open Guard (Top)]]
 
 ## Description

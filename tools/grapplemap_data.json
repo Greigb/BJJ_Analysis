@@ -1,0 +1,6853 @@
+{
+  "positions": [
+    {
+      "name": "side ctrl w/ near open elbow and crossface",
+      "tags": [
+        "side_control",
+        "top_underhook",
+        "bottom_supine",
+        "crossface",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "twister side control",
+      "tags": [
+        "twister_side",
+        "top_on_side",
+        "side_control",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "north south",
+      "tags": [
+        "north_south",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated back w/ hook on underhook side",
+      "tags": [
+        "back",
+        "seatbelt",
+        "top_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "full guard kimura",
+      "tags": [
+        "full_guard",
+        "kimura",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated rnc w/ trapped arm",
+      "tags": [
+        "top_seated",
+        "bottom_seated",
+        "back",
+        "rear_naked_choke"
+      ],
+      "ref": null
+    },
+    {
+      "name": "flanking after standing drag",
+      "tags": [
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "combat base vs freshly broken guard",
+      "tags": [
+        "combat_base",
+        "bottom_supine",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated butterfly dragging arm",
+      "tags": [
+        "arm_drag",
+        "top_kneeling",
+        "bottom_seated",
+        "butterfly",
+        "two_on_one"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle vs darce",
+      "tags": [
+        "darce",
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "shooting for underhook in bottom half",
+      "tags": [
+        "half_guard",
+        "bottom_turned_in",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "distant standing collar-tie",
+      "tags": [
+        "standing",
+        "collar_tie"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mini stomp one",
+      "tags": [
+        "bottom_supine",
+        "knee_slice",
+        "quarter_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle w/ single-leg vs vice grip",
+      "tags": [
+        "single_leg_takedown",
+        "turtle",
+        "top_kneeling",
+        "sprawl",
+        "vice_grip"
+      ],
+      "ref": null
+    },
+    {
+      "name": "octopus closed guard",
+      "tags": [
+        "full_guard",
+        "closed_guard",
+        "octopus",
+        "top_kneeling",
+        "bottom_post_hand"
+      ],
+      "ref": null
+    },
+    {
+      "name": "judo side w/ crossface vs elbow blocking hip and neck frame",
+      "tags": [
+        "judo_side",
+        "crossface",
+        "top_on_side",
+        "bottom_supine",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mono w/ figure four and foot-in-armpit",
+      "tags": [
+        "monoplata",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "judo side w/ whizzer vs shitty underhook",
+      "tags": [
+        "judo_side",
+        "side_control",
+        "top_on_side",
+        "whizzer",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ near arm pin and far underhook",
+      "tags": [
+        "side_control",
+        "bottom_supine",
+        "top_underhook",
+        "top_arm_pin"
+      ],
+      "ref": null
+    },
+    {
+      "name": "octopus half guard",
+      "tags": [
+        "half_guard",
+        "octopus",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "smashed \u00bc vs whizzer",
+      "tags": [
+        "whizzer",
+        "bottom_underhook",
+        "quarter_guard",
+        "knee_slice",
+        "bottom_turned_in",
+        "top_overhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs de la riva",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double leg from knees vs sprawl",
+      "tags": [
+        "sprawl",
+        "double_leg_takedown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "judo side going around c-cups",
+      "tags": [
+        "judo_side",
+        "side_control",
+        "top_on_side",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "reverse knee on belly",
+      "tags": [
+        "knee_on_belly",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "bottom throwing leg up",
+      "tags": [
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "judo side vs double c-cups",
+      "tags": [
+        "judo_side",
+        "top_on_side",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "judo side vs t-rex",
+      "tags": [
+        "judo_side",
+        "t_rex",
+        "side_control",
+        "bottom_supine",
+        "top_on_side",
+        "crossface"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sliced knee",
+      "tags": [
+        "pass_through",
+        "standing",
+        "bottom_supine",
+        "knee_slice"
+      ],
+      "ref": null
+    },
+    {
+      "name": "coming up on posting turtle's leg",
+      "tags": [
+        "turtle",
+        "top_kneeling",
+        "top_post_hand",
+        "single_leg_takedown",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "arm dragged turtle",
+      "tags": [
+        "turtle",
+        "arm_drag"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle body lock",
+      "tags": [
+        "turtle",
+        "body_lock",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing up from footsies",
+      "tags": [
+        "footsies",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "omoplata posturing up",
+      "tags": [
+        "omoplata",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "x-guard on knee leaning forward",
+      "tags": [
+        "x_guard",
+        "combat_base",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee slice vs t-rex",
+      "tags": [
+        "pass_split",
+        "knee_slice",
+        "bottom_turned_in",
+        "combat_base",
+        "quarter_guard",
+        "t_rex",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard arm drag",
+      "tags": [
+        "half_guard",
+        "arm_drag",
+        "bottom_seated",
+        "top_kneeling",
+        "two_on_one"
+      ],
+      "ref": null
+    },
+    {
+      "name": "waiter sweep start",
+      "tags": [
+        "deep_half",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "\u00bc clinch w/ knee on ground",
+      "tags": [
+        "quarter_guard",
+        "bottom_turned_in",
+        "top_kneeling",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs supine butterfly",
+      "tags": [
+        "standing",
+        "butterfly",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "combat base leg drag w/ bicep control",
+      "tags": [
+        "pass_around",
+        "leg_drag",
+        "combat_base",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "inverted half guard",
+      "tags": [
+        "pass",
+        "bottom_supine",
+        "back_step",
+        "half_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing between legs",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee over pass w/ leg over shoulder",
+      "tags": [
+        "pass_split",
+        "bottom_supine",
+        "top_kneeling",
+        "knee_pin",
+        "leg_over_shoulder"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing arm drag on back leg side",
+      "tags": [
+        "standing",
+        "arm_drag",
+        "two_on_one"
+      ],
+      "ref": null
+    },
+    {
+      "name": "removing butterfly hooks",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs reverse dlr",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "omoplata dig under escape",
+      "tags": [
+        "omoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee slice vs de la riva",
+      "tags": [
+        "standing",
+        "bottom_supine",
+        "knee_slice"
+      ],
+      "ref": null
+    },
+    {
+      "name": "posture broken full guard w/ hand on mat",
+      "tags": [
+        "full_guard",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken",
+        "top_post_hand"
+      ],
+      "ref": null
+    },
+    {
+      "name": "bottom turning in w/ underhook in side control",
+      "tags": [
+        "side_control",
+        "bottom_turned_in",
+        "top_kneeling",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "approaching turned away t-rex",
+      "tags": [
+        "side_control",
+        "bottom_on_side",
+        "bottom_turned_away",
+        "top_kneeling",
+        "t_rex",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "passing vs pimp-arm",
+      "tags": [
+        "pass_around",
+        "bottom_supine",
+        "pimp_arm",
+        "top_kneeling",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ bottom underhook",
+      "tags": [
+        "side_control",
+        "bottom_supine",
+        "bottom_underhook",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing over+under vs tricep+under",
+      "tags": [
+        "standing",
+        "overhook",
+        "underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "full guard octopus hip bump",
+      "tags": [
+        "octopus",
+        "hip_bump",
+        "bottom_post_hand",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "flat \u00bc w/ head+arm",
+      "tags": [
+        "quarter_guard",
+        "bottom_overhook",
+        "crossface",
+        "bottom_supine",
+        "top_underhook",
+        "knee_slice"
+      ],
+      "ref": null
+    },
+    {
+      "name": "arm bar w/ single leg over",
+      "tags": [
+        "armbar",
+        "bottom_supine",
+        "top_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs arm-pinnen closed guard",
+      "tags": [
+        "closed_guard",
+        "bottom_supine",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee on belly vs underhook",
+      "tags": [
+        "knee_on_belly",
+        "top_underhook",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "stacked double under pass",
+      "tags": [
+        "pass_under",
+        "stacked"
+      ],
+      "ref": null
+    },
+    {
+      "name": "south-paw neutral standing",
+      "tags": [
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "recovering guard",
+      "tags": [
+        "top_kneeling",
+        "bottom_turned_in",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double leg takedown finish",
+      "tags": [
+        "double_leg_takedown",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing behind w/ body lock, grip fighting",
+      "tags": [
+        "body_lock",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing single-leg turned away",
+      "tags": [
+        "single_leg_takedown",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "roll escape from double under pass",
+      "tags": [
+        "pass_under"
+      ],
+      "ref": null
+    },
+    {
+      "name": "single-leg from knees",
+      "tags": [
+        "single_leg_takedown",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "distance closed guard w/ 2-on-1",
+      "tags": [
+        "full_guard",
+        "closed_guard",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "arm-out guillotine",
+      "tags": [
+        "guillotine",
+        "top_posture_broken",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kneeling single-leg",
+      "tags": [
+        "single_leg_takedown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "bottom defeating hip post in closed guard",
+      "tags": [
+        "full_guard",
+        "closed_guard",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "angled out full guard",
+      "tags": [
+        "full_guard",
+        "bottom_turned_in",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "arm-in guillotine",
+      "tags": [
+        "guillotine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "bottom coming up into guillotine",
+      "tags": [
+        "guillotine",
+        "bottom_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated butterfly w/ reverse 2-on-1",
+      "tags": [
+        "bottom_seated",
+        "butterfly",
+        "top_kneeling",
+        "two_on_one"
+      ],
+      "ref": null
+    },
+    {
+      "name": "thwarted half guard pass",
+      "tags": [
+        "half_guard",
+        "bottom_supine",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing w/ whizzer",
+      "tags": [
+        "standing",
+        "whizzer",
+        "overhook",
+        "underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee inside pass",
+      "tags": [
+        "half_guard",
+        "pass",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing w/ body lock",
+      "tags": [
+        "standing",
+        "body_lock",
+        "underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "top attempting mount from side w/ open elbow",
+      "tags": [
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "deep half vs head&arm",
+      "tags": [
+        "half_guard",
+        "deep_half",
+        "bottom_supine",
+        "top_on_side",
+        "crossface",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterfly knee pin pass",
+      "tags": [
+        "pass",
+        "butterfly",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "gator roll",
+      "tags": [
+        "sprawl",
+        "bottom_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing behind w/ body lock",
+      "tags": [
+        "body_lock",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterfly w/ whizzer",
+      "tags": [
+        "butterfly",
+        "whizzer",
+        "top_kneeling",
+        "bottom_seated",
+        "bottom_overhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "japanese necktie w/ top leg trapped",
+      "tags": [
+        "neck_crank",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "dogfight w/o leg control",
+      "tags": [
+        "whizzer",
+        "top_kneeling",
+        "dogfight"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing in half w/ hip pinned",
+      "tags": [
+        "standing",
+        "half_guard",
+        "bottom_supine",
+        "hip_pin"
+      ],
+      "ref": null
+    },
+    {
+      "name": "weak double unders vs head+tricep",
+      "tags": [
+        "standing",
+        "bottom_double_unders"
+      ],
+      "ref": null
+    },
+    {
+      "name": "coming up on close single-leg",
+      "tags": [
+        "bottom_turned_in",
+        "bottom_post_elbow",
+        "top_kneeling",
+        "single_leg_takedown",
+        "quarter_guard",
+        "knee_slice"
+      ],
+      "ref": null
+    },
+    {
+      "name": "2-on-1 to chest",
+      "tags": [
+        "standing",
+        "two_on_one"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing arm drag on front leg side",
+      "tags": [
+        "standing",
+        "arm_drag",
+        "two_on_one"
+      ],
+      "ref": null
+    },
+    {
+      "name": "symmetric staggered standing",
+      "tags": [
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "neck cleared in new jersey",
+      "tags": [
+        "rubber_guard",
+        "top_kneeling",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "low double leg",
+      "tags": [
+        "double_leg_takedown",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "lead leg collar tie vs south paw",
+      "tags": [
+        "standing",
+        "collar_tie"
+      ],
+      "ref": null
+    },
+    {
+      "name": "bottom armbar vs figure four",
+      "tags": [
+        "armbar",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control elbow level",
+      "tags": [
+        "judo_side",
+        "bottom_supine",
+        "t_rex",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "deep half leaning backwards",
+      "tags": [
+        "deep_half",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "parallel jiu-claw",
+      "tags": [
+        "omoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double bagged chill dog",
+      "tags": [
+        "rubber_guard",
+        "top_kneeling",
+        "top_posture_broken",
+        "bottom_supine",
+        "top_underhook",
+        "full_guard",
+        "double_bag"
+      ],
+      "ref": null
+    },
+    {
+      "name": "new jersey w/ meat hook",
+      "tags": [
+        "rubber_guard",
+        "top_kneeling",
+        "bottom_turned_in",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "omoplata on side",
+      "tags": [
+        "omoplata",
+        "bottom_on_side",
+        "top_kneeling",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "chill dog",
+      "tags": [
+        "rubber_guard",
+        "bottom_supine",
+        "top_kneeling",
+        "top_underhook",
+        "full_guard",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "electric chair submission",
+      "tags": [
+        "lockdown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mission control",
+      "tags": [
+        "rubber_guard",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "cocoon w/ posture broken",
+      "tags": [
+        "butterfly",
+        "bottom_overhook",
+        "bottom_turned_in",
+        "top_kneeling",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "swim move",
+      "tags": [
+        "bottom_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "posture broken full guard",
+      "tags": [
+        "full_guard",
+        "closed_guard",
+        "top_kneeling",
+        "bottom_supine",
+        "top_posture_broken",
+        "collar_tie"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kung fu move w/ leg trapped",
+      "tags": [
+        "rubber_guard",
+        "omoplata",
+        "top_kneeling",
+        "bottom_turned_in",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "new jersey",
+      "tags": [
+        "rubber_guard",
+        "bottom_supine",
+        "top_kneeling",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "stomp half guard",
+      "tags": [
+        "half_guard",
+        "bottom_overhook",
+        "bottom_supine",
+        "top_kneeling",
+        "pimp_arm",
+        "crossface",
+        "top_underhook",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "single leg x w/ overhook",
+      "tags": [
+        "standing",
+        "slx",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "twister roll start",
+      "tags": [
+        "twister_side",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "postured up new jersey w/ overhook",
+      "tags": [
+        "rubber_guard",
+        "bottom_overhook",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterfly 2-on-1",
+      "tags": [
+        "butterfly",
+        "arm_drag",
+        "top_kneeling",
+        "bottom_seated",
+        "two_on_one"
+      ],
+      "ref": null
+    },
+    {
+      "name": "halfway butterfly overhook sweep",
+      "tags": [
+        "butterfly_sweep",
+        "butterfly",
+        "engaged_butterfly",
+        "bottom_overhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mounted turtle w/ seatbelt",
+      "tags": [
+        "turtle",
+        "back",
+        "seatbelt"
+      ],
+      "ref": null
+    },
+    {
+      "name": "twister side w/ fishnet and love handle",
+      "tags": [
+        "twister_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "distance standing vs seated",
+      "tags": [
+        "standing",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle w/ lower back control",
+      "tags": [
+        "turtle",
+        "lower_back_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated half w/ bottom underhook",
+      "tags": [
+        "half_guard",
+        "bottom_seated",
+        "bottom_underhook",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control vs turned away t-rex",
+      "tags": [
+        "side_control",
+        "bottom_on_side",
+        "bottom_turned_away",
+        "t_rex",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "twister side w/ grapevine and fishnet",
+      "tags": [
+        "twister_side",
+        "grapevine",
+        "top_on_side",
+        "bottom_turned_in",
+        "side_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated lower back control",
+      "tags": [
+        "lower_back_control",
+        "top_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "3/4 mount w/ bottom on side and leg grabbed",
+      "tags": [
+        "bottom_on_side",
+        "three_quarter_mount",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side half w/ deep underhook",
+      "tags": [
+        "half_guard",
+        "bottom_underhook",
+        "bottom_turned_in",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "back step pass",
+      "tags": [
+        "pass",
+        "half_guard",
+        "twister_side",
+        "bottom_turned_in",
+        "quarter_guard",
+        "back_step"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ near bottom overhook and neck frame",
+      "tags": [
+        "side_control",
+        "bottom_overhook",
+        "top_kneeling",
+        "bottom_supine",
+        "top_underhook",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee bar",
+      "tags": [
+        "knee_bar"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ bottom body lock",
+      "tags": [
+        "side_control",
+        "bottom_underhook",
+        "body_lock",
+        "bottom_supine",
+        "top_kneeling",
+        "crossface"
+      ],
+      "ref": null
+    },
+    {
+      "name": "north/south choke",
+      "tags": [
+        "north_south",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "prone rnc",
+      "tags": [
+        "back",
+        "rear_naked_choke"
+      ],
+      "ref": null
+    },
+    {
+      "name": "supine lower back control",
+      "tags": [
+        "lower_back_control",
+        "top_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "defeated deep half",
+      "tags": [
+        "deep_half",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "leg pushed down from truck",
+      "tags": [
+        "lower_back_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "freeing leg in deep half",
+      "tags": [
+        "deep_half",
+        "top_sitting",
+        "bottom_turned_in",
+        "back_step"
+      ],
+      "ref": null
+    },
+    {
+      "name": "twister side w/ bottom turned in",
+      "tags": [
+        "twister_side",
+        "top_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "deep half back roll",
+      "tags": [
+        "deep_half"
+      ],
+      "ref": null
+    },
+    {
+      "name": "deep half top receded",
+      "tags": [
+        "deep_half",
+        "bottom_supine",
+        "top_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ head&arm vs hip block and overhook",
+      "tags": [
+        "side_control",
+        "bottom_overhook",
+        "top_kneeling",
+        "crossface",
+        "bottom_supine",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ head&arm vs hip block + neck frame",
+      "tags": [
+        "side_control",
+        "top_underhook",
+        "crossface",
+        "bottom_supine",
+        "top_kneeling",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "switching to regular side",
+      "tags": [
+        "side_control",
+        "t_rex",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "near side side control kimura",
+      "tags": [
+        "kimura",
+        "top_kneeling",
+        "bottom_turned_away",
+        "side_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control arm triangle",
+      "tags": [
+        "side_control",
+        "arm_triangle",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "north/south kimura",
+      "tags": [
+        "north_south",
+        "kimura",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "combat base vs butterfly",
+      "tags": [
+        "bottom_seated",
+        "combat_base",
+        "butterfly"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mount",
+      "tags": [
+        "mount",
+        "bottom_supine",
+        "top_post_hand"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterfly w/ double under elevation start",
+      "tags": [
+        "bottom_double_unders",
+        "butterfly"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sprawl w/ head&arm vs turtle",
+      "tags": [
+        "sprawl",
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "spider web w/ near arm extended but far arm free",
+      "tags": [
+        "spiderweb",
+        "bottom_supine",
+        "armbar"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sprawled front chestlock vs turtle",
+      "tags": [
+        "sprawl",
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard shell",
+      "tags": [
+        "half_guard",
+        "bottom_turned_in",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "smashed traditional half",
+      "tags": [
+        "half_guard",
+        "bottom_supine",
+        "top_underhook",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs seated",
+      "tags": [
+        "standing",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs seated single w/ head inside",
+      "tags": [
+        "standing",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ seatbelt and first hook",
+      "tags": [
+        "bottom_turned_away",
+        "seatbelt",
+        "back"
+      ],
+      "ref": null
+    },
+    {
+      "name": "over/under pass w/ leg trapped",
+      "tags": [
+        "pass_split",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "flattened butterfly w/ stiff arms",
+      "tags": [
+        "butterfly",
+        "top_kneeling",
+        "bottom_supine",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle w/ seatbelt and near hook",
+      "tags": [
+        "turtle",
+        "seatbelt",
+        "back",
+        "bottom_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs closed guard",
+      "tags": [
+        "full_guard",
+        "closed_guard",
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "coming up on distant single",
+      "tags": [
+        "single_leg_takedown",
+        "bottom_turned_in",
+        "fetal"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Brazilian Jiu-Jitsu\", Series II, Volume 4: Advanced Guard Passing, Technique ? @ 7:16"
+    },
+    {
+      "name": "high mount w/ one arm trapped",
+      "tags": [
+        "mount",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "closed guard homie",
+      "tags": [
+        "full_guard",
+        "closed_guard",
+        "bottom_turned_in",
+        "top_kneeling",
+        "top_posture_broken",
+        "homie",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "parallel turtle w/ seatbelt",
+      "tags": [
+        "turtle",
+        "seatbelt",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs seated w/ knee pinned",
+      "tags": [
+        "standing",
+        "bottom_seated",
+        "knee_pin"
+      ],
+      "ref": null
+    },
+    {
+      "name": "pinned arm sweep start",
+      "tags": [
+        "butterfly",
+        "bottom_turned_in",
+        "bottom_underhook",
+        "butterfly_sweep"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated butterfly w/ single underhook",
+      "tags": [
+        "butterfly",
+        "bottom_seated",
+        "top_kneeling",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing inside w/ knee and hip pinned",
+      "tags": [
+        "standing",
+        "bottom_supine",
+        "knee_pin",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing quarter",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee on belly w/ head&arm",
+      "tags": [
+        "knee_on_belly",
+        "crossface",
+        "top_underhook",
+        "bottom_overhook",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "low side control w/ arm between legs",
+      "tags": [
+        "side_control",
+        "pass",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "suspended butterfly",
+      "tags": [
+        "butterfly",
+        "bottom_double_unders"
+      ],
+      "ref": null
+    },
+    {
+      "name": "invisible collar",
+      "tags": [
+        "rubber_guard",
+        "top_posture_broken",
+        "top_kneeling",
+        "bottom_turned_in",
+        "top_underhook",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "deep half leaning forward",
+      "tags": [
+        "deep_half"
+      ],
+      "ref": null
+    },
+    {
+      "name": "\u00bc clinch knee battle",
+      "tags": [
+        "quarter_guard",
+        "bottom_turned_in",
+        "combat_base",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "spiderweb w/ S-grip and w/o leg control",
+      "tags": [
+        "spiderweb",
+        "bottom_supine",
+        "top_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "posture broken seated butterfly w/ double unders",
+      "tags": [
+        "bottom_double_unders",
+        "butterfly",
+        "top_posture_broken",
+        "bottom_seated",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double outside ashi",
+      "tags": [
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "deep half backdoor sweep",
+      "tags": [
+        "deep_half"
+      ],
+      "ref": null
+    },
+    {
+      "name": "covered up S-mount",
+      "tags": [
+        "bottom_supine",
+        "s_mount"
+      ],
+      "ref": null
+    },
+    {
+      "name": "twister pass w/ far arm stuffed",
+      "tags": [
+        "half_guard",
+        "pass",
+        "reverse_half",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs supine w/ legs extended",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "supine butterfly w/ over/under",
+      "tags": [
+        "butterfly",
+        "bottom_supine",
+        "bottom_underhook",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "over/under pass start",
+      "tags": [
+        "pass_split",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterflies engaged w/ double unders",
+      "tags": [
+        "butterfly",
+        "bottom_double_unders",
+        "top_airborne",
+        "bottom_supine",
+        "engaged_butterfly",
+        "butterfly_sweep"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ crossface vs t-rex",
+      "tags": [
+        "side_control",
+        "crossface",
+        "bottom_supine",
+        "t_rex",
+        "top_kneeling",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mounted triangle",
+      "tags": [
+        "mount",
+        "triangle",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "\u00bc clinch w/ underhook",
+      "tags": [
+        "quarter_guard",
+        "bottom_underhook",
+        "bottom_turned_in",
+        "whizzer"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee on belly drape",
+      "tags": [
+        "knee_on_belly",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee on belly center",
+      "tags": [
+        "knee_on_belly",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "inserting first hook from side",
+      "tags": [
+        "side_control",
+        "seatbelt",
+        "bottom_turned_away",
+        "back"
+      ],
+      "ref": null
+    },
+    {
+      "name": "z guard vs wrist pin",
+      "tags": [
+        "z_guard",
+        "half_guard",
+        "bottom_turned_in",
+        "top_kneeling",
+        "knee_shield"
+      ],
+      "ref": null
+    },
+    {
+      "name": "gangsta-lean",
+      "tags": [
+        "mount",
+        "crossface",
+        "bottom_supine",
+        "bottom_open_elbow"
+      ],
+      "ref": null
+    },
+    {
+      "name": "safe haven",
+      "tags": [
+        "top_on_side",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "rear naked choke w/ arm trapped",
+      "tags": [
+        "back",
+        "rear_naked_choke"
+      ],
+      "ref": null
+    },
+    {
+      "name": "old school",
+      "tags": [
+        "bottom_turned_in",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "\u00bc clinch",
+      "tags": [
+        "quarter_guard",
+        "bottom_turned_in",
+        "combat_base",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "\u00be mount",
+      "tags": [
+        "three_quarter_mount",
+        "crossface",
+        "top_kneeling",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "electric underhooks",
+      "tags": [
+        "half_guard",
+        "lockdown",
+        "bottom_turned_in",
+        "top_kneeling",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mount w/ double unders",
+      "tags": [
+        "mount",
+        "top_double_unders",
+        "top_underhook",
+        "bottom_supine"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\" Episode 67 @ 58:51"
+    },
+    {
+      "name": "mount w/ head&arm",
+      "tags": [
+        "mount",
+        "crossface",
+        "top_underhook",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "electric chair",
+      "tags": [
+        "half_guard",
+        "lockdown",
+        "bottom_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mounted arm triangle",
+      "tags": [
+        "arm_triangle",
+        "mount",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "full guard clinch",
+      "tags": [
+        "full_guard",
+        "crossface",
+        "top_underhook",
+        "bottom_overhook",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "electric cradle",
+      "tags": [
+        "cradle",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "z guard toe hold threat",
+      "tags": [
+        "z_guard",
+        "toehold",
+        "half_guard",
+        "bottom_turned_in",
+        "top_kneeling",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated closed guard w/ double unders",
+      "tags": [
+        "full_guard",
+        "bottom_double_unders",
+        "bottom_seated",
+        "top_kneeling",
+        "closed_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "toe hold roll",
+      "tags": [
+        "toehold",
+        "roll"
+      ],
+      "ref": null
+    },
+    {
+      "name": "homie w/ arm shucked",
+      "tags": [
+        "full_guard",
+        "homie",
+        "top_kneeling",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "modified jean jacques sweep",
+      "tags": [
+        "bottom_overhook",
+        "butterfly",
+        "butterfly_sweep",
+        "bottom_seated",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "foot-over-foot pass start",
+      "tags": [
+        "pass_split",
+        "combat_base",
+        "bottom_supine",
+        "knee_pin",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated full guard guillotine",
+      "tags": [
+        "guillotine",
+        "bottom_seated",
+        "top_kneeling",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "honey hole heel hook",
+      "tags": [
+        "footsies",
+        "heel_hook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "honey hole",
+      "tags": [
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "postured up mount",
+      "tags": [
+        "mount",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "honey hole escape route",
+      "tags": [
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "closed guard w/ double unders",
+      "tags": [
+        "full_guard",
+        "closed_guard",
+        "bottom_double_unders",
+        "top_posture_broken",
+        "top_post_hand",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "perpendicular triangle",
+      "tags": [
+        "triangle",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle w/ seat- belt and knee under elbow",
+      "tags": [
+        "turtle",
+        "seatbelt",
+        "combat_base"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side half w/ lockdown and deep underhook",
+      "tags": [
+        "half_guard",
+        "lockdown",
+        "bottom_underhook",
+        "whizzer",
+        "bottom_turned_in",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "back w/ arm trapped",
+      "tags": [
+        "back"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ head&arm",
+      "tags": [
+        "side_control",
+        "top_underhook",
+        "bottom_supine",
+        "top_kneeling",
+        "crossface"
+      ],
+      "ref": null
+    },
+    {
+      "name": "threatened triangle w/ hands clasped",
+      "tags": [
+        "triangle",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "full guard kimura threat",
+      "tags": [
+        "full_guard",
+        "kimura",
+        "top_kneeling",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "new york",
+      "tags": [
+        "full_guard",
+        "rubber_guard",
+        "bottom_supine",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control behind w/ double unders vs overhook",
+      "tags": [
+        "side_control",
+        "top_double_unders",
+        "top_underhook",
+        "bottom_turned_away",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side half w/ lockdown, double unders vs whizzer",
+      "tags": [
+        "half_guard",
+        "lockdown",
+        "bottom_double_unders",
+        "whizzer",
+        "bottom_turned_in",
+        "fetal",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "halfway pendulum sweep",
+      "tags": [
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "hip bump sweep w/ hand post",
+      "tags": [
+        "full_guard",
+        "sweep",
+        "top_kneeling",
+        "bottom_post_hand",
+        "hip_bump",
+        "body_lock"
+      ],
+      "ref": null
+    },
+    {
+      "name": "hip bump sweep w/ elbow post",
+      "tags": [
+        "sweep",
+        "full_guard",
+        "bottom_post_elbow",
+        "hip_bump",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs stacked w/ legs pinned",
+      "tags": [
+        "standing",
+        "stacked",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "blocked triangle",
+      "tags": [
+        "triangle",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "chest pass",
+      "tags": [
+        "pass_around",
+        "top_kneeling",
+        "leg_smash",
+        "passing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "parallel turtle",
+      "tags": [
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "cocoon w/ collar tie and overhook",
+      "tags": [
+        "butterfly",
+        "bottom_overhook",
+        "bottom_seated",
+        "top_kneeling",
+        "collar_tie"
+      ],
+      "ref": null
+    },
+    {
+      "name": "reverse triangle",
+      "tags": [
+        "triangle",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "locked triangle",
+      "tags": [
+        "triangle",
+        "top_kneeling",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle behind",
+      "tags": [
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "over/under cocoon w/ head on underhook side",
+      "tags": [
+        "butterfly",
+        "bottom_overhook",
+        "bottom_underhook",
+        "bottom_seated",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "straight back w/ seatbelt",
+      "tags": [
+        "back",
+        "seatbelt"
+      ],
+      "ref": null
+    },
+    {
+      "name": "locked triangle halfway perpendicular",
+      "tags": [
+        "triangle",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side half w/ lockdown, overhook and pimp-arm",
+      "tags": [
+        "half_guard",
+        "lockdown",
+        "bottom_overhook",
+        "top_underhook",
+        "crossface",
+        "pimp_arm",
+        "top_kneeling",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "calf crank from truck",
+      "tags": [
+        "lower_back_control",
+        "truck"
+      ],
+      "ref": null
+    },
+    {
+      "name": "perfect kimura",
+      "tags": [
+        "kimura",
+        "shoulder_lock",
+        "bottom_turned_in",
+        "combat_base"
+      ],
+      "ref": null
+    },
+    {
+      "name": "spiderweb w/o leg over head",
+      "tags": [
+        "spiderweb",
+        "bottom_supine",
+        "top_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs darce",
+      "tags": [
+        "standing",
+        "darce"
+      ],
+      "ref": null
+    },
+    {
+      "name": "elbow half w/ lockdown + underh. vs whizzer",
+      "tags": [
+        "half_guard",
+        "lockdown",
+        "whizzer",
+        "bottom_underhook",
+        "bottom_turned_in",
+        "top_kneeling",
+        "bottom_post_elbow"
+      ],
+      "ref": null
+    },
+    {
+      "name": "back on choke arm side",
+      "tags": [
+        "back",
+        "seatbelt",
+        "top_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "cocoon w/ overhook",
+      "tags": [
+        "butterfly",
+        "bottom_overhook",
+        "bottom_seated",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "twister side control w/ grapevine",
+      "tags": [
+        "twister_side",
+        "grapevine",
+        "top_on_side",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "rolled onto side in mount",
+      "tags": [
+        "mount",
+        "bottom_on_side",
+        "bottom_turned_away"
+      ],
+      "ref": null
+    },
+    {
+      "name": "far side side control kimura",
+      "tags": [
+        "side_control",
+        "kimura",
+        "top_kneeling",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "over/under cocoon w/ head on overhook side",
+      "tags": [
+        "butterfly",
+        "bottom_underhook",
+        "bottom_overhook",
+        "top_kneeling",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "back on underhook side",
+      "tags": [
+        "back",
+        "seatbelt",
+        "top_on_side",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "loose traditional side control",
+      "tags": [
+        "side_control",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "lockdown w/ double unders",
+      "tags": [
+        "half_guard",
+        "lockdown",
+        "bottom_double_unders",
+        "bottom_supine",
+        "crossface",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "japanese necktie",
+      "tags": [
+        "arm_choke",
+        "neck_crank",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kneeling darce vs half guard w/ underhook",
+      "tags": [
+        "darce",
+        "half_guard",
+        "bottom_turned_in",
+        "top_kneeling",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "arm lock",
+      "tags": [
+        "armbar",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "clamp guard",
+      "tags": [
+        "full_guard",
+        "bottom_turned_in",
+        "top_kneeling",
+        "top_post_hand",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "distance closed guard",
+      "tags": [
+        "full_guard",
+        "closed_guard",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "triangle threat",
+      "tags": [
+        "triangle",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "judo side w/ head and near open elbow",
+      "tags": [
+        "judo_side",
+        "bottom_supine",
+        "side_control",
+        "top_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kuzure kesa gatame",
+      "tags": [
+        "judo_side",
+        "side_control",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "truck",
+      "tags": [
+        "lower_back_control",
+        "top_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "baseball bat control",
+      "tags": [
+        "twister",
+        "top_supine",
+        "truck"
+      ],
+      "ref": null
+    },
+    {
+      "name": "pre-web",
+      "tags": [
+        "back"
+      ],
+      "ref": null
+    },
+    {
+      "name": "muddy waters",
+      "tags": [
+        "rubber_guard",
+        "full_guard",
+        "closed_guard",
+        "bottom_turned_in",
+        "top_posture_broken",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "power dogfight",
+      "tags": [
+        "whizzer",
+        "bottom_underhook",
+        "bottom_kneeling",
+        "top_kneeling",
+        "dogfight"
+      ],
+      "ref": "Eddie Bravo \"Advanced Rubber Guard\" p227"
+    },
+    {
+      "name": "spiderweb w/ arms locked and leg control",
+      "tags": [
+        "spiderweb",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "middle double bag",
+      "tags": [
+        "full_guard",
+        "rubber_guard",
+        "top_kneeling",
+        "bottom_supine",
+        "top_posture_broken",
+        "top_underhook",
+        "double_bag"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated back w/ seatbelt",
+      "tags": [
+        "back",
+        "seatbelt",
+        "top_seated",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "distance supine butterfly",
+      "tags": [
+        "butterfly",
+        "top_kneeling",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "distance seated butterfly",
+      "tags": [
+        "butterfly",
+        "top_kneeling",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "postured up omoplata",
+      "tags": [
+        "omoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "omoplata w/ bottom leg free",
+      "tags": [
+        "omoplata",
+        "bottom_on_side",
+        "top_posture_broken",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "top shooting for underhooks in butterfly",
+      "tags": [
+        "butterfly",
+        "top_kneeling",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "basic omoplata finish",
+      "tags": [
+        "omoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "spider guard w/ shins against biceps",
+      "tags": [
+        "top_kneeling",
+        "spider_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "omoplata escape roll",
+      "tags": [
+        "omoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "flipped omoplata",
+      "tags": [
+        "omoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "completed imanari roll",
+      "tags": [
+        "standing",
+        "bottom_inverted"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle stepping over",
+      "tags": [
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sprawl vs turtle w/ single",
+      "tags": [
+        "turtle",
+        "single_leg_takedown",
+        "sprawl"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double under pass",
+      "tags": [
+        "pass_under",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "smashed half above knees",
+      "tags": [
+        "top_underhook",
+        "crossface",
+        "half_guard",
+        "bottom_supine",
+        "top_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "bottom starting to turn in",
+      "tags": [
+        "side_control",
+        "bottom_turned_in",
+        "bottom_underhook",
+        "combat_base"
+      ],
+      "ref": null
+    },
+    {
+      "name": "completed o-soto-gari",
+      "tags": [
+        "bottom_supine",
+        "standing",
+        "side_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing w/ wrist control and thai clinch",
+      "tags": [
+        "standing",
+        "collar_tie",
+        "wrist_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard arm triangle",
+      "tags": [
+        "half_guard",
+        "arm_triangle",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control darce",
+      "tags": [
+        "darce",
+        "side_control",
+        "bottom_turned_in",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "forward leaning leg drag vs t-rex",
+      "tags": [
+        "leg_drag",
+        "combat_base",
+        "bottom_supine",
+        "t_rex"
+      ],
+      "ref": null
+    },
+    {
+      "name": "limp armed out of cocoon",
+      "tags": [
+        "bottom_seated",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "top pulling away from x-guard",
+      "tags": [
+        "combat_base",
+        "x_guard",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "wide standing x-guard",
+      "tags": [
+        "standing",
+        "bottom_supine",
+        "x_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "x-guard push sweep start",
+      "tags": [
+        "x_guard",
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "electric cradle w/ open elbow",
+      "tags": [
+        "side_control",
+        "bottom_supine",
+        "crossface",
+        "cradle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control handfight",
+      "tags": [
+        "side_control",
+        "bottom_supine",
+        "crossface",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "north/south darce",
+      "tags": [
+        "darce",
+        "north_south",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "fetal w/ seat belt",
+      "tags": [
+        "bottom_turned_away",
+        "side_control",
+        "seatbelt",
+        "back",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated butterfly w/ over/under body lock",
+      "tags": [
+        "body_lock",
+        "butterfly",
+        "top_kneeling",
+        "bottom_seated",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterflies engaged w/ over/under body lock",
+      "tags": [
+        "body_lock",
+        "butterfly",
+        "bottom_supine",
+        "engaged_butterfly"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing half guard knee slice start",
+      "tags": [
+        "knee_slice",
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "tornado pass",
+      "tags": [
+        "pass_over",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "supine butterfly homie",
+      "tags": [
+        "butterfly",
+        "top_kneeling",
+        "bottom_supine",
+        "homie",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated butterfly homie",
+      "tags": [
+        "homie",
+        "butterfly",
+        "bottom_seated",
+        "top_kneeling",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double knee bar",
+      "tags": [
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "quarter z",
+      "tags": [
+        "z_guard",
+        "quarter_guard",
+        "bottom_turned_in",
+        "top_kneeling",
+        "knee_slice",
+        "fetal",
+        "half_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "ashi",
+      "tags": [
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs wide open guard",
+      "tags": [
+        "bottom_supine",
+        "standing",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seated leg drag start",
+      "tags": [
+        "leg_drag",
+        "top_seated",
+        "bottom_supine",
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "reverse leg drag",
+      "tags": [
+        "leg_drag",
+        "bottom_turned_in",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "6 o'clock homie",
+      "tags": [
+        "full_guard",
+        "homie",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "new york crackhead",
+      "tags": [
+        "bottom_supine",
+        "top_kneeling",
+        "rubber_guard",
+        "full_guard",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "blocked invisible collar",
+      "tags": [
+        "rubber_guard",
+        "full_guard",
+        "bottom_supine",
+        "stacked",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "arm crush",
+      "tags": [
+        "spiderweb",
+        "top_seated",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "50/50 heel hook",
+      "tags": [
+        "heel_hook",
+        "50_50",
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs 50/50",
+      "tags": [
+        "standing",
+        "50_50",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "blocked butterfly overhook sweep",
+      "tags": [
+        "butterfly_sweep",
+        "top_kneeling",
+        "top_post_hand",
+        "bottom_seated",
+        "butterfly",
+        "bottom_overhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kneeling vs seated open guard w/ 2-on-1",
+      "tags": [
+        "two_on_one",
+        "top_kneeling",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "combat base vs knee side 2-on-1",
+      "tags": [
+        "combat_base",
+        "two_on_one",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "combat base butterfly arm drag",
+      "tags": [
+        "combat_base",
+        "bottom_seated",
+        "arm_drag",
+        "two_on_one",
+        "butterfly"
+      ],
+      "ref": null
+    },
+    {
+      "name": "clubbing butterfly sweep",
+      "tags": [
+        "butterfly_sweep",
+        "butterfly",
+        "collar_tie"
+      ],
+      "ref": null
+    },
+    {
+      "name": "full guard knee slice",
+      "tags": [
+        "full_guard",
+        "knee_slice",
+        "bottom_supine",
+        "pass_through"
+      ],
+      "ref": null
+    },
+    {
+      "name": "stepping back from knee slice",
+      "tags": [
+        "back_step",
+        "knee_slice",
+        "quarter_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "back step pass leg battle",
+      "tags": [
+        "back_step",
+        "top_seated",
+        "bottom_turned_in",
+        "quarter_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "from sprawl to turtle",
+      "tags": [
+        "turtle",
+        "sprawl"
+      ],
+      "ref": null
+    },
+    {
+      "name": "3/4 mount w/ underhook",
+      "tags": [
+        "bottom_supine",
+        "three_quarter_mount",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "cop landing",
+      "tags": [
+        "bottom_supine",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "halfway over/- under bodylock butterfly sweep",
+      "tags": [
+        "butterfly_sweep",
+        "engaged_butterfly"
+      ],
+      "ref": null
+    },
+    {
+      "name": "top lock clinch",
+      "tags": [
+        "top_double_unders",
+        "lockdown",
+        "bottom_supine",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "electric chair sweep",
+      "tags": [
+        "bottom_supine",
+        "lockdown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "low lockdown clinch",
+      "tags": [
+        "lockdown",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double bagged mission control",
+      "tags": [
+        "double_bag",
+        "rubber_guard",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double bagged chill dog w/o hand on mat",
+      "tags": [
+        "rubber_guard",
+        "double_bag",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "invisible  collar w/o hand-on-mat",
+      "tags": [
+        "rubber_guard",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "recovered half",
+      "tags": [
+        "half_guard",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "bottom arm triangle w/ lockdown",
+      "tags": [
+        "arm_triangle",
+        "lockdown",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken",
+        "half_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "top turning to twister pass",
+      "tags": [
+        "bottom_supine",
+        "lockdown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee-pinned butterfly w/ wrist ctrl and overhook",
+      "tags": [
+        "butterfly",
+        "wrist_control",
+        "bottom_turned_in",
+        "top_kneeling",
+        "top_posture_broken",
+        "bottom_overhook",
+        "pass_split",
+        "head_grind",
+        "knee_pin"
+      ],
+      "ref": null
+    },
+    {
+      "name": "tony montana",
+      "tags": [
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "?",
+      "tags": [
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sitting after trip",
+      "tags": [
+        "footsies",
+        "bottom_seated",
+        "top_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "game over",
+      "tags": [
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee knot",
+      "tags": [
+        "footsies"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double unders w/ feet on hips",
+      "tags": [
+        "bottom_double_unders",
+        "top_kneeling",
+        "bottom_seated",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mount w/ head&armpit",
+      "tags": [
+        "mount",
+        "bottom_supine",
+        "crossface"
+      ],
+      "ref": null
+    },
+    {
+      "name": "strike threat from mount",
+      "tags": [
+        "mount",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "quarter on side w/ top underhook",
+      "tags": [
+        "top_underhook",
+        "bottom_turned_in",
+        "top_kneeling",
+        "quarter_guard",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "monoplata",
+      "tags": [
+        "bottom_supine",
+        "monoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "parallel jiu-claw vs locked hands",
+      "tags": [
+        "omoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "monoplata w/ leg trapped",
+      "tags": [
+        "bottom_supine",
+        "monoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "stack double under w/ arm pin",
+      "tags": [
+        "stacked",
+        "pass_under"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing outside  w/ knee and hip pinned",
+      "tags": [
+        "standing",
+        "bottom_supine",
+        "knee_pin"
+      ],
+      "ref": null
+    },
+    {
+      "name": "leg drag w/ lockdown",
+      "tags": [
+        "leg_drag",
+        "lockdown",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "leg drag to side control",
+      "tags": [
+        "side_control",
+        "bottom_turned_away"
+      ],
+      "ref": null
+    },
+    {
+      "name": "gangsta- lean w/  head&armpit",
+      "tags": [
+        "mount",
+        "crossface",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "s-mount w/ isolated arm",
+      "tags": [
+        "s_mount",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "crucifix",
+      "tags": [
+        "crucifix"
+      ],
+      "ref": null
+    },
+    {
+      "name": "spiderweb w/o leg control",
+      "tags": [
+        "bottom_supine",
+        "spiderweb"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kneeling slx",
+      "tags": [
+        "combat_base",
+        "bottom_supine",
+        "slx"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing single- leg w/ head and leg outside",
+      "tags": [
+        "single_leg_takedown",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "crucified turtle",
+      "tags": [
+        "crucifix",
+        "turtle",
+        "seatbelt"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sprawl w/ head&arm vs double-leg",
+      "tags": [
+        "double_leg_takedown",
+        "sprawl",
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "upright z",
+      "tags": [
+        "z_guard",
+        "top_kneeling",
+        "bottom_post_elbow",
+        "bottom_turned_in",
+        "half_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle crucified w/ one leg",
+      "tags": [
+        "turtle",
+        "crucifix",
+        "seatbelt"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs seated single w/ head outside",
+      "tags": [
+        "bottom_seated",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs seated grabbing leg",
+      "tags": [
+        "bottom_seated",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "stacked w/ waist lock",
+      "tags": [
+        "body_lock",
+        "stacked",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs elbow control",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "closed guard w/ arm trapped",
+      "tags": [
+        "closed_guard",
+        "full_guard",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "closed guard w/ 100%",
+      "tags": [
+        "closed_guard",
+        "full_guard",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "running survival posture",
+      "tags": [
+        "bottom_turned_away",
+        "standing",
+        "t_rex",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "air 300",
+      "tags": [
+        "bottom_seated",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "twister side w/ bottom underhook",
+      "tags": [
+        "bottom_supine",
+        "twister_side",
+        "side_control",
+        "bottom_underhook",
+        "top_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ vice grip vs underhook",
+      "tags": [
+        "darce",
+        "side_control",
+        "bottom_turned_in",
+        "bottom_underhook",
+        "vice_grip"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle w/ open elbow vs vice",
+      "tags": [
+        "vice_grip",
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turned in t-rex vs side vice",
+      "tags": [
+        "bottom_turned_in",
+        "vice_grip",
+        "side_control",
+        "t_rex",
+        "fetal"
+      ],
+      "ref": null
+    },
+    {
+      "name": "rolling toward hippo",
+      "tags": [
+        "combat_base"
+      ],
+      "ref": null
+    },
+    {
+      "name": "smashed half w/ double unders vs crossface",
+      "tags": [
+        "bottom_supine",
+        "half_guard",
+        "crossface",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "twister pass w/ arm inside",
+      "tags": [
+        "reverse_half",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turning to twister pass from z",
+      "tags": [
+        "twister_pass",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "freshly broken standing triangle",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "tripped through knee control",
+      "tags": [
+        "bottom_supine",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "leg ride",
+      "tags": [
+        "back",
+        "leg_ride"
+      ],
+      "ref": null
+    },
+    {
+      "name": "wide upright standing x",
+      "tags": [
+        "x_guard",
+        "bottom_supine",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "reverse leg drag w/ head&arm",
+      "tags": [
+        "leg_drag",
+        "crossface",
+        "top_underhook",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "jailbreak",
+      "tags": [
+        "side_control",
+        "crossface",
+        "bottom_overhook",
+        "top_underhook",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "stepping to side",
+      "tags": [
+        "crossface",
+        "bottom_turned_in",
+        "pass_around",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "leg drag w/ underhook",
+      "tags": [
+        "leg_drag",
+        "top_underhook",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kneeling in full w/ leg+wrist",
+      "tags": [
+        "full_guard",
+        "top_kneeling",
+        "bottom_supine",
+        "wrist_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "judo side w/ far underhook + near wrist",
+      "tags": [
+        "judo_side",
+        "top_underhook",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterfly guillotine",
+      "tags": [
+        "butterfly",
+        "guillotine",
+        "top_kneeling",
+        "top_posture_broken",
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double ankle pick",
+      "tags": [
+        "bottom_supine",
+        "standing",
+        "ankle_pick",
+        "trip"
+      ],
+      "ref": null
+    },
+    {
+      "name": "spider guard w/ wrist control",
+      "tags": [
+        "bottom_supine",
+        "top_kneeling",
+        "wrist_control",
+        "spider_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "blocked full guard kimura",
+      "tags": [
+        "kimura",
+        "full_guard",
+        "bottom_supine",
+        "top_posture_broken",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sit up guard",
+      "tags": [
+        "bottom_seated",
+        "top_kneeling",
+        "full_guard",
+        "bottom_post_elbow"
+      ],
+      "ref": null
+    },
+    {
+      "name": "full guard kimura vs body-lock",
+      "tags": [
+        "full_guard",
+        "bottom_post_elbow",
+        "top_kneeling",
+        "kimura",
+        "body_lock"
+      ],
+      "ref": null
+    },
+    {
+      "name": "switching to judo side",
+      "tags": [
+        "side_control",
+        "t_rex",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing collar+tricep",
+      "tags": [
+        "collar_tie",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "reverse butterfly sweep",
+      "tags": [
+        "reverse_butterfly"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sit-up guard",
+      "tags": [
+        "top_kneeling",
+        "bottom_post_hand",
+        "full_guard",
+        "closed_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "no hand pass",
+      "tags": [
+        "crossface",
+        "bottom_supine",
+        "top_underhook",
+        "bottom_overhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "goes guard",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee bar from half guard",
+      "tags": [
+        "bottom_supine",
+        "knee_bar"
+      ],
+      "ref": null
+    },
+    {
+      "name": "blocked knee bar",
+      "tags": [
+        "knee_bar"
+      ],
+      "ref": null
+    },
+    {
+      "name": "\u00be mount w/ head&arm",
+      "tags": [
+        "three_quarter_mount",
+        "crossface",
+        "top_underhook",
+        "top_kneeling",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee bar escape",
+      "tags": [
+        "knee_bar"
+      ],
+      "ref": null
+    },
+    {
+      "name": "stoner control",
+      "tags": [
+        "lockdown",
+        "half_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double leg vs reverse leg",
+      "tags": [
+        "double_leg_takedown",
+        "funk",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "single leg vs reverse leg",
+      "tags": [
+        "funk",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "top gogo",
+      "tags": [
+        "bottom_supine",
+        "mount"
+      ],
+      "ref": null
+    },
+    {
+      "name": "countering upa side control escape",
+      "tags": [
+        "bridge",
+        "side_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "omoplata w/ far arm vs seated",
+      "tags": [
+        "omoplata"
+      ],
+      "ref": null
+    },
+    {
+      "name": "overhook and collar vs underhook and tricep",
+      "tags": [
+        "standing",
+        "collar_tie",
+        "underhook",
+        "overhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "imanari roll",
+      "tags": [
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs outside ashi",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterfly ashi",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "closed guard w/ over/under collar",
+      "tags": [
+        "closed_guard",
+        "collar_tie",
+        "top_posture_broken",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "closed guard w/ double under collar",
+      "tags": [
+        "closed_guard",
+        "collar_tie",
+        "top_posture_broken",
+        "bottom_supine",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "irish collar",
+      "tags": [
+        "closed_guard",
+        "bottom_supine",
+        "irish_collar",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "irish collar w/ wrist control",
+      "tags": [
+        "irish_collar",
+        "bottom_supine",
+        "wrist_control",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "boston handshake w/ grapevine",
+      "tags": [
+        "boston_handshake",
+        "grapevine",
+        "top_posture_broken",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "boston handshake",
+      "tags": [
+        "boston_handshake",
+        "full_guard",
+        "bottom_supine",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "boston handshake triangle",
+      "tags": [
+        "boston_handshake",
+        "triangle",
+        "bottom_supine",
+        "full_guard",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "full guard shoulder pin w/ bicep ride",
+      "tags": [
+        "shoulder_pin",
+        "full_guard",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "k-control",
+      "tags": [
+        "full_guard",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs seated ankle to ankle",
+      "tags": [
+        "bottom_seated",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "single leg vs leg ride",
+      "tags": [
+        "standing",
+        "single_leg_takedown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "distant leg drag",
+      "tags": [
+        "leg_drag",
+        "bottom_supine",
+        "combat_base"
+      ],
+      "ref": null
+    },
+    {
+      "name": "leg drag w/ head&arm",
+      "tags": [
+        "top_underhook",
+        "crossface",
+        "bottom_turned_away",
+        "leg_drag",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "outside ashi vs combat base",
+      "tags": [
+        "ashi",
+        "combat_base",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "bull fighter pass",
+      "tags": [
+        "standing",
+        "bottom_supine",
+        "pass_around"
+      ],
+      "ref": null
+    },
+    {
+      "name": "o-soto-gari",
+      "tags": [
+        "trip",
+        "standing",
+        "throw"
+      ],
+      "ref": null
+    },
+    {
+      "name": "high single w/ head on chest",
+      "tags": [
+        "standing",
+        "single_leg_takedown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing w/ one leg grabbed vs supine",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "squared up russian vs elbow grip",
+      "tags": [
+        "two_on_one",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "snapped down",
+      "tags": [
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control w/ far underhook",
+      "tags": [
+        "side_control",
+        "top_underhook",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kata guruma",
+      "tags": [
+        "te_waza"
+      ],
+      "ref": null
+    },
+    {
+      "name": "snapping down w/ collar and tricep",
+      "tags": [
+        "standing",
+        "collar_tie"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing w/ collar tie and underhook",
+      "tags": [
+        "standing",
+        "collar_tie",
+        "underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "shooting for single",
+      "tags": [
+        "standing",
+        "single_leg_takedown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing single w/ head outside",
+      "tags": [
+        "standing",
+        "single_leg_takedown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "high single w/ head inside",
+      "tags": [
+        "single_leg_takedown",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "combat base w/ single",
+      "tags": [
+        "single_leg_takedown",
+        "combat_base",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "incoming roundhouse",
+      "tags": [
+        "standing",
+        "kick"
+      ],
+      "ref": null
+    },
+    {
+      "name": "roundhouse vs forearm",
+      "tags": [
+        "standing",
+        "kick"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sweep single",
+      "tags": [
+        "standing",
+        "single_leg_takedown",
+        "combat_base"
+      ],
+      "ref": null
+    },
+    {
+      "name": "full guard w/ bicep control vs double collar",
+      "tags": [
+        "collar_tie",
+        "full_guard",
+        "closed_guard",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "underhook shoulder pin",
+      "tags": [
+        "full_guard",
+        "shoulder_pin",
+        "full_guard",
+        "top_kneeling",
+        "bottom_turned_in",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "collar tie ankle pick from knee",
+      "tags": [
+        "ankle_pick",
+        "standing",
+        "collar_tie"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard w/ crossface vs neck frame",
+      "tags": [
+        "bottom_supine",
+        "top_kneeling",
+        "crossface",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "back on choke arm side w/ one leg trapped",
+      "tags": [
+        "back",
+        "seatbelt"
+      ],
+      "ref": null
+    },
+    {
+      "name": "rat guard",
+      "tags": [
+        "closed_guard",
+        "bottom_supine",
+        "top_kneeling",
+        "top_posture_broken"
+      ],
+      "ref": null
+    },
+    {
+      "name": "quarter guard w/ far underhook",
+      "tags": [
+        "quarter_guard",
+        "top_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "z-guard vs cross-grip and wrist",
+      "tags": [
+        "wrist_pin",
+        "z_guard",
+        "top_kneeling",
+        "bottom_turned_in",
+        "half_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "sliced guard vs cross grip and wrist pin",
+      "tags": [
+        "knee_slice",
+        "wrist_pin",
+        "bottom_turned_in"
+      ],
+      "ref": null
+    },
+    {
+      "name": "postured up single-x",
+      "tags": [
+        "slx",
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "pulling guard from single-leg",
+      "tags": [
+        "single_leg_takedown",
+        "guard_pull",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterfly arm drag w/ leg grab",
+      "tags": [
+        "butterfly",
+        "bottom_seated",
+        "arm_drag",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "jumping guard w/ overhook",
+      "tags": [
+        "standing",
+        "overhook",
+        "guard_pull"
+      ],
+      "ref": null
+    },
+    {
+      "name": "x-guard sweep",
+      "tags": [
+        "bottom_seated"
+      ],
+      "ref": null
+    },
+    {
+      "name": "collar tie ankle pick + inside trip",
+      "tags": [
+        "ankle_pick",
+        "trip",
+        "inside_trip",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing collar-tie + wrist ctrl",
+      "tags": [
+        "wrist_control",
+        "standing",
+        "collar_tie"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing dominant overhook + wrist ctrl",
+      "tags": [
+        "overhook",
+        "standing",
+        "wrist_control",
+        "underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing underhook vs wrist ctrl",
+      "tags": [
+        "standing",
+        "wrist_control",
+        "underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "flying scissor",
+      "tags": [
+        "standing",
+        "collar_tie"
+      ],
+      "ref": null
+    },
+    {
+      "name": "closed guard w/ overhook vs arm pin",
+      "tags": [
+        "bottom_supine",
+        "top_kneeling",
+        "bottom_overhook",
+        "closed_guard",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "spiderweb w/o leg over head",
+      "tags": [
+        "spiderweb",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "x guard w/o underhook",
+      "tags": [
+        "x_guard",
+        "bottom_supine",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "another leg drag w/ head&arm",
+      "tags": [
+        "leg_drag",
+        "bottom_supine",
+        "top_kneeling",
+        "top_underhook",
+        "crossface"
+      ],
+      "ref": null
+    },
+    {
+      "name": "pablo lockdown",
+      "tags": [
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "staggered + hip post vs open guard",
+      "tags": [
+        "bottom_supine",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "hip control pass",
+      "tags": [
+        "bottom_supine",
+        "standing",
+        "pass_around",
+        "knee_pin"
+      ],
+      "ref": null
+    },
+    {
+      "name": "high single vs arm drag",
+      "tags": [
+        "single_leg_takedown",
+        "arm_drag",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "single leg arm drag 2",
+      "tags": [
+        "single_leg_takedown",
+        "arm_drag",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard knee+hip control",
+      "tags": [
+        "bottom_supine",
+        "top_kneeling",
+        "half_guard",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "elbow half w/ deep underhook vs whizzer",
+      "tags": [
+        "whizzer",
+        "top_overhook",
+        "bottom_underhook",
+        "top_kneeling",
+        "bottom_turned_in",
+        "bottom_post_elbow",
+        "half_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "elbow half w/ weak underhook",
+      "tags": [
+        "half_guard",
+        "bottom_underhook",
+        "bottom_post_elbow",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing body lock vs kimura",
+      "tags": [
+        "kimura",
+        "standing",
+        "body_lock"
+      ],
+      "ref": null
+    },
+    {
+      "name": "high double leg",
+      "tags": [
+        "double_leg_takedown",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "low flying double leg",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "single leg vs kimura",
+      "tags": [
+        "single_leg_takedown",
+        "standing",
+        "kimura"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing front headlock",
+      "tags": [
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "bridged against judo side",
+      "tags": [
+        "bridge",
+        "judo_side",
+        "side_control",
+        "bottom_double_unders"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double unders side control vs headlock",
+      "tags": [
+        "body_lock",
+        "headlock",
+        "side_control",
+        "bottom_turned_away"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kneeling body lock vs kimura",
+      "tags": [
+        "top_kneeling",
+        "kimura"
+      ],
+      "ref": null
+    },
+    {
+      "name": "entering side control w/ kimura",
+      "tags": [
+        "kimura",
+        "side_control",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kimura throw/sweep",
+      "tags": [
+        "kimura"
+      ],
+      "ref": null
+    },
+    {
+      "name": "weak underhook vs head block",
+      "tags": [
+        "half_guard",
+        "bottom_underhook",
+        "top_kneeling",
+        "bottom_turned_in",
+        "bottom_post_elbow",
+        "knee_pin"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard kimura",
+      "tags": [
+        "half_guard",
+        "bottom_supine",
+        "kimura"
+      ],
+      "ref": null
+    },
+    {
+      "name": "crucifix w/ kimura",
+      "tags": [
+        "kimura",
+        "crucifix",
+        "bottom_supine",
+        "top_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "rev. triangle crucifix + kimura",
+      "tags": [
+        "crucifix",
+        "triangle",
+        "kimura",
+        "bottom_supine",
+        "top_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "rev. mounted triangle-crucifix- kimura",
+      "tags": [
+        "crucifix",
+        "triangle",
+        "kimura",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "quarter w/ double unders",
+      "tags": [
+        "bottom_double_unders",
+        "bottom_supine",
+        "quarter_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mounted turtle",
+      "tags": [
+        "back",
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "parallel turtle w/ hip and shoulder control",
+      "tags": [
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mounted turtle w/ double wrist control",
+      "tags": [
+        "turtle",
+        "wrist_control",
+        "back"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mounted turtle w/ single hook & seatbelt",
+      "tags": [
+        "turtle",
+        "back",
+        "seatbelt"
+      ],
+      "ref": null
+    },
+    {
+      "name": "grounded single leg vs arm drag",
+      "tags": [
+        "bottom_supine",
+        "top_kneeling",
+        "arm_drag"
+      ],
+      "ref": null
+    },
+    {
+      "name": "arm-in guillotine vs single leg",
+      "tags": [
+        "guillotine",
+        "half_guard",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "new jersey w/ overhook",
+      "tags": [
+        "three_quarter_guard",
+        "top_kneeling",
+        "bottom_supine",
+        "bottom_overhook",
+        "top_posture_broken",
+        "rubber_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "postured up new jersey",
+      "tags": [
+        "top_kneeling",
+        "rubber_guard",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "broken out of triangle",
+      "tags": [
+        "top_kneeling",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "ankle pick off of two-on-one",
+      "tags": [
+        "standing",
+        "ankle_pick",
+        "overhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "ankle pick off of overhook",
+      "tags": [
+        "standing",
+        "ankle_pick",
+        "overhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing parallel upright w/ underhook",
+      "tags": [
+        "standing",
+        "underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "single leg vs spladle",
+      "tags": [
+        "single_leg_takedown",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "leg smash pass w/ body lock",
+      "tags": [
+        "body_lock",
+        "bottom_double_unders",
+        "leg_smash",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "cupping leg smash",
+      "tags": [
+        "leg_smash",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "z guard w/ wrist and collar tie",
+      "tags": [
+        "collar_tie",
+        "z_guard",
+        "wrist_control",
+        "bottom_turned_in",
+        "top_kneeling",
+        "half_guard",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "tornado guard",
+      "tags": [
+        "inverted_guard",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "dogfight w/ double unders",
+      "tags": [
+        "bottom_double_unders",
+        "top_kneeling",
+        "bottom_kneeling",
+        "dogfight"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half and half",
+      "tags": [
+        "top_kneeling",
+        "bottom_kneeling",
+        "dogfight"
+      ],
+      "ref": null
+    },
+    {
+      "name": "flat 3/4 mount vs double unders",
+      "tags": [
+        "three_quarter_mount",
+        "bottom_double_unders",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "3/4 mount with isolated arm",
+      "tags": [
+        "three_quarter_mount"
+      ],
+      "ref": null
+    },
+    {
+      "name": "knee pinned w/ leg over shoulder",
+      "tags": [
+        "bottom_supine",
+        "leg_over_shoulder"
+      ],
+      "ref": null
+    },
+    {
+      "name": "flattened back mount",
+      "tags": [
+        "back",
+        "bottom_prone"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing rnc",
+      "tags": [
+        "rear_naked_choke",
+        "back"
+      ],
+      "ref": null
+    },
+    {
+      "name": "rnc on side",
+      "tags": [
+        "rear_naked_choke",
+        "back"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mount vs body lock",
+      "tags": [
+        "mount",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "angled monoplata",
+      "tags": [
+        "monoplata",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "inside trip",
+      "tags": [
+        "standing",
+        "trip",
+        "inside_trip"
+      ],
+      "ref": null
+    },
+    {
+      "name": "snapped down vs standing head stuff",
+      "tags": [
+        "standing",
+        "all_fours"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side control double unders bridge",
+      "tags": [
+        "side_control",
+        "bottom_double_unders",
+        "bridge"
+      ],
+      "ref": null
+    },
+    {
+      "name": "combat base back",
+      "tags": [
+        "combat_base",
+        "back"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing knee pinch",
+      "tags": [
+        "standing",
+        "bottom_supine",
+        "full_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing vs freshly broken guard",
+      "tags": [
+        "standing",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "low mount",
+      "tags": [
+        "mount",
+        "bottom_supine",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing back mount",
+      "tags": [
+        "standing",
+        "back",
+        "seatbelt"
+      ],
+      "ref": null
+    },
+    {
+      "name": "closed guard w/ overhook + collar tie",
+      "tags": [
+        "collar_tie",
+        "bottom_overhook",
+        "top_kneeling",
+        "closed_guard",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "rnc with one hook and hip control",
+      "tags": [
+        "back",
+        "rear_naked_choke"
+      ],
+      "ref": null
+    },
+    {
+      "name": "kneeling behind turned away passee",
+      "tags": [
+        "bottom_turned_away",
+        "side_control",
+        "top_kneeling",
+        "bottom_on_side"
+      ],
+      "ref": null
+    },
+    {
+      "name": "electric cradle w/ lockdown",
+      "tags": [
+        "cradle",
+        "lockdown",
+        "top_kneeling",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "top half lockdown vs double overs",
+      "tags": [
+        "bottom_overhook",
+        "bottom_supine",
+        "top_double_unders",
+        "lockdown",
+        "half_guard",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "top lockdown vs single butterfly",
+      "tags": [
+        "lockdown",
+        "top_kneeling",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "full domination top lock half",
+      "tags": [
+        "lockdown",
+        "half_guard",
+        "top_kneeling",
+        "top_double_unders",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "front headlock vs single",
+      "tags": [
+        "sprawl",
+        "bottom_kneeling",
+        "top_kneeling",
+        "single_leg_takedown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard w/ underhook + wrist vs combat base",
+      "tags": [
+        "wrist_control",
+        "bottom_seated",
+        "combat_base",
+        "half_guard",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "close half guard shell",
+      "tags": [
+        "half_guard",
+        "bottom_turned_in",
+        "top_kneeling",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "dogfight w/o whizzer",
+      "tags": [
+        "dogfight",
+        "bottom_kneeling",
+        "top_kneeling",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "elbow half w/ deep underhook",
+      "tags": [
+        "bottom_post_elbow",
+        "bottom_turned_in",
+        "half_guard",
+        "top_kneeling",
+        "bottom_underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "shrugged turtle",
+      "tags": [
+        "bottom_kneeling",
+        "top_kneeling",
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "seatbelt from dogfight",
+      "tags": [
+        "back",
+        "bottom_kneeling",
+        "top_kneeling",
+        "seatbelt",
+        "turtle",
+        "dogfight"
+      ],
+      "ref": null
+    },
+    {
+      "name": "te guruma",
+      "tags": [
+        "standing",
+        "te_waza"
+      ],
+      "ref": null
+    },
+    {
+      "name": "north/south vs elbow frame",
+      "tags": [
+        "north_south",
+        "bottom_supine",
+        "top_kneeling",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard w/ head&arm vs t rex",
+      "tags": [
+        "crossface",
+        "half_guard",
+        "t_rex",
+        "bottom_supine",
+        "top_kneeling",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "collar tie + tricep vs weak underhook",
+      "tags": [
+        "standing",
+        "collar_tie",
+        "underhook"
+      ],
+      "ref": null
+    },
+    {
+      "name": "throw finish",
+      "tags": [
+        "bottom_supine",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "flanking body lock",
+      "tags": [
+        "standing",
+        "body_lock"
+      ],
+      "ref": null
+    },
+    {
+      "name": "butterfly elevation vs squeezed knees",
+      "tags": [
+        "butterfly",
+        "bottom_supine",
+        "top_post_hand"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing x vs near wrist control",
+      "tags": [
+        "wrist_control",
+        "x_guard",
+        "bottom_supine",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "collar tie vs wrist+tricep control",
+      "tags": [
+        "standing",
+        "collar_tie",
+        "wrist_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "duck under",
+      "tags": [
+        "duck_under",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "single leg w/\\bwrist control",
+      "tags": [
+        "wrist_control",
+        "standing",
+        "single_leg_takedown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard w/ knee pin",
+      "tags": [
+        "bottom_supine",
+        "bottom_turned_in",
+        "top_kneeling",
+        "knee_pin"
+      ],
+      "ref": null
+    },
+    {
+      "name": "duck under vs arm",
+      "tags": [
+        "duck_under",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard w/ hip control",
+      "tags": [
+        "half_guard",
+        "bottom_supine",
+        "frame"
+      ],
+      "ref": null
+    },
+    {
+      "name": "top 3/4 lockdown",
+      "tags": [
+        "three_quarter_mount",
+        "bottom_supine",
+        "lockdown"
+      ],
+      "ref": null
+    },
+    {
+      "name": "off balanced crab ride",
+      "tags": [
+        "crab_ride",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "crab ride w/ ankle control",
+      "tags": [
+        "crab_ride",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "semi crab w/ over/under ankles",
+      "tags": [
+        "crab_ride",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "caught kick",
+      "tags": [
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "lower-back mounted turtle",
+      "tags": [
+        "turtle",
+        "lower_back_control"
+      ],
+      "ref": null
+    },
+    {
+      "name": "backward roll north south escape",
+      "tags": [
+        "north_south",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "crab ride w/ ankles vs hand posts",
+      "tags": [
+        "crab_ride"
+      ],
+      "ref": null
+    },
+    {
+      "name": "double under pass w/ hips pulled in",
+      "tags": [
+        "pass_double_under",
+        "top_kneeling",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "mounting turtle",
+      "tags": [
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "level dropped",
+      "tags": [
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "KoB w/ collar tie and elbow",
+      "tags": [
+        "collar_tie",
+        "knee_on_belly",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "parallel kimura roll",
+      "tags": [
+        "kimura",
+        "roll"
+      ],
+      "ref": null
+    },
+    {
+      "name": "closed guard w/ head&arm vs neck frame",
+      "tags": [
+        "frame",
+        "bottom_supine",
+        "closed_guard",
+        "full_guard",
+        "top_posture_broken",
+        "top_kneeling"
+      ],
+      "ref": null
+    },
+    {
+      "name": "standing up w/ collar tie",
+      "tags": [
+        "collar_tie",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "body lock from side w/ arm trapped",
+      "tags": [
+        "standing",
+        "body_lock"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard w/ double unders vs crossface",
+      "tags": [
+        "half_guard",
+        "bottom_turned_in",
+        "crossface"
+      ],
+      "ref": null
+    },
+    {
+      "name": "leg smash vs pimp-arm",
+      "tags": [
+        "bottom_supine",
+        "top_kneeling",
+        "leg_smash",
+        "passing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "z guard w/ neck frame and wrist control",
+      "tags": [
+        "wrist_control",
+        "z_guard",
+        "frame",
+        "knee_shield",
+        "half_guard"
+      ],
+      "ref": null
+    },
+    {
+      "name": "crouching w/ one leg over shoulder",
+      "tags": [
+        "bottom_supine",
+        "leg_over_shoulder"
+      ],
+      "ref": null
+    },
+    {
+      "name": "combat base vs flat\\bbutterfly",
+      "tags": [
+        "butterfly",
+        "combat_base",
+        "bottom_supine"
+      ],
+      "ref": null
+    },
+    {
+      "name": "...A",
+      "tags": [
+        "leg_over_shoulder"
+      ],
+      "ref": null
+    },
+    {
+      "name": "...B",
+      "tags": [
+        "leg_over_shoulder"
+      ],
+      "ref": null
+    },
+    {
+      "name": "half guard shell w/ leg grabbed",
+      "tags": [
+        "bottom_turned_in",
+        "half_guard",
+        "top_kneeling",
+        "frame",
+        "knee_shield"
+      ],
+      "ref": null
+    },
+    {
+      "name": "turtle shoulder roll w/ leg",
+      "tags": [
+        "roll",
+        "turtle"
+      ],
+      "ref": null
+    },
+    {
+      "name": "...C",
+      "tags": [
+        "stacked",
+        "bottom_supine",
+        "standing"
+      ],
+      "ref": null
+    },
+    {
+      "name": "50/50 vs combat base",
+      "tags": [
+        "50_50",
+        "combat_base"
+      ],
+      "ref": null
+    },
+    {
+      "name": "side ctrl w/ lat trap",
+      "tags": [
+        "side_ctrl",
+        "lat_trap",
+        "bottom_supine"
+      ],
+      "ref": null
+    }
+  ],
+  "transitions": [
+    {
+      "name": "uncountered",
+      "tags": [
+        "toehold"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\" Episode ??",
+      "frames": 5
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "stand_up"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\" Episode 73 @ 53:01",
+      "frames": 6
+    },
+    {
+      "name": "arm bar (wip)",
+      "tags": [
+        "armbar"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\" Episode 98 @ ?",
+      "frames": 2
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "rear_naked_choke"
+      ],
+      "ref": null,
+      "frames": 5
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "pass_split"
+      ],
+      "ref": "Marcelo Garcia \"Advanced Brazilian Jiu Jitsu Techniques\" p223",
+      "frames": 7
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "sweep"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\" Episode 71 @ 1:16",
+      "frames": 4
+    },
+    {
+      "name": "properties: bottom detailed",
+      "tags": [
+        "sweep"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\" Episode 67 @ 42:50",
+      "frames": 13
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "takedown"
+      ],
+      "ref": null,
+      "frames": 4
+    },
+    {
+      "name": "properties: top detailed",
+      "tags": [
+        "pass_around"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Brazilian Jiu-Jitsu\", Series II, Volume 4: Advanced Guard Passing, Technique 2 @ 6:26",
+      "frames": 5
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "pass_split"
+      ],
+      "ref": "Ryan Hall \"The Deep Half Guard\", Volume 2: Deep Half Attacks, Section ?: \"?\" @ 15:00",
+      "frames": 2
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "roll"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 6: Escapes 2, Technique 1 @ 1:18",
+      "frames": 4
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "butterfly_sweep"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series I, Volume 5: The Guard (Sweeps), Technique 6 @ 15:18",
+      "frames": 9
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "pass_around"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series I, Volume 3: Passing The Guard, Technique 1",
+      "frames": 6
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "pass_through"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series I, Volume 3: Passing The Guard, Technique 3 @ 5:57",
+      "frames": 5
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "bridge",
+        "sweep"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 6: Escapes 1, Technique ? @ 5:11",
+      "frames": 2
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "grapevine"
+      ],
+      "ref": "Ryan Hall \"Back Attacks\", Volume 3: The Rolling Back Attack, Technique 4: Side Control Setup 2 @ 8:36",
+      "frames": 3
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "roll"
+      ],
+      "ref": "Ryan Hall \"Back Attacks\", Volume 3, The Rolling Back Attack, Technique ? @ 1:39",
+      "frames": 3
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "sweep"
+      ],
+      "ref": "Eddie Bravo \"Advanced Rubber Guard\", Section \"Failed Hip Bump to Flying New York\" @ p52",
+      "frames": 5
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "omoplata"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series IV, Volume 2: Advanced Omoplata 2, Technique 1 @ 0:55",
+      "frames": 3
+    },
+    {
+      "name": "properties: top detailed",
+      "tags": [
+        "pass_under"
+      ],
+      "ref": "Ryan Hall \"Back Attacks\", Volume 2: Finishes, Technique 24: \"Over Under to Double Under\" @ 1:28:38",
+      "frames": 5
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "arm_drag"
+      ],
+      "ref": "Richie Martinez \"Mastering the System\" Episode 100 @ 5:00",
+      "frames": 8
+    },
+    {
+      "name": "ankle pick",
+      "tags": [
+        "trip",
+        "ankle_pick"
+      ],
+      "ref": "?? \"Mastering the System\" Episode 100",
+      "frames": 6
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "trip"
+      ],
+      "ref": "?? \"Mastering the System\" Episode 100",
+      "frames": 6
+    },
+    {
+      "name": "hip throw",
+      "tags": [
+        "throw"
+      ],
+      "ref": "Dan Gable \"Wrestling Essentials\", https://www.youtube.com/watch?v=WM1JtwB7Xu8 @ 31:34",
+      "frames": 8
+    },
+    {
+      "name": "stand up",
+      "tags": [
+        "stand_up"
+      ],
+      "ref": null,
+      "frames": 4
+    },
+    {
+      "name": "stand up",
+      "tags": [
+        "stand_up"
+      ],
+      "ref": null,
+      "frames": 4
+    },
+    {
+      "name": "to back",
+      "tags": [
+        "arm_drag"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Brazilian Jiu-Jitsu\", Series II, Volume 2: Arm Drags, Technique 1 @ 0:46",
+      "frames": 5
+    },
+    {
+      "name": "arm drag",
+      "tags": [
+        "arm_drag"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Brazilian Jiu-Jitsu\", Series II, Volume 2: Arm Drags, Technique 1 @ 2:30",
+      "frames": 3
+    },
+    {
+      "name": "far leg takedown",
+      "tags": [
+        "single_leg_takedown",
+        "arm_drag"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Brazilian Jiu-Jitsu\", Series II, Volume 2: Arm Drags, Technique 1 @ 3:16",
+      "frames": 6
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "single_leg_takedown",
+        "arm_drag"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Brazilian Jiu-Jitsu\", Series II, Volume 2: Arm Drags, Technique 2 @ 4:23",
+      "frames": 4
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "sweep"
+      ],
+      "ref": "Eddie Bravo \"Advanced Rubber Guard\" p213: Deep Half Backdoor Sweep",
+      "frames": 5
+    },
+    {
+      "name": "drive forward",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": null,
+      "frames": 3
+    },
+    {
+      "name": "to single",
+      "tags": [
+        "single_leg_takedown"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Brazilian Jiu-Jitsu\", Series II, Volume 2: Arm Drags, Technique 3 @ 6:09",
+      "frames": 3
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "single_leg_takedown"
+      ],
+      "ref": null,
+      "frames": 6
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "arm_drag"
+      ],
+      "ref": "Marcelo Garcia \"The X Guard\" p137: CROSS GRIP TO ARM DRAG X-GUARD SETUP",
+      "frames": 4
+    },
+    {
+      "name": "to single",
+      "tags": [
+        "single_leg_takedown"
+      ],
+      "ref": null,
+      "frames": 4
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "pass_split"
+      ],
+      "ref": null,
+      "frames": 4
+    },
+    {
+      "name": "stub",
+      "tags": [
+        "stub"
+      ],
+      "ref": null,
+      "frames": 3
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "arm_drag",
+        "half_guard"
+      ],
+      "ref": "Ryan Hall \"The Deep Half Guard\", Volume 3: Advanced Deep Half Attacks, Section 2: The Armdrag @ 7:05",
+      "frames": 4
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "arm_drag"
+      ],
+      "ref": "Ryan Hall",
+      "frames": 3
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "deep_half"
+      ],
+      "ref": "Ryan Hall \"The Deep Half Guard\", Volume 3: Advanced Deep Half Attacks, Section 2: The Armdrag @ 8:41",
+      "frames": 7
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "octopus"
+      ],
+      "ref": "Eduardo Telles \"?\", Volume 5: Octopus Guard, Section 2: ? @ 5:29",
+      "frames": 6
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "octopus"
+      ],
+      "ref": "Eduardo Telles \"?\", Volume 5: Octopus Guard, Section 11: ? @ 25:01",
+      "frames": 5
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "half_guard",
+        "knee_slice",
+        "smash",
+        "top_overhook"
+      ],
+      "ref": "Ryan Hall \"Arm Triangles\", Volume 2: Creating Openings & Finishing, Technique 9: Half Guard Top: Brabo @ 1:01:53",
+      "frames": 2
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "knee_slice",
+        "quarter_guard",
+        "top_overhook"
+      ],
+      "ref": "Ryan Hall \"Arm Triangles\", Volume 2: Creating Openings & Finishing, Technique 9: Half Guard Top: Brabo @ 1:01:53",
+      "frames": 3
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "standing",
+        "throw",
+        "te_waza"
+      ],
+      "ref": "Karo Parysian \"Judo For MMA\" Volume 4: DROP SEOI-NAGE, Section 1 @ 2:06",
+      "frames": 20
+    },
+    {
+      "name": "stand up further",
+      "tags": [
+        "stand_up"
+      ],
+      "ref": null,
+      "frames": 3
+    },
+    {
+      "name": "o-soto-gari",
+      "tags": [
+        "trip",
+        "throw",
+        "ashi_waza"
+      ],
+      "ref": "Karo Parysian \"Judo For MMA\" Volume 1: OSOTO-GARI, Section 6",
+      "frames": 6
+    },
+    {
+      "name": "knee-pick counter to arm pull",
+      "tags": [
+        "knee_pick"
+      ],
+      "ref": "Karo Parysian \"Judo For MMA\" Volume 1: OSOTO-GARI, Section 12-ish",
+      "frames": 6
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "darce"
+      ],
+      "ref": "Ryan Hall \"Arm Triangles\", Volume 3: Troubleshooting, Transitions and Drills, Technique 10: The Brabo Roll Under @ 46:35",
+      "frames": 13
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "crossface"
+      ],
+      "ref": "Pablo Popovitch \"NoGi Exposed\", DVD 2: Guard Passing, Volume 10: Half Guard Series, Section 13: Knee Cross Pass @ 1:22:08",
+      "frames": 4
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "butterfly_sweep"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\", Episode 104 @ 1:32:13",
+      "frames": 3
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "knee_slice"
+      ],
+      "ref": null,
+      "frames": 2
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "arm_drag"
+      ],
+      "ref": "Ryan Hall",
+      "frames": 5
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "knee_slice"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\" Episode 82 @ 37:26",
+      "frames": 3
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "rear_naked_choke"
+      ],
+      "ref": "Ryan Hall \"Back Attacks\", Volume 2: \"?\", Section ? @ 7:07",
+      "frames": 8
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "butterfly_sweep"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\", Episode 104 @ 1:32:13",
+      "frames": 7
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "butterfly_sweep"
+      ],
+      "ref": "Eddie Bravo \"Mastering the System\", Episode 105 @ 26:24",
+      "frames": 5
+    },
+    {
+      "name": "to mono",
+      "tags": [
+        "monoplata"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Submission Grappling\", Series IV, Volume 2: Advanced Omoplata 2, Technique 11 @ 37:51",
+      "frames": 6
+    },
+    {
+      "name": "to mono",
+      "tags": [
+        "monoplata"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Submission Grappling\", Series IV, Volume 2: Advanced Omoplata 2, Technique 12 @ 42:21",
+      "frames": 3
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "sweep"
+      ],
+      "ref": "Eddie Bravo \"Advanced Rubber Guard\", Section \"Failed Hip Bump to Flying New York\" @ p52",
+      "frames": 2
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "roll"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 6: Escapes 2, Technique 1 @ 1:18",
+      "frames": 5
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "pass_around"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 3: Sweeps and Turnovers, Technique 15 @ 55:38",
+      "frames": 2
+    },
+    {
+      "name": "shoot for double",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": "Greg Jackson \"Jackson's Mixed Martial Arts - The Ground Game\", Section: Spider Guard Sweeps - Basic Sweep @ p146",
+      "frames": 10
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": "Jean Jacques Machado \"The Grappler's Handbook - Gi and No-Gi Techniques\", REVERSAL FROM BUTTERFLY GUARD @ p39",
+      "frames": 5
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "sweep"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 6: Escapes 1, Technique ? @ 5:11",
+      "frames": 4
+    },
+    {
+      "name": "kata guruma",
+      "tags": [
+        "te_waza"
+      ],
+      "ref": "How to do a Fireman's Carry throw from the clinch w/ Kit Dale| No Gi BJJ & MMA (https://www.youtube.com/watch?v=jT5UKXKyN_M)",
+      "frames": 5
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "triangle"
+      ],
+      "ref": "Neil Melanson \"Mastering Triangle Chokes\", Section: Double Biceps Ride to Cross Grip Two-on-One @ p71",
+      "frames": 9
+    },
+    {
+      "name": "properties: top detailed",
+      "tags": [
+        "pass_around"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques of Brazilian Jiu-Jitsu\", Series II, Volume 4: Advanced Guard Passing, Technique 2 @ 6:26",
+      "frames": 4
+    },
+    {
+      "name": "todo: wip",
+      "tags": [
+        "crab_ride"
+      ],
+      "ref": "Ostap Manastyrski \"Reverse de la Riva Guard: A Step by Step Tutorial\" https://www.youtube.com/watch?v=lj985a5UJl0 @ 9:45",
+      "frames": 8
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "kick"
+      ],
+      "ref": "Greg Jackson \"Jackson's Mixed Martial Arts - The Ground Game\", Section: Leg Kick Get-Up @ p169",
+      "frames": 7
+    },
+    {
+      "name": "pull guard",
+      "tags": [
+        "guard_pull"
+      ],
+      "ref": "Kenny Florian \"Mastering the System\" Episode 39 @ 13:52",
+      "frames": 2
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "sacrifice_throw",
+        "throw",
+        "sutemi_waza"
+      ],
+      "ref": "Cary Kolat \"Wrestling Moves KOLAT.COM Russian to Lateral Spin\" (https://www.youtube.com/watch?v=nAhN-P7UebM)",
+      "frames": 11
+    },
+    {
+      "name": "switch arm and trip",
+      "tags": [
+        "trip",
+        "throw"
+      ],
+      "ref": "Cary Kolat \"Wrestling Moves KOLAT.COM Russian to Arm Throw Trip\" (https://www.youtube.com/watch?v=mZN9sJhD0I4)",
+      "frames": 10
+    },
+    {
+      "name": "foot block knee pick",
+      "tags": [
+        "knee_pick"
+      ],
+      "ref": "Cary Kolat \"Wrestling Moves KOLAT.COM Foot Block Knee Pick from 2 on 1\" (https://www.youtube.com/watch?v=YHtyjGHQAd8)",
+      "frames": 10
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "single_leg_takedown"
+      ],
+      "ref": "Anderson Silva \"Takedown Defense (Single Leg Counters)\" (https://www.youtube.com/watch?v=wEtKhy9zHI8)",
+      "frames": 5
+    },
+    {
+      "name": "head inside",
+      "tags": [
+        "single_leg_takedown"
+      ],
+      "ref": "Dan Gable \"Wrestling Essentials\", https://www.youtube.com/watch?v=WM1JtwB7Xu8 @ 20:11",
+      "frames": 3
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "single_leg_takedown"
+      ],
+      "ref": "Dan Gable \"Wrestling Essentials\", https://www.youtube.com/watch?v=WM1JtwB7Xu8 @ 20:11",
+      "frames": 10
+    },
+    {
+      "name": "ankle pick",
+      "tags": [
+        "ankle_pick"
+      ],
+      "ref": "Dan Gable \"Wrestling Essentials\", https://www.youtube.com/watch?v=WM1JtwB7Xu8 @ 33:30",
+      "frames": 3
+    },
+    {
+      "name": "ankle pick",
+      "tags": [
+        "ankle_pick"
+      ],
+      "ref": "Dan Gable \"Wrestling Essentials\", https://www.youtube.com/watch?v=WM1JtwB7Xu8 @ 33:30",
+      "frames": 5
+    },
+    {
+      "name": "properties: bottom detailed",
+      "tags": [
+        "arm_drag",
+        "half_guard",
+        "wrist_control"
+      ],
+      "ref": "Caio Terra \"111 Half Guard Techniques\", Volume 1, Part 2, Section 3: Taking the Back From Knee Grip @ 40:47",
+      "frames": 9
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "half_guard",
+        "knee_slice",
+        "smash",
+        "top_overhook"
+      ],
+      "ref": "Ryan Hall \"Arm Triangles\", Volume 2: Creating Openings & Finishing, Technique 9: Half Guard Top: Brabo @ 1:01:53",
+      "frames": 6
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "knee_slice"
+      ],
+      "ref": "Pablo Popovitch \"NoGi Exposed\", DVD 1: Guard Passing, Volume 4: Cross Grip Series, Section 4: Knee Through Pass",
+      "frames": 4
+    },
+    {
+      "name": "pull guard",
+      "tags": [
+        "guard_pull"
+      ],
+      "ref": "Kenny Florian \"Mastering the System\" Episode 39 @ 13:52",
+      "frames": 4
+    },
+    {
+      "name": "stand up to guard jump",
+      "tags": [
+        "stand_up"
+      ],
+      "ref": null,
+      "frames": 5
+    },
+    {
+      "name": "control wrist",
+      "tags": [
+        "wrist_control"
+      ],
+      "ref": "Reilly Bodycomb \"No Kurtka\" Volume 1, Section 1: Foot Hook Ankle Pick",
+      "frames": 3
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "ankle_pick"
+      ],
+      "ref": "Dan Gable \"Wrestling Essentials\", https://www.youtube.com/watch?v=WM1JtwB7Xu8 @ 33:30",
+      "frames": 4
+    },
+    {
+      "name": "foot hook ankle pick",
+      "tags": [
+        "ankle_pick"
+      ],
+      "ref": "Reilly Bodycomb \"No Kurtka\" Volume 1, Section 1: Foot Hook Ankle Pick",
+      "frames": 4
+    },
+    {
+      "name": "ankle pick",
+      "tags": [
+        "ankle_pick"
+      ],
+      "ref": null,
+      "frames": 3
+    },
+    {
+      "name": "kani basami",
+      "tags": [
+        "sutemi_waza"
+      ],
+      "ref": "Stephan Kesting https://www.youtube.com/watch?v=XRklGgwpbj0",
+      "frames": 6
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "technical_standup"
+      ],
+      "ref": null,
+      "frames": 6
+    },
+    {
+      "name": "double leg drill",
+      "tags": [
+        "double_leg_takedown",
+        "drill"
+      ],
+      "ref": "Ben Askren \"The Manhandling Manifesto\", Double Leg Drill 2 @ 3:40",
+      "frames": 4
+    },
+    {
+      "name": "double leg drill (part 2)",
+      "tags": [
+        "double_leg_takedown",
+        "drill"
+      ],
+      "ref": "Ben Askren \"The Manhandling Manifesto\", Double Leg Drill 2 @ 3:40",
+      "frames": 9
+    },
+    {
+      "name": "to high",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": null,
+      "frames": 2
+    },
+    {
+      "name": "pick up",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": null,
+      "frames": 2
+    },
+    {
+      "name": "drive forward",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": null,
+      "frames": 3
+    },
+    {
+      "name": "to double leg",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": null,
+      "frames": 4
+    },
+    {
+      "name": "drop level slightly",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": "Ben Askren \"The Manhandling Manifesto\", Basic Double Leg @ 1:17",
+      "frames": 2
+    },
+    {
+      "name": "shoot for high double",
+      "tags": [
+        "double_leg_takedown"
+      ],
+      "ref": "Ben Askren \"The Manhandling Manifesto\", Basic Double Leg @ 1:17",
+      "frames": 3
+    },
+    {
+      "name": "throw",
+      "tags": [
+        "sacrifice_throw",
+        "kimura",
+        "throw",
+        "sutemi_waza"
+      ],
+      "ref": "Firas Zahabi \"How to Fight Wrestling with Jiu-Jitsu - Kimura Counter to High Crotch\", https://www.youtube.com/watch?v=-Im-DSUm4VQ @ 2:56",
+      "frames": 4
+    },
+    {
+      "name": "te guruma",
+      "tags": [
+        "te_waza"
+      ],
+      "ref": "Ben Askren https://www.youtube.com/watch?v=EZ4hvirIZ3I",
+      "frames": 4
+    },
+    {
+      "name": "bottom keeps neck frame",
+      "tags": [
+        "frame"
+      ],
+      "ref": null,
+      "frames": 3
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "kimura"
+      ],
+      "ref": "Firas Zahabi \"Sakuraba Style Kimura Attacks\" https://www.youtube.com/watch?v=Ly11uw2l-80",
+      "frames": 8
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "shoulder_roll"
+      ],
+      "ref": "Firas Zahabi \"Sakuraba Style Kimura Attacks\" https://www.youtube.com/watch?v=Ly11uw2l-80",
+      "frames": 9
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "kimura"
+      ],
+      "ref": "Firas Zahabi \"Sakuraba Style Kimura Attacks\" https://www.youtube.com/watch?v=Ly11uw2l-80",
+      "frames": 4
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "kimura"
+      ],
+      "ref": "Firas Zahabi \"How to Fight Wrestling with Jiu-Jitsu - Kimura Counter to High Crotch\", https://www.youtube.com/watch?v=-Im-DSUm4VQ @ 2:56",
+      "frames": 3
+    },
+    {
+      "name": "kimura",
+      "tags": [
+        "kimura"
+      ],
+      "ref": "Ryan Hall \"Open Elbow\", Volume 2: The Kimura, Section 8",
+      "frames": 9
+    },
+    {
+      "name": "polish throw",
+      "tags": [
+        "throw"
+      ],
+      "ref": null,
+      "frames": 6
+    },
+    {
+      "name": "properties: top detailed",
+      "tags": [
+        "knee_slice",
+        "crossface"
+      ],
+      "ref": "Pablo Popovitch \"NoGi Exposed\", DVD 2: Guard Passing, Volume 10: Half Guard Series, Section 13: Knee Cross Pass @ 1:22:08",
+      "frames": 6
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "arm_drag"
+      ],
+      "ref": "Bill Cooper \"Deep Half Guard Killer\", Chapter 10: Forward roll to armdrag to the back @ 20:45",
+      "frames": 5
+    },
+    {
+      "name": "properties: top",
+      "tags": [
+        "shoulder_roll"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series IV, Volume 3: Advanced Omoplata 3, Technique 2 @ 6:54",
+      "frames": 8
+    },
+    {
+      "name": "ankle pick",
+      "tags": [
+        "trip",
+        "ankle_pick"
+      ],
+      "ref": "?? \"Mastering the System\" Episode 100",
+      "frames": 4
+    },
+    {
+      "name": "ankle pick",
+      "tags": [
+        "ankle_pick"
+      ],
+      "ref": null,
+      "frames": 4
+    },
+    {
+      "name": "spladle throw",
+      "tags": [
+        "throw"
+      ],
+      "ref": "Anderson Silva \"Takedown Defense (Single Leg Counters)\" (https://www.youtube.com/watch?v=wEtKhy9zHI8)",
+      "frames": 11
+    },
+    {
+      "name": "takedown",
+      "tags": [
+        "takedown"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series I, Volume 5: The Guard (Sweeps), Technique ? @ 10:00",
+      "frames": 8
+    },
+    {
+      "name": "stand up to arm drag",
+      "tags": [
+        "arm_drag",
+        "stand_up"
+      ],
+      "ref": null,
+      "frames": 4
+    },
+    {
+      "name": "properties: top detailed",
+      "tags": [
+        "rear_naked_choke"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series I, Volume 1: Arm Drags, Technique 10",
+      "frames": 8
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "guard_pull",
+        "guard_jump"
+      ],
+      "ref": "Elliott Bayev \"Guard Pull Technique Straight Into an Armbar\" https://www.youtube.com/watch?v=agv2nNVKd_8",
+      "frames": 6
+    },
+    {
+      "name": "properties: top detailed",
+      "tags": [
+        "pass_under"
+      ],
+      "ref": "Ryan Hall \"Back Attacks\", Volume 2: Finishes, Technique 24: \"Over Under to Double Under\" @ 1:28:38",
+      "frames": 6
+    },
+    {
+      "name": "properties: top detailed",
+      "tags": [
+        "rear_naked_choke"
+      ],
+      "ref": "Pablo Popovitch \"NoGi Exposed\", DVD 3: Taking the Back, Volume 12: Submissions, Section 3: Double Hooks to Pablo Crush Choke @ 37:52",
+      "frames": 13
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "te_waza"
+      ],
+      "ref": "Ben Askren https://www.youtube.com/watch?v=EZ4hvirIZ3I",
+      "frames": 13
+    },
+    {
+      "name": "ogoshi",
+      "tags": [
+        "throw",
+        "koshi_waza"
+      ],
+      "ref": "Dan Gable \"Wrestling Essentials\", https://www.youtube.com/watch?v=WM1JtwB7Xu8 @ 32:10",
+      "frames": 8
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "throw"
+      ],
+      "ref": "Karo Parysian \"Judo For MMA\" Volume 4: Uchi-Mata, Section 1 @ 43:43",
+      "frames": 13
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "single_leg_takedown"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 1: Takedowns, Technique 1 @ 1:03",
+      "frames": 6
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "single_leg_takedown",
+        "stand_up"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 1: Takedowns, Technique 1 @ 1:03",
+      "frames": 3
+    },
+    {
+      "name": "properties: detailed",
+      "tags": [
+        "single_leg_takedown",
+        "stand_up"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 1: Takedowns, Technique 2 @ 5:14",
+      "frames": 3
+    },
+    {
+      "name": "takedown",
+      "tags": [
+        "single_leg_takedown"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 1: Takedowns, Technique 2 @ 5:42",
+      "frames": 7
+    },
+    {
+      "name": "kata guruma",
+      "tags": [
+        "te_waza"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 1: Takedowns, Technique 12 @ 39:18",
+      "frames": 7
+    },
+    {
+      "name": "kata guruma",
+      "tags": [
+        "te_waza"
+      ],
+      "ref": "Marcelo Garcia \"Winning Techniques Of Submission Grappling\", Series III, Volume 1: Takedowns, Technique 12 @ 39:18",
+      "frames": 3
+    },
+    {
+      "name": "properties: bottom",
+      "tags": [
+        "deep_half"
+      ],
+      "ref": "Ryan Hall \"The Deep Half Guard\", Volume 2: Deep Half Attacks, Section 12: Leg Lever To Back @ 52:01",
+      "frames": 8
+    }
+  ],
+  "mapped_to_taxonomy": {
+    "side_control_bottom": {
+      "variation_count": 27,
+      "variation_names": [
+        "side ctrl w/ near open elbow and crossface",
+        "twister side control",
+        "side control w/ near arm pin and far underhook",
+        "judo side going around c-cups",
+        "judo side vs t-rex",
+        "side control w/ bottom underhook",
+        "side control w/ near bottom overhook and neck frame",
+        "side control w/ bottom body lock",
+        "side control w/ head&arm vs hip block and overhook",
+        "side control w/ head&arm vs hip block + neck frame"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "north_south_top": {
+      "variation_count": 6,
+      "variation_names": [
+        "north south",
+        "north/south choke",
+        "north/south kimura",
+        "north/south darce",
+        "north/south vs elbow frame",
+        "backward roll north south escape"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "back_mount": {
+      "variation_count": 15,
+      "variation_names": [
+        "seated back w/ hook on underhook side",
+        "seated rnc w/ trapped arm",
+        "mounted turtle w/ seatbelt",
+        "side control w/ seatbelt and first hook",
+        "turtle w/ seatbelt and near hook",
+        "inserting first hook from side",
+        "straight back w/ seatbelt",
+        "back on choke arm side",
+        "back on underhook side",
+        "seated back w/ seatbelt"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "closed_guard_bottom": {
+      "variation_count": 65,
+      "variation_names": [
+        "full guard kimura",
+        "combat base vs freshly broken guard",
+        "octopus closed guard",
+        "posture broken full guard w/ hand on mat",
+        "standing vs arm-pinnen closed guard",
+        "distance closed guard w/ 2-on-1",
+        "bottom defeating hip post in closed guard",
+        "angled out full guard",
+        "neck cleared in new jersey",
+        "double bagged chill dog"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "standing_neutral": {
+      "variation_count": 103,
+      "variation_names": [
+        "flanking after standing drag",
+        "distant standing collar-tie",
+        "standing vs de la riva",
+        "standing between legs",
+        "standing arm drag on back leg side",
+        "removing butterfly hooks",
+        "standing vs reverse dlr",
+        "standing over+under vs tricep+under",
+        "south-paw neutral standing",
+        "standing behind w/ body lock, grip fighting"
+      ],
+      "techniques": [
+        "properties: detailed"
+      ],
+      "references": [
+        "Karo Parysian \"Judo For MMA\" Volume 4: DROP SEOI-NAGE, Section 1 @ 2:06"
+      ]
+    },
+    "butterfly_guard": {
+      "variation_count": 37,
+      "variation_names": [
+        "seated butterfly dragging arm",
+        "standing vs supine butterfly",
+        "seated butterfly w/ reverse 2-on-1",
+        "butterfly knee pin pass",
+        "butterfly w/ whizzer",
+        "cocoon w/ posture broken",
+        "butterfly 2-on-1",
+        "halfway butterfly overhook sweep",
+        "combat base vs butterfly",
+        "butterfly w/ double under elevation start"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "turtle_bottom": {
+      "variation_count": 23,
+      "variation_names": [
+        "turtle vs darce",
+        "turtle w/ single-leg vs vice grip",
+        "coming up on posting turtle's leg",
+        "arm dragged turtle",
+        "turtle body lock",
+        "turtle w/ lower back control",
+        "sprawl w/ head&arm vs turtle",
+        "sprawled front chestlock vs turtle",
+        "parallel turtle w/ seatbelt",
+        "parallel turtle"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "half_guard_bottom": {
+      "variation_count": 40,
+      "variation_names": [
+        "shooting for underhook in bottom half",
+        "inverted half guard",
+        "thwarted half guard pass",
+        "deep half vs head&arm",
+        "standing in half w/ hip pinned",
+        "stomp half guard",
+        "side half w/ deep underhook",
+        "back step pass",
+        "half guard shell",
+        "smashed traditional half"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "headquarters": {
+      "variation_count": 9,
+      "variation_names": [
+        "mini stomp one",
+        "smashed \u00bc vs whizzer",
+        "sliced knee",
+        "knee slice vs de la riva",
+        "flat \u00bc w/ head+arm",
+        "coming up on close single-leg",
+        "standing half guard knee slice start",
+        "stepping back from knee slice",
+        "sliced guard vs cross grip and wrist pin"
+      ],
+      "techniques": [
+        "properties: top detailed",
+        "properties: top"
+      ],
+      "references": [
+        "Pablo Popovitch \"NoGi Exposed\", DVD 2: Guard Passing, Volume 10: Half Guard Series, Section 13: Knee Cross Pass @ 1:22:08",
+        "Ryan Hall \"Arm Triangles\", Volume 2: Creating Openings & Finishing, Technique 9: Half Guard Top: Brabo @ 1:01:53",
+        "Eddie Bravo \"Mastering the System\" Episode 82 @ 37:26",
+        "Pablo Popovitch \"NoGi Exposed\", DVD 1: Guard Passing, Volume 4: Cross Grip Series, Section 4: Knee Through Pass"
+      ]
+    },
+    "side_control_top": {
+      "variation_count": 16,
+      "variation_names": [
+        "judo side w/ whizzer vs shitty underhook",
+        "bottom turning in w/ underhook in side control",
+        "approaching turned away t-rex",
+        "side control vs turned away t-rex",
+        "twister side w/ grapevine and fishnet",
+        "near side side control kimura",
+        "side control behind w/ double unders vs overhook",
+        "side control darce",
+        "leg drag to side control",
+        "side control w/ vice grip vs underhook"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "half_guard_top": {
+      "variation_count": 6,
+      "variation_names": [
+        "octopus half guard",
+        "half guard arm drag",
+        "seated half w/ bottom underhook",
+        "side half w/ lockdown, overhook and pimp-arm",
+        "elbow half w/ weak underhook",
+        "arm-in guillotine vs single leg"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "turtle_top": {
+      "variation_count": 3,
+      "variation_names": [
+        "double leg from knees vs sprawl",
+        "gator roll",
+        "front headlock vs single"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "knee_on_belly": {
+      "variation_count": 6,
+      "variation_names": [
+        "reverse knee on belly",
+        "knee on belly vs underhook",
+        "knee on belly w/ head&arm",
+        "knee on belly drape",
+        "knee on belly center",
+        "KoB w/ collar tie and elbow"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "single_leg_x": {
+      "variation_count": 10,
+      "variation_names": [
+        "x-guard on knee leaning forward",
+        "single leg x w/ overhook",
+        "honey hole heel hook",
+        "top pulling away from x-guard",
+        "wide standing x-guard",
+        "x-guard push sweep start",
+        "wide upright standing x",
+        "postured up single-x",
+        "x guard w/o underhook",
+        "standing x vs near wrist control"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "closed_guard_top": {
+      "variation_count": 19,
+      "variation_names": [
+        "knee slice vs t-rex",
+        "combat base leg drag w/ bicep control",
+        "\u00bc clinch knee battle",
+        "\u00bc clinch",
+        "foot-over-foot pass start",
+        "turtle w/ seat- belt and knee under elbow",
+        "perfect kimura",
+        "bottom starting to turn in",
+        "forward leaning leg drag vs t-rex",
+        "combat base vs knee side 2-on-1"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "front_headlock": {
+      "variation_count": 3,
+      "variation_names": [
+        "arm-out guillotine",
+        "arm-in guillotine",
+        "bottom coming up into guillotine"
+      ],
+      "techniques": [
+        "properties: bottom"
+      ],
+      "references": [
+        "Ryan Hall \"Arm Triangles\", Volume 3: Troubleshooting, Transitions and Drills, Technique 10: The Brabo Roll Under @ 46:35"
+      ]
+    },
+    "dogfight": {
+      "variation_count": 5,
+      "variation_names": [
+        "dogfight w/o leg control",
+        "power dogfight",
+        "dogfight w/ double unders",
+        "half and half",
+        "dogfight w/o whizzer"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "mount_bottom": {
+      "variation_count": 14,
+      "variation_names": [
+        "mount",
+        "high mount w/ one arm trapped",
+        "mounted triangle",
+        "gangsta-lean",
+        "mount w/ double unders",
+        "mount w/ head&arm",
+        "mounted arm triangle",
+        "postured up mount",
+        "mount w/ head&armpit",
+        "strike threat from mount"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "mount_top": {
+      "variation_count": 1,
+      "variation_names": [
+        "rolled onto side in mount"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "spider_lasso": {
+      "variation_count": 2,
+      "variation_names": [
+        "spider guard w/ shins against biceps",
+        "spider guard w/ wrist control"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "fifty_fifty": {
+      "variation_count": 2,
+      "variation_names": [
+        "50/50 heel hook",
+        "standing vs 50/50"
+      ],
+      "techniques": [],
+      "references": []
+    },
+    "crucifix": {
+      "variation_count": 6,
+      "variation_names": [
+        "crucifix",
+        "crucified turtle",
+        "turtle crucified w/ one leg",
+        "crucifix w/ kimura",
+        "rev. triangle crucifix + kimura",
+        "rev. mounted triangle-crucifix- kimura"
+      ],
+      "techniques": [],
+      "references": []
+    }
+  }
+}

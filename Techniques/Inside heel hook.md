@@ -7,9 +7,8 @@ tags: [technique]
 ## Used from
 
 - [[Cross Ashi Garami]]
-- [[Outside Ashi Garami]]
+- [[Inside Sankaku (Honeyhole/Saddle)]]
 - [[Single Leg X / Ashi Garami]]
-- [[Straight Ashi Garami]]
 
 ## Description
 

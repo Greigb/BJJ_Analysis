@@ -7,6 +7,7 @@ tags: [technique]
 ## Used from
 
 - [[Back Taken (Defending)]]
+- [[Submission Defence (escaping)]]
 
 ## Description
 

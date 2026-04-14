@@ -6,10 +6,7 @@ tags: [technique]
 
 ## Used from
 
-- [[Back Exposure (partially turned)]]
 - [[Back Mount / Back Control]]
-- [[Pass in Progress]]
-- [[Sweep in Progress]]
 
 ## Description
 

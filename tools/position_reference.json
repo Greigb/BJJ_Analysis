@@ -1,0 +1,596 @@
+{
+  "standing_neutral": {
+    "name": "Standing - Neutral",
+    "category": "Standing",
+    "visual_cues": "Both people standing upright, facing each other, no significant grip or contact. Athletic stance, hands out.",
+    "grapplemap_variations": [
+      "standing vs outside ashi",
+      "air 300",
+      "standing w/ whizzer",
+      "distant standing collar-tie",
+      "low double leg",
+      "te guruma",
+      "standing vs seated w/ knee pinned",
+      "standing arm drag on front leg side"
+    ],
+    "grapplemap_variation_count": 103,
+    "body_geometry": [],
+    "techniques_from_here": [
+      "properties: detailed"
+    ],
+    "instructional_references": [
+      "Karo Parysian \"Judo For MMA\" Volume 4: DROP SEOI-NAGE, Section 1 @ 2:06"
+    ]
+  },
+  "standing_clinch": {
+    "name": "Clinch / Collar Tie",
+    "category": "Standing",
+    "visual_cues": "Both standing but gripping each other \u2014 hands on head, neck, collar, or arms. Heads are close together. Pulling/pushing with upper body contact.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "closed_guard_bottom": {
+    "name": "Closed Guard (Bottom)",
+    "category": "Guard (Bottom)",
+    "visual_cues": "Person on their BACK with LEGS WRAPPED around the other person's waist. Ankles are LOCKED behind the top person's back. The top person is between the bottom person's legs, chest-to-chest.",
+    "grapplemap_variations": [
+      "closed guard w/ overhook + collar tie",
+      "full guard w/ bicep control vs double collar",
+      "hip bump sweep w/ hand post",
+      "closed guard w/ overhook vs arm pin",
+      "boston handshake",
+      "double bagged chill dog",
+      "rat guard",
+      "closed guard w/ double unders"
+    ],
+    "grapplemap_variation_count": 65,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "half_guard_bottom": {
+    "name": "Half Guard (Bottom)",
+    "category": "Guard (Bottom)",
+    "visual_cues": "Person on their back or side with ONE LEG trapped between their legs (not both). One of the top person's legs is controlled/entangled, the other is free. Partial guard retention.",
+    "grapplemap_variations": [
+      "z guard toe hold threat",
+      "smashed half above knees",
+      "smashed half w/ double unders vs crossface",
+      "half guard kimura",
+      "deep half vs head&arm",
+      "elbow half w/ deep underhook",
+      "half guard shell",
+      "half guard w/ double unders vs crossface"
+    ],
+    "grapplemap_variation_count": 40,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "butterfly_guard": {
+    "name": "Butterfly Guard",
+    "category": "Guard (Bottom)",
+    "visual_cues": "Bottom person is SEATED UPRIGHT (not flat on back) with BOTH FEET hooked inside the top person's thighs. Shins are against the inner thighs. Bottom person often has an underhook.",
+    "grapplemap_variations": [
+      "halfway butterfly overhook sweep",
+      "seated butterfly homie",
+      "posture broken seated butterfly w/ double unders",
+      "distance seated butterfly",
+      "combat base butterfly arm drag",
+      "distance supine butterfly",
+      "butterfly arm drag w/ leg grab",
+      "cocoon w/ overhook"
+    ],
+    "grapplemap_variation_count": 37,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "open_guard": {
+    "name": "Open Guard (generic)",
+    "category": "Guard (Bottom)",
+    "visual_cues": "Bottom person on back or seated with legs NOT wrapped around opponent. Feet are on hips, biceps, or pushing. There is SPACE between the two people. Legs are active but not locked.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "de_la_riva": {
+    "name": "De La Riva Guard",
+    "category": "Guard (Bottom)",
+    "visual_cues": "Bottom person has ONE LEG hooked BEHIND the top person's lead leg (from outside to inside, behind the knee). The other foot is on the hip. Often gripping the far ankle.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "spider_lasso": {
+    "name": "Spider / Lasso Guard",
+    "category": "Guard (Bottom)",
+    "visual_cues": "Bottom person on back with FEET ON THE BICEPS of the top person, pushing the arms. Legs are extended, creating distance. Often seen with gi grips on sleeves. Lasso: one leg wraps around the arm.",
+    "grapplemap_variations": [
+      "spider guard w/ shins against biceps",
+      "spider guard w/ wrist control"
+    ],
+    "grapplemap_variation_count": 2,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "closed_guard_top": {
+    "name": "Inside Closed Guard (Top)",
+    "category": "Inside Guard (Top)",
+    "visual_cues": "Person kneeling or postured INSIDE the other's CLOSED (locked ankles) guard. Trapped between the bottom person's wrapped legs. Often hands on the bottom person's hips or chest trying to open the guard.",
+    "grapplemap_variations": [
+      "combat base w/ single",
+      "turtle w/ seat- belt and knee under elbow",
+      "outside ashi vs combat base",
+      "knee slice vs t-rex",
+      "forward leaning leg drag vs t-rex",
+      "\u00bc clinch knee battle",
+      "rolling toward hippo",
+      "sweep single"
+    ],
+    "grapplemap_variation_count": 19,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "half_guard_top": {
+    "name": "Half Guard (Top)",
+    "category": "Inside Guard (Top)",
+    "visual_cues": "Top person is on top but has ONE LEG trapped by the bottom person. Upper body may be controlling with crossface/underhook. Trying to free the trapped leg to complete the pass.",
+    "grapplemap_variations": [
+      "elbow half w/ weak underhook",
+      "octopus half guard",
+      "half guard arm drag",
+      "seated half w/ bottom underhook",
+      "arm-in guillotine vs single leg",
+      "side half w/ lockdown, overhook and pimp-arm"
+    ],
+    "grapplemap_variation_count": 6,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "open_guard_top": {
+    "name": "Passing Open Guard (Top)",
+    "category": "Inside Guard (Top)",
+    "visual_cues": "Top person standing or kneeling OVER the bottom person who is playing open guard. Trying to get past the legs. Gripping pants/ankles, stepping around feet. Not yet past the legs.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "headquarters": {
+    "name": "Headquarters / Passing Position",
+    "category": "Inside Guard (Top)",
+    "visual_cues": "Top person has ONE KNEE between the bottom person's legs (splitting them) and the other knee outside. Stapling one leg down. Strong passing position with good base. Often pressing forward.",
+    "grapplemap_variations": [
+      "mini stomp one",
+      "sliced guard vs cross grip and wrist pin",
+      "stepping back from knee slice",
+      "smashed \u00bc vs whizzer",
+      "coming up on close single-leg",
+      "sliced knee",
+      "standing half guard knee slice start",
+      "flat \u00bc w/ head+arm"
+    ],
+    "grapplemap_variation_count": 9,
+    "body_geometry": [],
+    "techniques_from_here": [
+      "properties: top detailed",
+      "properties: top"
+    ],
+    "instructional_references": [
+      "Pablo Popovitch \"NoGi Exposed\", DVD 2: Guard Passing, Volume 10: Half Guard Series, Section 13: Knee Cross Pass @ 1:22:08",
+      "Ryan Hall \"Arm Triangles\", Volume 2: Creating Openings & Finishing, Technique 9: Half Guard Top: Brabo @ 1:01:53",
+      "Eddie Bravo \"Mastering the System\" Episode 82 @ 37:26",
+      "Pablo Popovitch \"NoGi Exposed\", DVD 1: Guard Passing, Volume 4: Cross Grip Series, Section 4: Knee Through Pass"
+    ]
+  },
+  "side_control_top": {
+    "name": "Side Control (Top)",
+    "category": "Dominant Position (Top)",
+    "visual_cues": "Top person is lying PERPENDICULAR (90 degrees) across the bottom person's chest. Chest-to-chest contact. NO LEGS between them \u2014 the pass is complete. Top person's hips are heavy on the mat. Often controlling with crossface and underhook.",
+    "grapplemap_variations": [
+      "twister side w/ grapevine and fishnet",
+      "side control darce",
+      "bridged against judo side",
+      "side control double unders bridge",
+      "approaching turned away t-rex",
+      "turned in t-rex vs side vice",
+      "leg drag to side control",
+      "judo side w/ whizzer vs shitty underhook"
+    ],
+    "grapplemap_variation_count": 16,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "mount_top": {
+    "name": "Mount (Top)",
+    "category": "Dominant Position (Top)",
+    "visual_cues": "Top person is SITTING ON the bottom person's torso/hips, STRADDLING them. Knees on both sides of the body. The bottom person is flat on their back underneath. Top person is upright or leaning forward.",
+    "grapplemap_variations": [
+      "rolled onto side in mount"
+    ],
+    "grapplemap_variation_count": 1,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "back_mount": {
+    "name": "Back Mount / Back Control",
+    "category": "Dominant Position (Top)",
+    "visual_cues": "One person is BEHIND the other, chest-to-back. Usually has HOOKS IN (feet inside the thighs) or a body triangle (legs wrapped around the waist). The person in front cannot see the person behind them.",
+    "grapplemap_variations": [
+      "seated back w/ hook on underhook side",
+      "turtle w/ seatbelt and near hook",
+      "mounted turtle w/ single hook & seatbelt",
+      "mounted turtle w/ seatbelt",
+      "side control w/ seatbelt and first hook",
+      "straight back w/ seatbelt",
+      "fetal w/ seat belt",
+      "back on choke arm side w/ one leg trapped"
+    ],
+    "grapplemap_variation_count": 15,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "knee_on_belly": {
+    "name": "Knee on Belly",
+    "category": "Dominant Position (Top)",
+    "visual_cues": "Top person has ONE KNEE planted on the bottom person's stomach/chest while the other foot is posted on the mat. The top person is essentially kneeling on the other. Very upright posture. One foot on the ground.",
+    "grapplemap_variations": [
+      "knee on belly w/ head&arm",
+      "KoB w/ collar tie and elbow",
+      "knee on belly center",
+      "knee on belly vs underhook",
+      "reverse knee on belly",
+      "knee on belly drape"
+    ],
+    "grapplemap_variation_count": 6,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "north_south_top": {
+    "name": "North-South (Top)",
+    "category": "Dominant Position (Top)",
+    "visual_cues": "Top person is lying ON TOP but HEAD-TO-TOE (180 degrees). Both people's heads point in OPPOSITE directions. Top person's chest is on the bottom person's chest but they are facing opposite ways.",
+    "grapplemap_variations": [
+      "north/south kimura",
+      "north south",
+      "north/south darce",
+      "north/south vs elbow frame",
+      "backward roll north south escape",
+      "north/south choke"
+    ],
+    "grapplemap_variation_count": 6,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "crucifix": {
+    "name": "Crucifix",
+    "category": "Dominant Position (Top)",
+    "visual_cues": "The top person has trapped BOTH of the bottom person's arms \u2014 one with the legs, one with the hands. The bottom person is stretched out like a cross with no arm defence. Often from the side or back.",
+    "grapplemap_variations": [
+      "rev. mounted triangle-crucifix- kimura",
+      "crucified turtle",
+      "rev. triangle crucifix + kimura",
+      "crucifix",
+      "crucifix w/ kimura",
+      "turtle crucified w/ one leg"
+    ],
+    "grapplemap_variation_count": 6,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "side_control_bottom": {
+    "name": "Bottom Side Control",
+    "category": "Inferior Position (Bottom)",
+    "visual_cues": "Person is flat on their BACK with the opponent lying across their chest (perpendicular). No legs between them. Being pinned and controlled. Often framing with forearms to create space.",
+    "grapplemap_variations": [
+      "side control w/ head&arm",
+      "electric cradle w/ open elbow",
+      "judo side vs t-rex",
+      "loose traditional side control",
+      "switching to regular side",
+      "entering side control w/ kimura",
+      "switching to judo side",
+      "side control w/ far underhook"
+    ],
+    "grapplemap_variation_count": 27,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "mount_bottom": {
+    "name": "Bottom Mount",
+    "category": "Inferior Position (Bottom)",
+    "visual_cues": "Person is flat on their BACK with the opponent SITTING ON THEM, straddling their hips/torso. Being ridden. Arms are defending against chokes and armlocks.",
+    "grapplemap_variations": [
+      "mounted triangle",
+      "high mount w/ one arm trapped",
+      "gangsta-lean",
+      "mount w/ head&arm",
+      "gangsta- lean w/  head&armpit",
+      "mount vs body lock",
+      "low mount",
+      "mounted arm triangle"
+    ],
+    "grapplemap_variation_count": 14,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "back_taken": {
+    "name": "Back Taken (Defending)",
+    "category": "Inferior Position (Bottom)",
+    "visual_cues": "Person has the opponent BEHIND them on their back. They CANNOT SEE the attacker. Hooks or body triangle are in. Hands are fighting at the neck to defend chokes.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "turtle_bottom": {
+    "name": "Turtle (Bottom)",
+    "category": "Inferior Position (Bottom)",
+    "visual_cues": "Person is on their HANDS AND KNEES, curled up, face DOWN, protecting their neck. Looks like a ball or turtle shell. The opponent is on top or beside them trying to turn them or take the back.",
+    "grapplemap_variations": [
+      "mounted turtle w/ double wrist control",
+      "mounting turtle",
+      "turtle body lock",
+      "lower-back mounted turtle",
+      "turtle shoulder roll w/ leg",
+      "turtle w/ lower back control",
+      "shrugged turtle",
+      "turtle w/ single-leg vs vice grip"
+    ],
+    "grapplemap_variation_count": 23,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "north_south_bottom": {
+    "name": "North-South (Bottom)",
+    "category": "Inferior Position (Bottom)",
+    "visual_cues": "Person is pinned on their back with the opponent lying on top HEAD-TO-TOE. Being smothered. Heads point opposite directions.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "single_leg_x": {
+    "name": "Single Leg X / Ashi Garami",
+    "category": "Leg Entanglement",
+    "visual_cues": "Bottom person is on their BACK with BOTH LEGS controlling ONE of the opponent's legs. One foot is on the hip, the other hooks behind the knee. The opponent's leg is between the attacker's legs. The opponent is usually still standing or kneeling.",
+    "grapplemap_variations": [
+      "wide upright standing x",
+      "wide standing x-guard",
+      "x guard w/o underhook",
+      "x-guard push sweep start",
+      "top pulling away from x-guard",
+      "postured up single-x",
+      "x-guard on knee leaning forward",
+      "standing x vs near wrist control"
+    ],
+    "grapplemap_variation_count": 10,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "straight_ashi": {
+    "name": "Straight Ashi Garami",
+    "category": "Leg Entanglement",
+    "visual_cues": "Attacker is on their back/side with the opponent's leg trapped between their legs. Both of attacker's legs are on the SAME SIDE of the opponent's trapped leg. The attacker's hips are next to the opponent's knee. Basic outside leg position.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "outside_ashi": {
+    "name": "Outside Ashi Garami",
+    "category": "Leg Entanglement",
+    "visual_cues": "Similar to straight ashi but the attacker's OUTSIDE leg crosses OVER the opponent's body/hip. More control than straight ashi. The attacker's legs frame the opponent's knee from the outside.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "inside_sankaku": {
+    "name": "Inside Sankaku (Honeyhole/Saddle)",
+    "category": "Leg Entanglement",
+    "visual_cues": "Attacker has BOTH LEGS TRIANGLED (crossed/locked like a triangle) around the opponent's SINGLE LEG. The trapped leg goes BETWEEN the attacker's thighs. The attacker's legs form a triangle (figure-four) grip. This is the strongest heel hook position. The heel is typically being exposed/attacked.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "outside_sankaku": {
+    "name": "Outside Sankaku (411)",
+    "category": "Leg Entanglement",
+    "visual_cues": "Attacker has legs triangled around the opponent's leg but from the OUTSIDE. The attacker's body faces AWAY from the opponent (belly-down relative to the opponent's leg). The triangle grip is on the outside of the thigh. Used for outside heel hooks.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "cross_ashi": {
+    "name": "Cross Ashi Garami",
+    "category": "Leg Entanglement",
+    "visual_cues": "Attacker controls the opponent's leg but their body is angled ACROSS \u2014 the attacker's legs cross to the opposite side of the opponent's body. A transitional position between inside and outside sankaku.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "fifty_fifty": {
+    "name": "50/50",
+    "category": "Leg Entanglement",
+    "visual_cues": "Both people have their legs EQUALLY entangled \u2014 each has one leg wrapped around the other's leg in a MIRROR image. Symmetrical position. Both people face the same direction with legs intertwined. Neither has a clear advantage.",
+    "grapplemap_variations": [
+      "50/50 heel hook",
+      "standing vs 50/50"
+    ],
+    "grapplemap_variation_count": 2,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "backside_fifty_fifty": {
+    "name": "Backside 50/50",
+    "category": "Leg Entanglement",
+    "visual_cues": "Like 50/50 but one person has rotated so they face AWAY from the other (back-to-back relative to the entangled legs). One person faces the opponent's feet, the other faces away. Asymmetric advantage.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "turtle_top": {
+    "name": "Turtle Attack (Top)",
+    "category": "Scramble / Transition",
+    "visual_cues": "One person is on top of or beside the turtled person (who is on hands and knees). The attacker is draped over the turtle, reaching for the neck or trying to insert hooks. Often has a seatbelt grip (one arm over shoulder, one under armpit).",
+    "grapplemap_variations": [
+      "front headlock vs single",
+      "gator roll",
+      "double leg from knees vs sprawl"
+    ],
+    "grapplemap_variation_count": 3,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "front_headlock": {
+    "name": "Front Headlock / Guillotine Position",
+    "category": "Scramble / Transition",
+    "visual_cues": "One person has their arm wrapped around the OTHER person's HEAD/NECK from the front. The head is trapped under the armpit. Often the defender's head is down. Can be standing or on the ground. The controller's body is sprawled back.",
+    "grapplemap_variations": [
+      "arm-out guillotine",
+      "bottom coming up into guillotine",
+      "arm-in guillotine"
+    ],
+    "grapplemap_variation_count": 3,
+    "body_geometry": [],
+    "techniques_from_here": [
+      "properties: bottom"
+    ],
+    "instructional_references": [
+      "Ryan Hall \"Arm Triangles\", Volume 3: Troubleshooting, Transitions and Drills, Technique 10: The Brabo Roll Under @ 46:35"
+    ]
+  },
+  "dogfight": {
+    "name": "Dogfight / Underhook Battle",
+    "category": "Scramble / Transition",
+    "visual_cues": "Both people are on their KNEES facing each other, chest-to-chest, fighting for underhooks. Neither is clearly on top or bottom. A 50/50 wrestling position. Both trying to get underneath the other.",
+    "grapplemap_variations": [
+      "dogfight w/o leg control",
+      "dogfight w/ double unders",
+      "dogfight w/o whizzer",
+      "half and half",
+      "power dogfight"
+    ],
+    "grapplemap_variation_count": 5,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "wrestling_scramble": {
+    "name": "Wrestling Scramble",
+    "category": "Scramble / Transition",
+    "visual_cues": "Fast movement, bodies tangled, neither person in a clear position. Someone may be shooting for a takedown, sprawling, or scrambling to their feet. Very dynamic and hard to freeze-frame.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "guard_recovery": {
+    "name": "Guard Recovery (in progress)",
+    "category": "Scramble / Transition",
+    "visual_cues": "The bottom person is actively SHRIMPING (hip escaping) or turning to get their legs back in between. They were in a bad position and are creating space. Hip movement is visible, legs are coming back in.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "pass_in_progress": {
+    "name": "Pass in Progress",
+    "category": "Scramble / Transition",
+    "visual_cues": "The top person is MID-PASS \u2014 they are stepping or sliding around the bottom person's legs but haven't settled into side control yet. The legs are partially cleared but the position isn't consolidated.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "sweep_in_progress": {
+    "name": "Sweep in Progress",
+    "category": "Scramble / Transition",
+    "visual_cues": "The bottom person is actively LIFTING or ROLLING the top person over. The top person is being off-balanced and may be mid-air or tilting. A reversal is happening in real-time.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "back_exposure": {
+    "name": "Back Exposure (partially turned)",
+    "category": "Scramble / Transition",
+    "visual_cues": "One person is partially turned away showing their BACK to the other but not fully in turtle or back control yet. Mid-transition \u2014 could go to back take or guard recovery. The exposed person's shoulders are rotating away.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "submission_defence": {
+    "name": "Submission Defence (escaping)",
+    "category": "Scramble / Transition",
+    "visual_cues": "One person is actively defending a submission \u2014 hands are fighting at the neck (defending choke), or stacking/posturing to escape an armbar, or rolling to relieve heel hook pressure. The defensive action is the primary thing happening.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "scramble_generic": {
+    "name": "Scramble (generic)",
+    "category": "Scramble / Transition",
+    "visual_cues": "Cannot identify a specific position. Bodies are tangled in a way that doesn't match any defined position. Use this as a last resort.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  },
+  "unclear": {
+    "name": "Unclear / Cannot Determine",
+    "category": "Scramble / Transition",
+    "visual_cues": "Frame is too blurry, dark, obstructed, or zoomed out to determine any position. Cannot see enough detail to classify.",
+    "grapplemap_variations": [],
+    "grapplemap_variation_count": 0,
+    "body_geometry": [],
+    "techniques_from_here": [],
+    "instructional_references": []
+  }
+}

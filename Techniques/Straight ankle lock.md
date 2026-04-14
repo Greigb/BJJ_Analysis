@@ -6,8 +6,6 @@ tags: [technique]
 
 ## Used from
 
-- [[Cross Ashi Garami]]
-- [[Outside Ashi Garami]]
 - [[Single Leg X / Ashi Garami]]
 - [[Straight Ashi Garami]]
 

@@ -6,6 +6,7 @@ tags: [technique]
 
 ## Used from
 
+- [[Back Exposure (partially turned)]]
 - [[Turtle Attack (Top)]]
 
 ## Description

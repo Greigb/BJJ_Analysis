@@ -6,6 +6,7 @@ tags: [technique]
 
 ## Used from
 
+- [[Backside 50/50]]
 - [[De La Riva Guard]]
 - [[Dogfight / Underhook Battle]]
 
