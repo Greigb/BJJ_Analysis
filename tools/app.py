@@ -20,7 +20,11 @@ from pathlib import Path
 from collections import Counter
 from datetime import timedelta
 from io import BytesIO
-from streamlit_agraph import agraph, Node, Edge, Config
+try:
+    from streamlit_agraph import agraph, Node, Edge, Config
+    HAS_AGRAPH = True
+except ImportError:
+    HAS_AGRAPH = False
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -696,123 +700,135 @@ def main():
         st.markdown("### BJJ Position Map")
         st.caption(f"{len(taxonomy['positions'])} positions · {len(taxonomy['valid_transitions'])} transitions")
 
-        all_cats = list(taxonomy["categories"].keys())
-        cat_labels = {k: v["label"] for k, v in taxonomy["categories"].items()}
-        selected_cats = st.multiselect("Filter by category", options=all_cats, default=all_cats,
-                                       format_func=lambda x: cat_labels.get(x, x))
+        if not HAS_AGRAPH:
+            st.warning("Interactive graph requires `streamlit-agraph`. Install with: `pip install streamlit-agraph`")
+            st.info("The position map works locally but may not be available on Streamlit Cloud.")
+            # Show a simple text-based position list instead
+            for cat_id, cat in taxonomy["categories"].items():
+                colour = CAT_COLOURS.get(cat["label"], "#666")
+                positions = [p for p in taxonomy["positions"] if p["category"] == cat_id]
+                with st.expander(f"{cat['label']} ({len(positions)} positions)"):
+                    for p in positions:
+                        st.markdown(f"- **{p['name']}** — {p.get('visual_cues', '')}")
+        else:
 
-        pos_map = {p["id"]: p for p in taxonomy["positions"]}
-        jsx_techniques = load_jsx_techniques()
-        yt_links = load_jsx_youtube_links()
+            all_cats = list(taxonomy["categories"].keys())
+            cat_labels = {k: v["label"] for k, v in taxonomy["categories"].items()}
+            selected_cats = st.multiselect("Filter by category", options=all_cats, default=all_cats,
+                                           format_func=lambda x: cat_labels.get(x, x))
 
-        analysis_positions = Counter()
-        analysis_edges = set()
-        if st.session_state.get("auto_result") or st.session_state.get("data"):
-            try:
-                adata = st.session_state.get("data") or json.loads(st.session_state.get("auto_result", "{}"))
-                atimeline = adata.get("timeline", [])
-                prev_pos = None
-                for entry in atimeline:
-                    pos_a = entry.get("player_a_position", "")
-                    if pos_a in pos_map:
-                        analysis_positions[pos_a] += 1
-                    if prev_pos and pos_a and prev_pos != pos_a:
-                        analysis_edges.add((prev_pos, pos_a))
-                    prev_pos = pos_a
-            except (json.JSONDecodeError, TypeError):
-                pass
+            pos_map = {p["id"]: p for p in taxonomy["positions"]}
+            jsx_techniques = load_jsx_techniques()
+            yt_links = load_jsx_youtube_links()
 
-        nodes = []
-        for pos in taxonomy["positions"]:
-            if pos["category"] not in selected_cats:
-                continue
-            cat = taxonomy["categories"][pos["category"]]
-            colour = CAT_COLOURS.get(cat["label"], "#666")
-            is_active = pos["id"] in analysis_positions
-            size = 25 + (analysis_positions.get(pos["id"], 0) * 5) if is_active else 20
-            size = min(size, 45)
-            nodes.append(Node(id=pos["id"], label=pos["name"], size=size,
-                color=colour if is_active or not analysis_positions else f"{colour}44",
-                font={"color": "#E5E7EB" if is_active or not analysis_positions else "#4B5563", "size": 11},
-                borderWidth=3 if is_active else 1, borderWidthSelected=4))
+            analysis_positions = Counter()
+            analysis_edges = set()
+            if st.session_state.get("auto_result") or st.session_state.get("data"):
+                try:
+                    adata = st.session_state.get("data") or json.loads(st.session_state.get("auto_result", "{}"))
+                    atimeline = adata.get("timeline", [])
+                    prev_pos = None
+                    for entry in atimeline:
+                        pos_a = entry.get("player_a_position", "")
+                        if pos_a in pos_map:
+                            analysis_positions[pos_a] += 1
+                        if prev_pos and pos_a and prev_pos != pos_a:
+                            analysis_edges.add((prev_pos, pos_a))
+                        prev_pos = pos_a
+                except (json.JSONDecodeError, TypeError):
+                    pass
 
-        edges = []
-        for a, b in taxonomy["valid_transitions"]:
-            if a not in pos_map or b not in pos_map:
-                continue
-            if pos_map[a]["category"] not in selected_cats or pos_map[b]["category"] not in selected_cats:
-                continue
-            is_traversed = (a, b) in analysis_edges
-            edges.append(Edge(source=a, target=b,
-                color="#D4A843" if is_traversed else "#1E2030",
-                width=3 if is_traversed else 1))
+            nodes = []
+            for pos in taxonomy["positions"]:
+                if pos["category"] not in selected_cats:
+                    continue
+                cat = taxonomy["categories"][pos["category"]]
+                colour = CAT_COLOURS.get(cat["label"], "#666")
+                is_active = pos["id"] in analysis_positions
+                size = 25 + (analysis_positions.get(pos["id"], 0) * 5) if is_active else 20
+                size = min(size, 45)
+                nodes.append(Node(id=pos["id"], label=pos["name"], size=size,
+                    color=colour if is_active or not analysis_positions else f"{colour}44",
+                    font={"color": "#E5E7EB" if is_active or not analysis_positions else "#4B5563", "size": 11},
+                    borderWidth=3 if is_active else 1, borderWidthSelected=4))
 
-        config = Config(width="100%", height=600, directed=True, physics=True,
-            hierarchical=False, nodeHighlightBehavior=True, highlightColor="#D4A843",
-            collapsible=False, node={"highlightStrokeColor": "#D4A843"},
-            link={"highlightColor": "#D4A843"}, backgroundColor="#0B0C0F")
+            edges = []
+            for a, b in taxonomy["valid_transitions"]:
+                if a not in pos_map or b not in pos_map:
+                    continue
+                if pos_map[a]["category"] not in selected_cats or pos_map[b]["category"] not in selected_cats:
+                    continue
+                is_traversed = (a, b) in analysis_edges
+                edges.append(Edge(source=a, target=b,
+                    color="#D4A843" if is_traversed else "#1E2030",
+                    width=3 if is_traversed else 1))
 
-        selected_node = agraph(nodes=nodes, edges=edges, config=config)
+            config = Config(width="100%", height=600, directed=True, physics=True,
+                hierarchical=False, nodeHighlightBehavior=True, highlightColor="#D4A843",
+                collapsible=False, node={"highlightStrokeColor": "#D4A843"},
+                link={"highlightColor": "#D4A843"}, backgroundColor="#0B0C0F")
 
-        # Legend (clean pill layout)
-        legend_html = '<div class="legend-row">'
-        for label, colour in CAT_COLOURS.items():
-            legend_html += f'<span class="legend-pill"><span style="color:{colour}">●</span> {label}</span>'
-        legend_html += '</div>'
-        st.markdown(legend_html, unsafe_allow_html=True)
+            selected_node = agraph(nodes=nodes, edges=edges, config=config)
 
-        if analysis_positions:
-            st.caption(f"Highlighted: {sum(analysis_positions.values())} frames across {len(analysis_positions)} positions")
+            # Legend (clean pill layout)
+            legend_html = '<div class="legend-row">'
+            for label, colour in CAT_COLOURS.items():
+                legend_html += f'<span class="legend-pill"><span style="color:{colour}">●</span> {label}</span>'
+            legend_html += '</div>'
+            st.markdown(legend_html, unsafe_allow_html=True)
 
-        if selected_node and selected_node in pos_map:
-            pos = pos_map[selected_node]
-            cat = taxonomy["categories"][pos["category"]]
-            colour = CAT_COLOURS.get(cat["label"], "#666")
+            if analysis_positions:
+                st.caption(f"Highlighted: {sum(analysis_positions.values())} frames across {len(analysis_positions)} positions")
 
-            st.markdown("---")
-            st.markdown(f"### <span style='color:{colour}'>{pos['name']}</span>", unsafe_allow_html=True)
-            st.caption(f"{cat['label']} · {pos['id']}")
+            if selected_node and selected_node in pos_map:
+                pos = pos_map[selected_node]
+                cat = taxonomy["categories"][pos["category"]]
+                colour = CAT_COLOURS.get(cat["label"], "#666")
 
-            col_tech, col_trans = st.columns(2)
-            with col_tech:
-                techniques = match_position_to_techniques(pos["name"], jsx_techniques)
-                if techniques:
-                    st.markdown("**Techniques**")
-                    for t in techniques:
-                        st.markdown(f"- {t}")
-                else:
-                    st.markdown("*No techniques listed*")
-            with col_trans:
-                to_pos = [pos_map[b]["name"] for a, b in taxonomy["valid_transitions"] if a == selected_node and b in pos_map]
-                from_pos = [pos_map[a]["name"] for a, b in taxonomy["valid_transitions"] if b == selected_node and a in pos_map]
-                if to_pos:
-                    st.markdown("**Transitions to**")
-                    st.markdown(", ".join(to_pos))
-                if from_pos:
-                    st.markdown("**Transitions from**")
-                    st.markdown(", ".join(from_pos))
+                st.markdown("---")
+                st.markdown(f"### <span style='color:{colour}'>{pos['name']}</span>", unsafe_allow_html=True)
+                st.caption(f"{cat['label']} · {pos['id']}")
 
-            yt_id_map = {
-                "standing_neutral": "standing", "standing_clinch": "clinch",
-                "closed_guard_bottom": "closedGuard", "half_guard_bottom": "halfGuard",
-                "open_guard": "openGuard", "butterfly_guard": "butterfly",
-                "de_la_riva": "dlr", "single_leg_x": "singleLegX",
-                "fifty_fifty": "fiftyFifty", "closed_guard_top": "closedGuardTop",
-                "half_guard_top": "halfGuardTop", "headquarters": "hq",
-                "side_control_top": "sideControl", "mount_top": "mount",
-                "back_mount": "backMount", "knee_on_belly": "kneeOnBelly",
-                "north_south_top": "northSouth", "turtle_top": "turtle",
-                "front_headlock": "frontHead", "side_control_bottom": "bottomSide",
-                "mount_bottom": "bottomMount", "turtle_bottom": "turtleBottom",
-                "back_taken": "backTaken",
-            }
-            jsx_id = yt_id_map.get(selected_node)
-            if jsx_id and jsx_id in yt_links:
-                yt = yt_links[jsx_id]
-                st.markdown(f"📺 **[{yt['title']}]({yt['url']})**")
+                col_tech, col_trans = st.columns(2)
+                with col_tech:
+                    techniques = match_position_to_techniques(pos["name"], jsx_techniques)
+                    if techniques:
+                        st.markdown("**Techniques**")
+                        for t in techniques:
+                            st.markdown(f"- {t}")
+                    else:
+                        st.markdown("*No techniques listed*")
+                with col_trans:
+                    to_pos = [pos_map[b]["name"] for a, b in taxonomy["valid_transitions"] if a == selected_node and b in pos_map]
+                    from_pos = [pos_map[a]["name"] for a, b in taxonomy["valid_transitions"] if b == selected_node and a in pos_map]
+                    if to_pos:
+                        st.markdown("**Transitions to**")
+                        st.markdown(", ".join(to_pos))
+                    if from_pos:
+                        st.markdown("**Transitions from**")
+                        st.markdown(", ".join(from_pos))
 
-            if selected_node in analysis_positions:
-                st.info(f"Appeared **{analysis_positions[selected_node]}x** in loaded analysis")
+                yt_id_map = {
+                    "standing_neutral": "standing", "standing_clinch": "clinch",
+                    "closed_guard_bottom": "closedGuard", "half_guard_bottom": "halfGuard",
+                    "open_guard": "openGuard", "butterfly_guard": "butterfly",
+                    "de_la_riva": "dlr", "single_leg_x": "singleLegX",
+                    "fifty_fifty": "fiftyFifty", "closed_guard_top": "closedGuardTop",
+                    "half_guard_top": "halfGuardTop", "headquarters": "hq",
+                    "side_control_top": "sideControl", "mount_top": "mount",
+                    "back_mount": "backMount", "knee_on_belly": "kneeOnBelly",
+                    "north_south_top": "northSouth", "turtle_top": "turtle",
+                    "front_headlock": "frontHead", "side_control_bottom": "bottomSide",
+                    "mount_bottom": "bottomMount", "turtle_bottom": "turtleBottom",
+                    "back_taken": "backTaken",
+                }
+                jsx_id = yt_id_map.get(selected_node)
+                if jsx_id and jsx_id in yt_links:
+                    yt = yt_links[jsx_id]
+                    st.markdown(f"📺 **[{yt['title']}]({yt['url']})**")
+
+                if selected_node in analysis_positions:
+                    st.info(f"Appeared **{analysis_positions[selected_node]}x** in loaded analysis")
 
     # ━━━ TAB: Advanced ━━━
     with tab_advanced:
