@@ -393,9 +393,10 @@ Return ONLY valid JSON, no markdown, no backticks."""
                     st.warning(f"Batch error: {err[:100]}")
                     break
 
-        # Rate limit: 15 req/min = 1 every 4s, use 5s for safety
+        # Rate limit: 30 RPM but 30k TPM — images are ~2k tokens each
+        # 4 images per batch = ~8k tokens, so max ~3-4 batches/min
         if batch_start + batch_size < len(frames):
-            time.sleep(5)
+            time.sleep(8)
 
     progress.progress(1.0, text="Generating summary...")
 
