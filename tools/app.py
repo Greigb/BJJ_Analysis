@@ -495,40 +495,108 @@ def main():
     ])
 
     with tab_auto:
-        st.markdown("Upload a video and analyse it automatically with Groq (free).")
-        uploaded_video = st.file_uploader("Upload video file", type=["mp4", "mov", "avi", "mkv"])
+        st.markdown("**Upload a video file** or **paste a YouTube link** — fully automated analysis with Groq (free).")
+
+        input_method = st.radio("Video source", ["YouTube URL", "Upload file"], horizontal=True)
+
+        yt_url_input = ""
+        uploaded_video = None
+
+        if input_method == "YouTube URL":
+            yt_url_input = st.text_input(
+                "YouTube URL",
+                placeholder="https://www.youtube.com/watch?v=...",
+                key="yt_auto_url",
+            )
+            if yt_url_input and not video_url:
+                video_url = yt_url_input
+        else:
+            uploaded_video = st.file_uploader("Upload video file", type=["mp4", "mov", "avi", "mkv"])
+
         col_int, col_max = st.columns(2)
         with col_int:
             auto_interval = st.slider("Sample interval (seconds)", 3, 15, 5)
         with col_max:
             auto_max = st.slider("Max frames", 10, 80, 30)
 
-        auto_btn = st.button("🚀 Analyse Video", type="primary", use_container_width=True, disabled=not (uploaded_video and groq_key))
+        has_video = bool(uploaded_video) or bool(yt_url_input)
+        auto_btn = st.button("🚀 Analyse Video", type="primary", use_container_width=True, disabled=not (has_video and groq_key))
 
         if not groq_key:
             st.info("Enter your free Groq API key in the sidebar to enable auto-analysis.")
 
-        if auto_btn and uploaded_video and groq_key:
-            # Save uploaded video to temp file
+        if auto_btn and has_video and groq_key:
             import tempfile
-            with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
-                tmp.write(uploaded_video.read())
-                tmp_path = tmp.name
+            tmp_path = None
+            dl_error = None
 
-            data, error = run_groq_analysis(tmp_path, player_name, auto_interval, auto_max, groq_key, taxonomy)
-            os.unlink(tmp_path)
+            if input_method == "YouTube URL" and yt_url_input:
+                # Download YouTube video
+                with st.spinner("Downloading YouTube video..."):
+                    try:
+                        import subprocess
+                        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
+                            tmp_path = tmp.name
+                        result = subprocess.run(
+                            ["yt-dlp", "-f", "best[height<=480]",
+                             "--max-filesize", "50M",
+                             "-o", tmp_path,
+                             "--no-warnings", "--quiet",
+                             yt_url_input],
+                            capture_output=True, text=True, timeout=120,
+                        )
+                        if result.returncode != 0:
+                            # Try with cookies from browser
+                            result = subprocess.run(
+                                ["yt-dlp", "-f", "best[height<=480]",
+                                 "--max-filesize", "50M",
+                                 "--cookies-from-browser", "chrome",
+                                 "-o", tmp_path,
+                                 "--no-warnings", "--quiet",
+                                 yt_url_input],
+                                capture_output=True, text=True, timeout=120,
+                            )
+                        if result.returncode != 0:
+                            dl_error = f"Failed to download video. Error: {result.stderr[:200]}"
+                            if tmp_path and os.path.exists(tmp_path):
+                                os.unlink(tmp_path)
+                            tmp_path = None
+                    except FileNotFoundError:
+                        dl_error = "yt-dlp not installed. Run: brew install yt-dlp"
+                        tmp_path = None
+                    except subprocess.TimeoutExpired:
+                        dl_error = "Download timed out. Try a shorter video."
+                        tmp_path = None
 
-            if error:
-                st.error(error)
-            elif data:
-                json_input = json.dumps(data)
-                analyse_btn = True
-                st.session_state["auto_result"] = json_input
+                if not video_url:
+                    video_url = yt_url_input
+
+            elif uploaded_video:
+                with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
+                    tmp.write(uploaded_video.read())
+                    tmp_path = tmp.name
+
+            if dl_error:
+                st.error(dl_error)
+            elif tmp_path:
+                data, error = run_groq_analysis(tmp_path, player_name, auto_interval, auto_max, groq_key, taxonomy)
+                os.unlink(tmp_path)
+
+                if error:
+                    st.error(error)
+                elif data:
+                    json_input = json.dumps(data)
+                    analyse_btn = True
+                    st.session_state["auto_result"] = json_input
+                    if yt_url_input:
+                        st.session_state["video_url"] = yt_url_input
 
         # Restore previous auto result
         if st.session_state.get("auto_result") and not analyse_btn:
             json_input = st.session_state["auto_result"]
             analyse_btn = True
+            if st.session_state.get("video_url"):
+                video_url = st.session_state["video_url"]
 
     with tab_paste:
         pasted = st.text_area(
