@@ -1,62 +1,300 @@
 {
   "categories": {
-    "standing": { "label": "Standing", "dominance": 0 },
-    "guard_bottom": { "label": "Guard (Bottom)", "dominance": 1 },
-    "guard_top": { "label": "Inside Guard (Top)", "dominance": 2 },
-    "dominant_top": { "label": "Dominant Position (Top)", "dominance": 4 },
-    "inferior_bottom": { "label": "Inferior Position (Bottom)", "dominance": -2 },
-    "leg_entanglement": { "label": "Leg Entanglement", "dominance": 0 },
-    "scramble": { "label": "Scramble / Transition", "dominance": 0 }
+    "standing": {
+      "label": "Standing",
+      "dominance": 0,
+      "visual_cues": "Both people are upright on their feet. Bodies are vertical. Full height visible."
+    },
+    "guard_bottom": {
+      "label": "Guard (Bottom)",
+      "dominance": 1,
+      "visual_cues": "One person is on their BACK or seated on the mat with legs active (open, wrapped, hooking). The other person is above or in front of them. The bottom person's hips are on or near the mat."
+    },
+    "guard_top": {
+      "label": "Inside Guard (Top)",
+      "dominance": 2,
+      "visual_cues": "One person is kneeling or standing OVER the other who is on their back. The top person is trying to get past the bottom person's legs. The bottom person's legs are between them."
+    },
+    "dominant_top": {
+      "label": "Dominant Position (Top)",
+      "dominance": 4,
+      "visual_cues": "One person is ON TOP of the other with no legs between them. The top person has passed the legs and is chest-to-chest, mounted, or on the back. Clear top-bottom relationship."
+    },
+    "inferior_bottom": {
+      "label": "Inferior Position (Bottom)",
+      "dominance": -2,
+      "visual_cues": "One person is pinned underneath or flattened. They are being controlled from the top with no guard. Their back may be on the mat (under side control/mount) or they may be in turtle (face down, curled up)."
+    },
+    "leg_entanglement": {
+      "label": "Leg Entanglement",
+      "dominance": 0,
+      "visual_cues": "Both people's LEGS are intertwined or tangled together. Often both are on the ground facing each other's feet. One or both may be gripping a foot or heel. Legs are the central focus, not the upper body."
+    },
+    "scramble": {
+      "label": "Scramble / Transition",
+      "dominance": 0,
+      "visual_cues": "Chaotic movement. Neither person has a clear settled position. Bodies may be partially inverted, rotating, or mid-movement between two recognisable positions."
+    }
   },
   "positions": [
-    { "id": "standing_neutral", "name": "Standing - Neutral", "category": "standing" },
-    { "id": "standing_clinch", "name": "Clinch / Collar Tie", "category": "standing" },
+    {
+      "id": "standing_neutral",
+      "name": "Standing - Neutral",
+      "category": "standing",
+      "visual_cues": "Both people standing upright, facing each other, no significant grip or contact. Athletic stance, hands out."
+    },
+    {
+      "id": "standing_clinch",
+      "name": "Clinch / Collar Tie",
+      "category": "standing",
+      "visual_cues": "Both standing but gripping each other — hands on head, neck, collar, or arms. Heads are close together. Pulling/pushing with upper body contact."
+    },
 
-    { "id": "closed_guard_bottom", "name": "Closed Guard (Bottom)", "category": "guard_bottom" },
-    { "id": "half_guard_bottom", "name": "Half Guard (Bottom)", "category": "guard_bottom" },
-    { "id": "butterfly_guard", "name": "Butterfly Guard", "category": "guard_bottom" },
-    { "id": "open_guard", "name": "Open Guard (generic)", "category": "guard_bottom" },
-    { "id": "de_la_riva", "name": "De La Riva Guard", "category": "guard_bottom" },
-    { "id": "spider_lasso", "name": "Spider / Lasso Guard", "category": "guard_bottom" },
+    {
+      "id": "closed_guard_bottom",
+      "name": "Closed Guard (Bottom)",
+      "category": "guard_bottom",
+      "visual_cues": "Person on their BACK with LEGS WRAPPED around the other person's waist. Ankles are LOCKED behind the top person's back. The top person is between the bottom person's legs, chest-to-chest."
+    },
+    {
+      "id": "half_guard_bottom",
+      "name": "Half Guard (Bottom)",
+      "category": "guard_bottom",
+      "visual_cues": "Person on their back or side with ONE LEG trapped between their legs (not both). One of the top person's legs is controlled/entangled, the other is free. Partial guard retention."
+    },
+    {
+      "id": "butterfly_guard",
+      "name": "Butterfly Guard",
+      "category": "guard_bottom",
+      "visual_cues": "Bottom person is SEATED UPRIGHT (not flat on back) with BOTH FEET hooked inside the top person's thighs. Shins are against the inner thighs. Bottom person often has an underhook."
+    },
+    {
+      "id": "open_guard",
+      "name": "Open Guard (generic)",
+      "category": "guard_bottom",
+      "visual_cues": "Bottom person on back or seated with legs NOT wrapped around opponent. Feet are on hips, biceps, or pushing. There is SPACE between the two people. Legs are active but not locked."
+    },
+    {
+      "id": "de_la_riva",
+      "name": "De La Riva Guard",
+      "category": "guard_bottom",
+      "visual_cues": "Bottom person has ONE LEG hooked BEHIND the top person's lead leg (from outside to inside, behind the knee). The other foot is on the hip. Often gripping the far ankle."
+    },
+    {
+      "id": "spider_lasso",
+      "name": "Spider / Lasso Guard",
+      "category": "guard_bottom",
+      "visual_cues": "Bottom person on back with FEET ON THE BICEPS of the top person, pushing the arms. Legs are extended, creating distance. Often seen with gi grips on sleeves. Lasso: one leg wraps around the arm."
+    },
 
-    { "id": "closed_guard_top", "name": "Inside Closed Guard (Top)", "category": "guard_top" },
-    { "id": "half_guard_top", "name": "Half Guard (Top)", "category": "guard_top" },
-    { "id": "open_guard_top", "name": "Passing Open Guard (Top)", "category": "guard_top" },
-    { "id": "headquarters", "name": "Headquarters / Passing Position", "category": "guard_top" },
+    {
+      "id": "closed_guard_top",
+      "name": "Inside Closed Guard (Top)",
+      "category": "guard_top",
+      "visual_cues": "Person kneeling or postured INSIDE the other's CLOSED (locked ankles) guard. Trapped between the bottom person's wrapped legs. Often hands on the bottom person's hips or chest trying to open the guard."
+    },
+    {
+      "id": "half_guard_top",
+      "name": "Half Guard (Top)",
+      "category": "guard_top",
+      "visual_cues": "Top person is on top but has ONE LEG trapped by the bottom person. Upper body may be controlling with crossface/underhook. Trying to free the trapped leg to complete the pass."
+    },
+    {
+      "id": "open_guard_top",
+      "name": "Passing Open Guard (Top)",
+      "category": "guard_top",
+      "visual_cues": "Top person standing or kneeling OVER the bottom person who is playing open guard. Trying to get past the legs. Gripping pants/ankles, stepping around feet. Not yet past the legs."
+    },
+    {
+      "id": "headquarters",
+      "name": "Headquarters / Passing Position",
+      "category": "guard_top",
+      "visual_cues": "Top person has ONE KNEE between the bottom person's legs (splitting them) and the other knee outside. Stapling one leg down. Strong passing position with good base. Often pressing forward."
+    },
 
-    { "id": "side_control_top", "name": "Side Control (Top)", "category": "dominant_top" },
-    { "id": "mount_top", "name": "Mount (Top)", "category": "dominant_top" },
-    { "id": "back_mount", "name": "Back Mount / Back Control", "category": "dominant_top" },
-    { "id": "knee_on_belly", "name": "Knee on Belly", "category": "dominant_top" },
-    { "id": "north_south_top", "name": "North-South (Top)", "category": "dominant_top" },
-    { "id": "crucifix", "name": "Crucifix", "category": "dominant_top" },
+    {
+      "id": "side_control_top",
+      "name": "Side Control (Top)",
+      "category": "dominant_top",
+      "visual_cues": "Top person is lying PERPENDICULAR (90 degrees) across the bottom person's chest. Chest-to-chest contact. NO LEGS between them — the pass is complete. Top person's hips are heavy on the mat. Often controlling with crossface and underhook."
+    },
+    {
+      "id": "mount_top",
+      "name": "Mount (Top)",
+      "category": "dominant_top",
+      "visual_cues": "Top person is SITTING ON the bottom person's torso/hips, STRADDLING them. Knees on both sides of the body. The bottom person is flat on their back underneath. Top person is upright or leaning forward."
+    },
+    {
+      "id": "back_mount",
+      "name": "Back Mount / Back Control",
+      "category": "dominant_top",
+      "visual_cues": "One person is BEHIND the other, chest-to-back. Usually has HOOKS IN (feet inside the thighs) or a body triangle (legs wrapped around the waist). The person in front cannot see the person behind them."
+    },
+    {
+      "id": "knee_on_belly",
+      "name": "Knee on Belly",
+      "category": "dominant_top",
+      "visual_cues": "Top person has ONE KNEE planted on the bottom person's stomach/chest while the other foot is posted on the mat. The top person is essentially kneeling on the other. Very upright posture. One foot on the ground."
+    },
+    {
+      "id": "north_south_top",
+      "name": "North-South (Top)",
+      "category": "dominant_top",
+      "visual_cues": "Top person is lying ON TOP but HEAD-TO-TOE (180 degrees). Both people's heads point in OPPOSITE directions. Top person's chest is on the bottom person's chest but they are facing opposite ways."
+    },
+    {
+      "id": "crucifix",
+      "name": "Crucifix",
+      "category": "dominant_top",
+      "visual_cues": "The top person has trapped BOTH of the bottom person's arms — one with the legs, one with the hands. The bottom person is stretched out like a cross with no arm defence. Often from the side or back."
+    },
 
-    { "id": "side_control_bottom", "name": "Bottom Side Control", "category": "inferior_bottom" },
-    { "id": "mount_bottom", "name": "Bottom Mount", "category": "inferior_bottom" },
-    { "id": "back_taken", "name": "Back Taken (Defending)", "category": "inferior_bottom" },
-    { "id": "turtle_bottom", "name": "Turtle (Bottom)", "category": "inferior_bottom" },
-    { "id": "north_south_bottom", "name": "North-South (Bottom)", "category": "inferior_bottom" },
+    {
+      "id": "side_control_bottom",
+      "name": "Bottom Side Control",
+      "category": "inferior_bottom",
+      "visual_cues": "Person is flat on their BACK with the opponent lying across their chest (perpendicular). No legs between them. Being pinned and controlled. Often framing with forearms to create space."
+    },
+    {
+      "id": "mount_bottom",
+      "name": "Bottom Mount",
+      "category": "inferior_bottom",
+      "visual_cues": "Person is flat on their BACK with the opponent SITTING ON THEM, straddling their hips/torso. Being ridden. Arms are defending against chokes and armlocks."
+    },
+    {
+      "id": "back_taken",
+      "name": "Back Taken (Defending)",
+      "category": "inferior_bottom",
+      "visual_cues": "Person has the opponent BEHIND them on their back. They CANNOT SEE the attacker. Hooks or body triangle are in. Hands are fighting at the neck to defend chokes."
+    },
+    {
+      "id": "turtle_bottom",
+      "name": "Turtle (Bottom)",
+      "category": "inferior_bottom",
+      "visual_cues": "Person is on their HANDS AND KNEES, curled up, face DOWN, protecting their neck. Looks like a ball or turtle shell. The opponent is on top or beside them trying to turn them or take the back."
+    },
+    {
+      "id": "north_south_bottom",
+      "name": "North-South (Bottom)",
+      "category": "inferior_bottom",
+      "visual_cues": "Person is pinned on their back with the opponent lying on top HEAD-TO-TOE. Being smothered. Heads point opposite directions."
+    },
 
-    { "id": "single_leg_x", "name": "Single Leg X / Ashi Garami", "category": "leg_entanglement" },
-    { "id": "straight_ashi", "name": "Straight Ashi Garami", "category": "leg_entanglement" },
-    { "id": "outside_ashi", "name": "Outside Ashi Garami", "category": "leg_entanglement" },
-    { "id": "inside_sankaku", "name": "Inside Sankaku (Honeyhole/Saddle)", "category": "leg_entanglement" },
-    { "id": "outside_sankaku", "name": "Outside Sankaku (411)", "category": "leg_entanglement" },
-    { "id": "cross_ashi", "name": "Cross Ashi Garami", "category": "leg_entanglement" },
-    { "id": "fifty_fifty", "name": "50/50", "category": "leg_entanglement" },
-    { "id": "backside_fifty_fifty", "name": "Backside 50/50", "category": "leg_entanglement" },
+    {
+      "id": "single_leg_x",
+      "name": "Single Leg X / Ashi Garami",
+      "category": "leg_entanglement",
+      "visual_cues": "Bottom person is on their BACK with BOTH LEGS controlling ONE of the opponent's legs. One foot is on the hip, the other hooks behind the knee. The opponent's leg is between the attacker's legs. The opponent is usually still standing or kneeling."
+    },
+    {
+      "id": "straight_ashi",
+      "name": "Straight Ashi Garami",
+      "category": "leg_entanglement",
+      "visual_cues": "Attacker is on their back/side with the opponent's leg trapped between their legs. Both of attacker's legs are on the SAME SIDE of the opponent's trapped leg. The attacker's hips are next to the opponent's knee. Basic outside leg position."
+    },
+    {
+      "id": "outside_ashi",
+      "name": "Outside Ashi Garami",
+      "category": "leg_entanglement",
+      "visual_cues": "Similar to straight ashi but the attacker's OUTSIDE leg crosses OVER the opponent's body/hip. More control than straight ashi. The attacker's legs frame the opponent's knee from the outside."
+    },
+    {
+      "id": "inside_sankaku",
+      "name": "Inside Sankaku (Honeyhole/Saddle)",
+      "category": "leg_entanglement",
+      "visual_cues": "Attacker has BOTH LEGS TRIANGLED (crossed/locked like a triangle) around the opponent's SINGLE LEG. The trapped leg goes BETWEEN the attacker's thighs. The attacker's legs form a triangle (figure-four) grip. This is the strongest heel hook position. The heel is typically being exposed/attacked."
+    },
+    {
+      "id": "outside_sankaku",
+      "name": "Outside Sankaku (411)",
+      "category": "leg_entanglement",
+      "visual_cues": "Attacker has legs triangled around the opponent's leg but from the OUTSIDE. The attacker's body faces AWAY from the opponent (belly-down relative to the opponent's leg). The triangle grip is on the outside of the thigh. Used for outside heel hooks."
+    },
+    {
+      "id": "cross_ashi",
+      "name": "Cross Ashi Garami",
+      "category": "leg_entanglement",
+      "visual_cues": "Attacker controls the opponent's leg but their body is angled ACROSS — the attacker's legs cross to the opposite side of the opponent's body. A transitional position between inside and outside sankaku."
+    },
+    {
+      "id": "fifty_fifty",
+      "name": "50/50",
+      "category": "leg_entanglement",
+      "visual_cues": "Both people have their legs EQUALLY entangled — each has one leg wrapped around the other's leg in a MIRROR image. Symmetrical position. Both people face the same direction with legs intertwined. Neither has a clear advantage."
+    },
+    {
+      "id": "backside_fifty_fifty",
+      "name": "Backside 50/50",
+      "category": "leg_entanglement",
+      "visual_cues": "Like 50/50 but one person has rotated so they face AWAY from the other (back-to-back relative to the entangled legs). One person faces the opponent's feet, the other faces away. Asymmetric advantage."
+    },
 
-    { "id": "turtle_top", "name": "Turtle Attack (Top)", "category": "scramble" },
-    { "id": "front_headlock", "name": "Front Headlock / Guillotine Position", "category": "scramble" },
-    { "id": "dogfight", "name": "Dogfight / Underhook Battle", "category": "scramble" },
-    { "id": "wrestling_scramble", "name": "Wrestling Scramble", "category": "scramble" },
-    { "id": "guard_recovery", "name": "Guard Recovery (in progress)", "category": "scramble" },
-    { "id": "pass_in_progress", "name": "Pass in Progress", "category": "scramble" },
-    { "id": "sweep_in_progress", "name": "Sweep in Progress", "category": "scramble" },
-    { "id": "back_exposure", "name": "Back Exposure (partially turned)", "category": "scramble" },
-    { "id": "submission_defence", "name": "Submission Defence (escaping)", "category": "scramble" },
-    { "id": "scramble_generic", "name": "Scramble (generic)", "category": "scramble" },
-    { "id": "unclear", "name": "Unclear / Cannot Determine", "category": "scramble" }
+    {
+      "id": "turtle_top",
+      "name": "Turtle Attack (Top)",
+      "category": "scramble",
+      "visual_cues": "One person is on top of or beside the turtled person (who is on hands and knees). The attacker is draped over the turtle, reaching for the neck or trying to insert hooks. Often has a seatbelt grip (one arm over shoulder, one under armpit)."
+    },
+    {
+      "id": "front_headlock",
+      "name": "Front Headlock / Guillotine Position",
+      "category": "scramble",
+      "visual_cues": "One person has their arm wrapped around the OTHER person's HEAD/NECK from the front. The head is trapped under the armpit. Often the defender's head is down. Can be standing or on the ground. The controller's body is sprawled back."
+    },
+    {
+      "id": "dogfight",
+      "name": "Dogfight / Underhook Battle",
+      "category": "scramble",
+      "visual_cues": "Both people are on their KNEES facing each other, chest-to-chest, fighting for underhooks. Neither is clearly on top or bottom. A 50/50 wrestling position. Both trying to get underneath the other."
+    },
+    {
+      "id": "wrestling_scramble",
+      "name": "Wrestling Scramble",
+      "category": "scramble",
+      "visual_cues": "Fast movement, bodies tangled, neither person in a clear position. Someone may be shooting for a takedown, sprawling, or scrambling to their feet. Very dynamic and hard to freeze-frame."
+    },
+    {
+      "id": "guard_recovery",
+      "name": "Guard Recovery (in progress)",
+      "category": "scramble",
+      "visual_cues": "The bottom person is actively SHRIMPING (hip escaping) or turning to get their legs back in between. They were in a bad position and are creating space. Hip movement is visible, legs are coming back in."
+    },
+    {
+      "id": "pass_in_progress",
+      "name": "Pass in Progress",
+      "category": "scramble",
+      "visual_cues": "The top person is MID-PASS — they are stepping or sliding around the bottom person's legs but haven't settled into side control yet. The legs are partially cleared but the position isn't consolidated."
+    },
+    {
+      "id": "sweep_in_progress",
+      "name": "Sweep in Progress",
+      "category": "scramble",
+      "visual_cues": "The bottom person is actively LIFTING or ROLLING the top person over. The top person is being off-balanced and may be mid-air or tilting. A reversal is happening in real-time."
+    },
+    {
+      "id": "back_exposure",
+      "name": "Back Exposure (partially turned)",
+      "category": "scramble",
+      "visual_cues": "One person is partially turned away showing their BACK to the other but not fully in turtle or back control yet. Mid-transition — could go to back take or guard recovery. The exposed person's shoulders are rotating away."
+    },
+    {
+      "id": "submission_defence",
+      "name": "Submission Defence (escaping)",
+      "category": "scramble",
+      "visual_cues": "One person is actively defending a submission — hands are fighting at the neck (defending choke), or stacking/posturing to escape an armbar, or rolling to relieve heel hook pressure. The defensive action is the primary thing happening."
+    },
+    {
+      "id": "scramble_generic",
+      "name": "Scramble (generic)",
+      "category": "scramble",
+      "visual_cues": "Cannot identify a specific position. Bodies are tangled in a way that doesn't match any defined position. Use this as a last resort."
+    },
+    {
+      "id": "unclear",
+      "name": "Unclear / Cannot Determine",
+      "category": "scramble",
+      "visual_cues": "Frame is too blurry, dark, obstructed, or zoomed out to determine any position. Cannot see enough detail to classify."
+    }
   ],
   "valid_transitions": [
     ["standing_neutral", "standing_clinch"],

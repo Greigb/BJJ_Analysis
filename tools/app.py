@@ -51,7 +51,35 @@ def build_taxonomy_string(taxonomy):
     lines = []
     for pos in taxonomy["positions"]:
         cat = taxonomy["categories"][pos["category"]]["label"]
+        cues = pos.get("visual_cues", "")
         lines.append(f'  "{pos["id"]}" — {pos["name"]} [{cat}]')
+        if cues:
+            lines.append(f'    Visual: {cues}')
+    return "\n".join(lines)
+
+
+def build_category_prompt(taxonomy):
+    """Build prompt for Pass 1: category identification."""
+    lines = ["Identify which CATEGORY this frame belongs to:\n"]
+    for cat_id, cat in taxonomy["categories"].items():
+        cues = cat.get("visual_cues", "")
+        lines.append(f'  "{cat_id}" — {cat["label"]}')
+        if cues:
+            lines.append(f'    How to identify: {cues}')
+    return "\n".join(lines)
+
+
+def build_position_prompt_for_category(taxonomy, category_id):
+    """Build prompt for Pass 2: specific position within a category."""
+    cat = taxonomy["categories"].get(category_id, {})
+    positions = [p for p in taxonomy["positions"] if p["category"] == category_id]
+    lines = [f"This frame is in the '{cat.get('label', category_id)}' category.",
+             f"Identify the SPECIFIC position from these options:\n"]
+    for pos in positions:
+        cues = pos.get("visual_cues", "")
+        lines.append(f'  "{pos["id"]}" — {pos["name"]}')
+        if cues:
+            lines.append(f'    Visual: {cues}')
     return "\n".join(lines)
 
 
@@ -197,33 +225,46 @@ def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, t
         lines.append("If appearances overlap or are unclear, use continuity from previous frames.")
         player_id_block = "\n".join(lines)
 
+    category_guide = build_category_prompt(taxonomy)
+
     system_prompt = f"""You are an expert Brazilian Jiu-Jitsu analyst with black belt-level knowledge.
 You are analysing keyframes extracted from a rolling/sparring session.
-
-POSITION TAXONOMY — use ONLY these position IDs:
-{taxonomy_str}
 
 {player_id_block}
 
 IMPORTANT: The video may show multiple people (bystanders, referees, coaches,
 other grapplers on adjacent mats). Focus ONLY on the two people actively
 grappling. Ignore anyone standing on the sideline, sitting, or not engaged
-in the roll. If you cannot determine which two people are the focus, describe
-what you see and set both positions to "unclear".
+in the roll.
 
-For EACH frame image provided, return a JSON object:
+CLASSIFICATION METHOD — follow these steps for EACH frame:
+Step 1: Identify the CATEGORY first using these visual guides:
+{category_guide}
+
+Step 2: Once you know the category, identify the SPECIFIC POSITION using these visual guides:
+{taxonomy_str}
+
+Step 3: Verify your answer — does your position match what you actually see?
+Common mistakes to avoid:
+- Closed guard requires ankles LOCKED behind the back (if legs are open, it's open guard)
+- Side control requires PERPENDICULAR chest-to-chest with NO legs between (if a leg is trapped, it's half guard)
+- Inside sankaku requires legs TRIANGLED around ONE leg (if legs are mirrored, it's 50/50)
+- Mount requires SITTING ON the opponent (if lying across, it's side control)
+- Turtle requires hands-and-knees face DOWN (if on their back, it's a different position)
+
+For EACH frame, return a JSON object:
 {{
   "frame_number": <int>,
   "timestamp_sec": <float>,
-  "player_a_position": "<position_id from taxonomy>",
-  "player_b_position": "<position_id from taxonomy>",
+  "category": "<category_id — the category you identified in Step 1>",
+  "player_a_position": "<position_id — the specific position from Step 2>",
+  "player_b_position": "<position_id — the complementary position for the other player>",
   "confidence": <float 0.0-1.0>,
+  "visual_reasoning": "<what you see in the image that led to this classification — describe body positions, limb placement, relative positioning>",
   "active_technique": "<technique being attempted or null>",
-  "notes": "<brief observation — mention what you see that identifies Player A>",
+  "notes": "<brief observation>",
   "coaching_tip": "<one actionable suggestion or null>"
-}}
-
-Be SPECIFIC with leg entanglements — identify the exact ashi garami / sankaku position."""
+}}"""
 
     batch_prompt_tpl = """Analyse these {{count}} sequential frames from a BJJ rolling session.
 The frames are {{interval}} seconds apart, starting at timestamp {{start_time}}s.
@@ -993,6 +1034,9 @@ def main():
                         st.caption(f"vs {pos_b}")
                     with col_detail:
                         st.markdown(f"**{tech}** — {notes}")
+                        reasoning = entry.get("visual_reasoning", "")
+                        if reasoning:
+                            st.caption(f"👁 {reasoning}")
                         if tip:
                             st.info(f"💡 {tip}")
                     st.divider()

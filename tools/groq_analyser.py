@@ -37,36 +37,41 @@ MAX_IMAGES_PER_REQUEST = 4  # Groq allows 5, keep 1 buffer
 SYSTEM_PROMPT = """You are an expert Brazilian Jiu-Jitsu analyst with black belt-level knowledge.
 You are analysing keyframes extracted from a rolling/sparring session.
 
-POSITION TAXONOMY — use ONLY these position IDs:
-{taxonomy_positions}
-
 {player_id_block}
 
 IMPORTANT: The video may show multiple people (bystanders, referees, coaches,
 other grapplers on adjacent mats). Focus ONLY on the two people actively
 grappling. Ignore anyone standing on the sideline, sitting, or not engaged
-in the roll. If you cannot determine which two people are the focus, describe
-what you see and set both positions to "unclear".
+in the roll.
 
-For EACH frame image provided, return a JSON object:
+CLASSIFICATION METHOD — follow these steps for EACH frame:
+Step 1: Identify the CATEGORY first using these visual guides:
+{category_guide}
+
+Step 2: Once you know the category, identify the SPECIFIC POSITION:
+{taxonomy_positions}
+
+Step 3: Verify — does your position match what you see?
+Common mistakes:
+- Closed guard requires ankles LOCKED behind the back (open legs = open guard)
+- Side control requires PERPENDICULAR chest-to-chest, NO legs between (leg trapped = half guard)
+- Inside sankaku requires legs TRIANGLED around ONE leg (mirrored = 50/50)
+- Mount requires SITTING ON opponent (lying across = side control)
+- Turtle requires hands-and-knees face DOWN (on back = different position)
+
+For EACH frame, return a JSON object:
 {{
   "frame_number": <int>,
   "timestamp_sec": <float>,
-  "player_a_position": "<position_id from taxonomy>",
-  "player_b_position": "<position_id from taxonomy>",
+  "category": "<category_id>",
+  "player_a_position": "<position_id>",
+  "player_b_position": "<position_id>",
   "confidence": <float 0.0-1.0>,
-  "active_technique": "<technique being attempted or null>",
-  "notes": "<brief observation — mention what you see that identifies Player A>",
-  "coaching_tip": "<one actionable suggestion if relevant, or null>"
+  "visual_reasoning": "<what you see: body positions, limb placement, relative positioning>",
+  "active_technique": "<technique or null>",
+  "notes": "<brief observation>",
+  "coaching_tip": "<one actionable suggestion or null>"
 }}
-
-Guidelines:
-- Player A = the person we're tracking
-- Player B = their training partner
-- If positions are complementary (e.g. A has mount, B has bottom mount), label both
-- If the frame is blurry or unclear, use "scramble_generic" or "unclear"
-- Be SPECIFIC with leg entanglements: identify exact ashi garami / sankaku position
-- Coaching tips should be actionable
 """
 
 BATCH_PROMPT = """Analyse these {count} sequential frames from a BJJ rolling session.
@@ -126,7 +131,20 @@ def build_taxonomy_string(taxonomy):
     lines = []
     for pos in taxonomy["positions"]:
         cat = taxonomy["categories"][pos["category"]]["label"]
+        cues = pos.get("visual_cues", "")
         lines.append(f'  "{pos["id"]}" — {pos["name"]} [{cat}]')
+        if cues:
+            lines.append(f'    Visual: {cues}')
+    return "\n".join(lines)
+
+
+def build_category_guide(taxonomy):
+    lines = []
+    for cat_id, cat in taxonomy["categories"].items():
+        cues = cat.get("visual_cues", "")
+        lines.append(f'  "{cat_id}" — {cat["label"]}')
+        if cues:
+            lines.append(f'    How to identify: {cues}')
     return "\n".join(lines)
 
 
@@ -487,7 +505,8 @@ def main():
         lines.append("Use these descriptions to consistently identify each player across ALL frames.")
         lines.append("If appearances overlap or are unclear, use continuity from previous frames.")
         player_id_block = "\n".join(lines)
-    system_prompt = SYSTEM_PROMPT.format(taxonomy_positions=taxonomy_str, player_id_block=player_id_block)
+    category_guide = build_category_guide(taxonomy)
+    system_prompt = SYSTEM_PROMPT.format(taxonomy_positions=taxonomy_str, player_id_block=player_id_block, category_guide=category_guide)
 
     # Step 1: Extract frames
     print(f"\nStep 1: Extracting frames from {args.video}")
