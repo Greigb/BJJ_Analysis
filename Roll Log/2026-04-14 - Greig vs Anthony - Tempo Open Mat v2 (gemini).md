@@ -7,8 +7,13 @@ guard_retention: 4
 positional_awareness: 6
 transition_quality: 5
 method: gemini-ai-studio
-tags: [roll, gemini-analysis]
+tags: [roll, historic, gemini-analysis]
 ---
+
+> [!warning] Historic Analysis
+> This is an earlier version of the analysis. The current version is split into two separate rolls:
+> - [[2026-04-14 - Greig vs Anthony - Roll 1 (WIN by submission)]]
+> - [[2026-04-14 - Greig vs Anthony - Roll 2 (Continuation)]]
 
 # Roll Analysis - Greig vs Anthony - Tempo Open Mat v2
 

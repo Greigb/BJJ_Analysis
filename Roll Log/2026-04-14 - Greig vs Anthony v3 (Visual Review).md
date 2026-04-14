@@ -7,8 +7,13 @@ guard_retention: 4
 positional_awareness: 6
 transition_quality: 5
 method: claude-vision-decision-tree
-tags: [roll, claude-analysis, visual-review]
+tags: [roll, historic, claude-analysis, visual-review]
 ---
+
+> [!warning] Historic Analysis
+> This is an earlier version of the analysis. The current version is split into two separate rolls:
+> - [[2026-04-14 - Greig vs Anthony - Roll 1 (WIN by submission)]]
+> - [[2026-04-14 - Greig vs Anthony - Roll 2 (Continuation)]]
 
 # Greig vs Anthony — Tempo Open Mat (Visual Review)
 
