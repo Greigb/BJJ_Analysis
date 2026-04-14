@@ -1,0 +1,308 @@
+{
+  "timeline": [
+    {
+      "timestamp": "0:00",
+      "timestamp_sec": 0,
+      "player_a_position": "standing_neutral",
+      "player_b_position": "standing_neutral",
+      "confidence": 0.95,
+      "active_technique": null,
+      "visual_reasoning": "Both Gordon and Cyborg are standing upright, separated. Referee is between them — match hasn't started yet or just being restarted.",
+      "notes": "Pre-match. Both athletes standing, referee in centre.",
+      "coaching_tip": null
+    },
+    {
+      "timestamp": "0:10",
+      "timestamp_sec": 10,
+      "player_a_position": "standing_neutral",
+      "player_b_position": "standing_neutral",
+      "confidence": 0.9,
+      "active_technique": null,
+      "visual_reasoning": "Both upright and circling. Gordon (tattooed arms, rash guard) on right, Cyborg (shirtless, larger) on left. Hands active, looking for grips. ADCC scoreboard shows R. Abreu vs G. Ryan.",
+      "notes": "Opening stance. Both circling at distance, hands out, feeling range.",
+      "coaching_tip": "Stay light on feet, keep hands active to control distance."
+    },
+    {
+      "timestamp": "0:20",
+      "timestamp_sec": 20,
+      "player_a_position": "standing_clinch",
+      "player_b_position": "standing_clinch",
+      "confidence": 0.9,
+      "active_technique": "collar_tie",
+      "visual_reasoning": "Both athletes gripping each other's hands/wrists. Heads close together. Cyborg pressing forward with hand fighting. Upper body contact, still on feet.",
+      "notes": "Hand fighting in the clinch. Cyborg using his size to pressure forward.",
+      "coaching_tip": "Fight the wrists, not the forearms. Strip grips quickly to prevent Cyborg establishing head control."
+    },
+    {
+      "timestamp": "0:30",
+      "timestamp_sec": 30,
+      "player_a_position": "standing_clinch",
+      "player_b_position": "standing_clinch",
+      "confidence": 0.85,
+      "active_technique": "snapdown_defence",
+      "visual_reasoning": "Cyborg has heavy collar tie on Gordon's head, pulling down. Gordon is bent slightly at the waist, defending the snapdown. Both still on feet but Cyborg has head control.",
+      "notes": "Cyborg aggressively snap-down attempt. Gordon defending posture.",
+      "coaching_tip": "Maintain forehead pressure, don't let head get below opponent's chest level."
+    },
+    {
+      "timestamp": "0:40",
+      "timestamp_sec": 40,
+      "player_a_position": "scramble_generic",
+      "player_b_position": "scramble_generic",
+      "confidence": 0.6,
+      "active_technique": null,
+      "visual_reasoning": "Camera angle obscured by referee in foreground. Both athletes appear to be on the ground but view is blocked. Can see legs on the mat.",
+      "notes": "Obstructed view — referee blocking camera. Both athletes on the mat.",
+      "coaching_tip": null
+    },
+    {
+      "timestamp": "0:50",
+      "timestamp_sec": 50,
+      "player_a_position": "standing_neutral",
+      "player_b_position": "standing_neutral",
+      "confidence": 0.9,
+      "active_technique": null,
+      "visual_reasoning": "Both standing and circling again. Cyborg (shirtless, left) and Gordon (rash guard, right) at range. Reset after ground exchange.",
+      "notes": "Reset to standing. Both circling at distance.",
+      "coaching_tip": "Use the reset to re-establish stance and game plan."
+    },
+    {
+      "timestamp": "1:00",
+      "timestamp_sec": 60,
+      "player_a_position": "standing_neutral",
+      "player_b_position": "standing_neutral",
+      "confidence": 0.85,
+      "active_technique": null,
+      "visual_reasoning": "Gordon partially visible on right, Cyborg's back to camera on left. Both standing, Cyborg advancing. Clock shows 9:03.",
+      "notes": "Standing. Cyborg pressuring forward, Gordon maintaining distance.",
+      "coaching_tip": "Use lateral movement to avoid being walked down by a bigger opponent."
+    },
+    {
+      "timestamp": "1:10",
+      "timestamp_sec": 70,
+      "player_a_position": "open_guard",
+      "player_b_position": "open_guard_top",
+      "confidence": 0.9,
+      "active_technique": "seated_guard_pull",
+      "visual_reasoning": "Gordon is SEATED on the mat with legs in front of him. Cyborg standing over him, bent at the waist reaching for Gordon's arms. Classic seated guard vs standing passer. Gordon's hands are fighting Cyborg's grips.",
+      "notes": "Gordon pulls to seated guard. Cyborg standing over him, hand fighting.",
+      "coaching_tip": "When seated, keep at least one foot on the hip to maintain distance and prevent the pass."
+    },
+    {
+      "timestamp": "1:20",
+      "timestamp_sec": 80,
+      "player_a_position": "half_guard_bottom",
+      "player_b_position": "half_guard_top",
+      "confidence": 0.75,
+      "active_technique": "pass_attempt",
+      "visual_reasoning": "Both on the ground. Cyborg (shirtless, on top) is driving forward into Gordon. Gordon is on his back/side with what appears to be one leg trapped — Cyborg has passed partially but one leg is still entangled. Not full side control yet.",
+      "notes": "Cyborg driving through a pass attempt. Gordon retaining half guard.",
+      "coaching_tip": "Get the underhook from bottom half guard to prevent the crossface and create space for recovery."
+    },
+    {
+      "timestamp": "1:30",
+      "timestamp_sec": 90,
+      "player_a_position": "open_guard",
+      "player_b_position": "open_guard_top",
+      "confidence": 0.7,
+      "active_technique": null,
+      "visual_reasoning": "Gordon (bottom, tattooed arms visible) is on his back. Cyborg (shirtless, on top) is standing/kneeling over him. Referee nearby. View partially obstructed but this looks like Gordon has recovered to open guard after the half guard exchange.",
+      "notes": "Gordon recovers guard. Cyborg standing over in passing position.",
+      "coaching_tip": "After recovering guard, immediately establish grips and foot placement before opponent can re-engage."
+    },
+    {
+      "timestamp": "1:40",
+      "timestamp_sec": 100,
+      "player_a_position": "closed_guard_top",
+      "player_b_position": "closed_guard_bottom",
+      "confidence": 0.7,
+      "active_technique": "guard_pressure",
+      "visual_reasoning": "Cyborg (large, shirtless) is on his back with legs appearing to wrap around Gordon. Gordon is on top driving into Cyborg's guard. Unusual — Gordon is the top player here. Cyborg may have pulled guard or been swept.",
+      "notes": "Roles reversed — Cyborg on bottom in guard, Gordon on top pressuring.",
+      "coaching_tip": "When inside someone's closed guard, maintain posture and work to break the guard open before attempting passes."
+    },
+    {
+      "timestamp": "1:50",
+      "timestamp_sec": 110,
+      "player_a_position": "open_guard_top",
+      "player_b_position": "open_guard",
+      "confidence": 0.7,
+      "active_technique": "guard_pass_attempt",
+      "visual_reasoning": "Gordon (rash guard, on top) is kneeling/leaning over Cyborg who is on his back. Cyborg's legs are open — not locked around Gordon. Gordon appears to be working a guard pass, driving his weight forward.",
+      "notes": "Gordon working to pass Cyborg's open guard from top.",
+      "coaching_tip": "When passing, keep hips low and heavy. Don't reach over — drive through."
+    },
+    {
+      "timestamp": "2:00",
+      "timestamp_sec": 120,
+      "player_a_position": "single_leg_x",
+      "player_b_position": "open_guard_top",
+      "confidence": 0.8,
+      "active_technique": "leg_entry",
+      "visual_reasoning": "Clear view. Gordon (in 'RYAN' rash guard) is on his back/side with his legs wrapped around ONE of Cyborg's legs. Cyborg (shirtless) is seated/kneeling. Gordon's feet are hooking around Cyborg's leg — one foot on the hip area, the other behind the knee. This is Single Leg X / Ashi Garami entry.",
+      "notes": "Gordon enters single leg X on Cyborg's leg. Beginning of leg entanglement sequence.",
+      "coaching_tip": "Pinch the knees tight to control the hip and prevent the opponent from stepping out."
+    },
+    {
+      "timestamp": "2:10",
+      "timestamp_sec": 130,
+      "player_a_position": "single_leg_x",
+      "player_b_position": "submission_defence",
+      "confidence": 0.8,
+      "active_technique": "heel_exposure",
+      "visual_reasoning": "Both on the ground. Gordon (bottom/side) has legs controlling Cyborg's leg. Cyborg is seated, appearing to fight the leg grip with his hands. Gordon is working to isolate the heel. Both grapplers' legs are tangled in the lower body.",
+      "notes": "Gordon working to expose the heel from single leg X. Cyborg defending grips.",
+      "coaching_tip": "Control the secondary leg (free leg) to prevent the opponent from stepping over and escaping the entanglement."
+    },
+    {
+      "timestamp": "2:20",
+      "timestamp_sec": 140,
+      "player_a_position": "inside_sankaku",
+      "player_b_position": "submission_defence",
+      "confidence": 0.85,
+      "active_technique": "inside_heel_hook",
+      "visual_reasoning": "Gordon has transitioned deeper. His legs appear to be triangled (crossed) around Cyborg's single leg. Cyborg is on his side trying to defend. Gordon is gripping the heel/foot area. This is inside sankaku (honeyhole/saddle) — the finishing position for inside heel hooks.",
+      "notes": "Gordon locks inside sankaku. Cyborg defending the heel hook.",
+      "coaching_tip": "Once in inside sankaku, tuck the heel deep into the armpit and bridge the hips into the knee for the break."
+    },
+    {
+      "timestamp": "2:30",
+      "timestamp_sec": 150,
+      "player_a_position": "inside_sankaku",
+      "player_b_position": "submission_defence",
+      "confidence": 0.85,
+      "active_technique": "inside_heel_hook",
+      "visual_reasoning": "Gordon ('RYAN' rash guard visible face-down) has Cyborg's leg deeply controlled. Both on the mat. Gordon is belly-down with Cyborg's leg trapped. Cyborg is trying to roll/defend. The triangle grip around the leg is visible.",
+      "notes": "Gordon maintaining inside sankaku, belly-down. Applying rotational pressure.",
+      "coaching_tip": "Belly-down finishing position maximises breaking pressure on heel hooks. Keep the triangle tight."
+    },
+    {
+      "timestamp": "2:40",
+      "timestamp_sec": 160,
+      "player_a_position": "inside_sankaku",
+      "player_b_position": "submission_defence",
+      "confidence": 0.8,
+      "active_technique": "inside_heel_hook",
+      "visual_reasoning": "Similar position. Gordon ('RYAN' visible) is on top/belly-down with legs locked around Cyborg's leg. Cyborg flat on his back. Gordon is controlling and applying the heel hook finish.",
+      "notes": "Gordon applying finishing pressure from inside sankaku. Cyborg in full submission defence.",
+      "coaching_tip": "When finishing belly-down, walk your hips forward to increase the rotational force on the knee."
+    },
+    {
+      "timestamp": "2:50",
+      "timestamp_sec": 170,
+      "player_a_position": "single_leg_x",
+      "player_b_position": "open_guard_top",
+      "confidence": 0.75,
+      "active_technique": "leg_control",
+      "visual_reasoning": "Position has changed. Both seated/on the ground. Cyborg (shirtless, left) appears to have partially escaped. Gordon (right) still has leg involvement. Cyborg looks like he's trying to disengage from the leg entanglement. They may have been reset or Cyborg defended successfully.",
+      "notes": "Cyborg partially escaping leg entanglement. Gordon re-establishing control.",
+      "coaching_tip": "If the opponent starts escaping, immediately transition to a different leg control rather than holding a failing grip."
+    },
+    {
+      "timestamp": "3:00",
+      "timestamp_sec": 180,
+      "player_a_position": "standing_neutral",
+      "player_b_position": "standing_neutral",
+      "confidence": 0.8,
+      "active_technique": null,
+      "visual_reasoning": "Both standing. Cyborg (kneeling/getting up, left) and Gordon (standing, right) with referee between them. Appears to be a reset/standup after the leg exchange. Officials nearby.",
+      "notes": "Reset to standing after extended leg entanglement exchange.",
+      "coaching_tip": null
+    },
+    {
+      "timestamp": "3:10",
+      "timestamp_sec": 190,
+      "player_a_position": "standing_neutral",
+      "player_b_position": "standing_neutral",
+      "confidence": 0.85,
+      "active_technique": null,
+      "visual_reasoning": "Both standing. Referee between them. Cyborg's back to camera. Clock shows 7:18. Reset position.",
+      "notes": "Standing. Both athletes resetting after the ground exchange.",
+      "coaching_tip": null
+    },
+    {
+      "timestamp": "3:20",
+      "timestamp_sec": 200,
+      "player_a_position": "standing_clinch",
+      "player_b_position": "standing_clinch",
+      "confidence": 0.85,
+      "active_technique": "collar_tie",
+      "visual_reasoning": "Cyborg (larger, shirtless) has both hands on Gordon's head/neck in a heavy collar tie. Both standing, chest to chest. Cyborg using his size advantage to pressure.",
+      "notes": "Cyborg re-establishes heavy collar tie. Using size to control Gordon.",
+      "coaching_tip": "Against a bigger opponent with collar ties, use level changes and arm drags rather than fighting strength-on-strength."
+    },
+    {
+      "timestamp": "3:30",
+      "timestamp_sec": 210,
+      "player_a_position": "unclear",
+      "player_b_position": "unclear",
+      "confidence": 0.2,
+      "active_technique": null,
+      "visual_reasoning": "Wide arena shot. Both athletes are very small in the frame — can see the full ADCC mat from a distance. Cannot identify positions. Crowd and scoreboard visible.",
+      "notes": "Wide camera angle — cannot determine positions.",
+      "coaching_tip": null
+    },
+    {
+      "timestamp": "3:40",
+      "timestamp_sec": 220,
+      "player_a_position": "unclear",
+      "player_b_position": "unclear",
+      "confidence": 0.2,
+      "active_technique": null,
+      "visual_reasoning": "Same wide arena shot. Athletes are tiny in centre of mat. Referee visible. Cannot determine positions from this distance.",
+      "notes": "Wide camera angle — cannot determine positions.",
+      "coaching_tip": null
+    }
+  ],
+  "summary": {
+    "session_overview": "ADCC match between Gordon Ryan and Roberto 'Cyborg' Abreu. The match features extensive standing hand fighting in the first minute, followed by Gordon pulling to seated guard and eventually entering a leg entanglement sequence. Gordon transitions from open guard to single leg X to inside sankaku (honeyhole), attacking with an inside heel hook. The sequence demonstrates elite leg lock entries from seated guard.",
+    "key_moments": [
+      {
+        "timestamp": "0:20",
+        "description": "Heavy hand fighting in the clinch. Cyborg uses size advantage to pressure Gordon with collar ties.",
+        "assessment": "neutral",
+        "suggestion": "Use arm drags or level changes against bigger opponents rather than engaging in a clinch battle."
+      },
+      {
+        "timestamp": "1:10",
+        "description": "Gordon pulls to seated guard, establishing the guard game he wants.",
+        "assessment": "good",
+        "suggestion": "Immediately establish shin-to-shin or collar drag threats when pulling guard to prevent being passed."
+      },
+      {
+        "timestamp": "2:00",
+        "description": "Gordon enters single leg X (ashi garami) on Cyborg's lead leg.",
+        "assessment": "good",
+        "suggestion": "The entry from seated guard to SLX is the key transition — drill this as a primary pathway."
+      },
+      {
+        "timestamp": "2:20",
+        "description": "Gordon transitions from single leg X to inside sankaku (honeyhole), locking the triangle around the leg.",
+        "assessment": "good",
+        "suggestion": "The SLX to inside sankaku transition is the money move. Focus on clearing the secondary leg to lock the triangle."
+      },
+      {
+        "timestamp": "2:30",
+        "description": "Gordon applies inside heel hook from belly-down inside sankaku position.",
+        "assessment": "good",
+        "suggestion": "Belly-down finishing increases rotational force. Walk hips forward to maximise pressure."
+      }
+    ],
+    "top_3_improvements": [
+      "Cyborg needs to address the knee line immediately when Gordon enters the legs — once inside sankaku is locked, escape is extremely difficult",
+      "Standing phase: use more proactive attacks rather than purely reactive clinch fighting against a guard-pulling opponent",
+      "Guard passing: when on top briefly, needed more urgency to pass before Gordon could re-establish guard and transition to leg attacks"
+    ],
+    "strengths_observed": [
+      "Gordon: Elite composure and patience — waited for the right moment to enter the legs rather than forcing it",
+      "Gordon: Seamless transition chain from seated guard → SLX → inside sankaku showing mastery of the Danaher leg lock system"
+    ],
+    "guard_retention_score": 9,
+    "guard_retention_reason": "Gordon recovered guard effectively after the brief half guard exchange at 1:20 and maintained offensive guard throughout",
+    "positional_awareness_score": 9,
+    "positional_awareness_reason": "Gordon chose the right moments to engage, disengage, and attack. Timing of the leg entry was excellent.",
+    "transition_quality_score": 10,
+    "transition_quality_reason": "The seated guard → SLX → inside sankaku chain was textbook Danaher system execution. Each transition flowed naturally into the next.",
+    "overall_notes": "A masterclass in modern no-gi leg locking. Gordon demonstrated the full seated guard to inside heel hook pathway that has become his signature. The key tactical decision was pulling guard against a larger, stronger wrestler rather than engaging in a clinch battle he was unlikely to win. Once on the ground, the leg entry sequence was clinical."
+  }
+}
