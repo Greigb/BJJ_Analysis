@@ -40,6 +40,14 @@ You are analysing keyframes extracted from a rolling/sparring session.
 POSITION TAXONOMY — use ONLY these position IDs:
 {taxonomy_positions}
 
+{player_id_block}
+
+IMPORTANT: The video may show multiple people (bystanders, referees, coaches,
+other grapplers on adjacent mats). Focus ONLY on the two people actively
+grappling. Ignore anyone standing on the sideline, sitting, or not engaged
+in the roll. If you cannot determine which two people are the focus, describe
+what you see and set both positions to "unclear".
+
 For EACH frame image provided, return a JSON object:
 {{
   "frame_number": <int>,
@@ -48,7 +56,7 @@ For EACH frame image provided, return a JSON object:
   "player_b_position": "<position_id from taxonomy>",
   "confidence": <float 0.0-1.0>,
   "active_technique": "<technique being attempted or null>",
-  "notes": "<brief observation about what's happening>",
+  "notes": "<brief observation — mention what you see that identifies Player A>",
   "coaching_tip": "<one actionable suggestion if relevant, or null>"
 }}
 
@@ -446,6 +454,8 @@ def main():
                         help="YouTube URL for clickable timestamps")
     parser.add_argument("--json-only", action="store_true",
                         help="Output raw JSON instead of markdown")
+    parser.add_argument("--player-description", default="",
+                        help="Visual description of Player A (e.g. 'white gi', 'blue shorts')")
     args = parser.parse_args()
 
     print("\n--- BJJ Groq Analyser (Free Tier) ---")
@@ -465,7 +475,12 @@ def main():
     client = Groq(api_key=api_key)
     taxonomy = load_taxonomy()
     taxonomy_str = build_taxonomy_string(taxonomy)
-    system_prompt = SYSTEM_PROMPT.format(taxonomy_positions=taxonomy_str)
+    player_id_block = ""
+    if args.player_description:
+        player_id_block = f"""Player A visual identification: {args.player_description}
+Use this description to consistently identify Player A across ALL frames.
+If Player A's appearance changes (e.g. position shift), maintain tracking based on continuity."""
+    system_prompt = SYSTEM_PROMPT.format(taxonomy_positions=taxonomy_str, player_id_block=player_id_block)
 
     # Step 1: Extract frames
     print(f"\nStep 1: Extracting frames from {args.video}")

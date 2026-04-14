@@ -151,7 +151,31 @@ CAT_EMOJI = {
 
 # ─── Groq Auto-Analysis ───────────────────────────────────────────────────────
 
-def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, taxonomy):
+def extract_first_frame(video_path):
+    """Extract just the first frame from a video for player identification. Returns base64 string or None."""
+    try:
+        import cv2
+        cap = cv2.VideoCapture(video_path)
+        if not cap.isOpened():
+            return None
+        ret, frame = cap.read()
+        cap.release()
+        if not ret:
+            return None
+        h, w = frame.shape[:2]
+        scale = min(640 / w, 640 / h, 1.0)
+        if scale < 1.0:
+            frame = cv2.resize(frame, (int(w * scale), int(h * scale)))
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        pil_image = Image.fromarray(rgb)
+        buffer = BytesIO()
+        pil_image.save(buffer, format="JPEG", quality=80)
+        return base64.b64encode(buffer.getvalue()).decode("utf-8")
+    except Exception:
+        return None
+
+
+def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, taxonomy, player_description=""):
     """Run fully automated Groq analysis on a video file. Returns (data, error)."""
     try:
         import cv2
@@ -161,11 +185,27 @@ def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, t
         return None, f"Missing dependency: {e}."
 
     taxonomy_str = build_taxonomy_string(taxonomy)
+
+    player_id_block = ""
+    if player_description:
+        player_id_block = f"""
+Player A visual identification: {player_description}
+Use this description to consistently identify Player A across ALL frames.
+If Player A's appearance changes (e.g. position shift), maintain tracking based on continuity."""
+
     system_prompt = f"""You are an expert Brazilian Jiu-Jitsu analyst with black belt-level knowledge.
 You are analysing keyframes extracted from a rolling/sparring session.
 
 POSITION TAXONOMY — use ONLY these position IDs:
 {taxonomy_str}
+
+{player_id_block}
+
+IMPORTANT: The video may show multiple people (bystanders, referees, coaches,
+other grapplers on adjacent mats). Focus ONLY on the two people actively
+grappling. Ignore anyone standing on the sideline, sitting, or not engaged
+in the roll. If you cannot determine which two people are the focus, describe
+what you see and set both positions to "unclear".
 
 For EACH frame image provided, return a JSON object:
 {{
@@ -175,7 +215,7 @@ For EACH frame image provided, return a JSON object:
   "player_b_position": "<position_id from taxonomy>",
   "confidence": <float 0.0-1.0>,
   "active_technique": "<technique being attempted or null>",
-  "notes": "<brief observation>",
+  "notes": "<brief observation — mention what you see that identifies Player A>",
   "coaching_tip": "<one actionable suggestion or null>"
 }}
 
@@ -289,6 +329,10 @@ Return ONLY valid JSON, no markdown, no backticks."""
                 results = json.loads(raw)
                 if isinstance(results, dict):
                     results = [results]
+                # Attach frame images to results for thumbnail display
+                for idx, result in enumerate(results):
+                    if idx < len(batch):
+                        result["frame_base64"] = batch[idx]["base64"]
                 timeline.extend(results)
                 if results:
                     last = results[-1]
@@ -516,6 +560,14 @@ def main():
         else:
             uploaded_video = st.file_uploader("Upload video file", type=["mp4", "mov", "avi", "mkv"])
 
+        # Player identification
+        st.markdown("#### Identify Player A")
+        player_description = st.text_input(
+            "Describe Player A so the model can track them",
+            placeholder="e.g. 'white gi', 'blue shorts, no shirt', 'the taller person'",
+            help="This helps the AI consistently track the right person, especially when multiple people are in frame.",
+        )
+
         col_int, col_max = st.columns(2)
         with col_int:
             auto_interval = st.slider("Sample every N seconds", 3, 15, 5)
@@ -570,7 +622,7 @@ def main():
             if dl_error:
                 st.error(dl_error)
             elif tmp_path:
-                data, error = run_groq_analysis(tmp_path, player_name, auto_interval, auto_max, groq_key, taxonomy)
+                data, error = run_groq_analysis(tmp_path, player_name, auto_interval, auto_max, groq_key, taxonomy, player_description)
                 os.unlink(tmp_path)
                 if error:
                     st.error(error)
@@ -903,8 +955,21 @@ def main():
                     tech = entry.get("active_technique") or "—"
                     notes = entry.get("notes", "")
                     tip = entry.get("coaching_tip") or ""
+                    has_thumb = bool(entry.get("frame_base64"))
 
-                    col_time, col_pos, col_detail = st.columns([1, 2, 4])
+                    if has_thumb:
+                        col_thumb, col_time, col_pos, col_detail = st.columns([1.5, 1, 2, 3.5])
+                    else:
+                        col_thumb = None
+                        col_time, col_pos, col_detail = st.columns([1, 2, 4])
+
+                    if col_thumb and has_thumb:
+                        with col_thumb:
+                            st.image(
+                                f"data:image/jpeg;base64,{entry['frame_base64']}",
+                                width=150,
+                                caption=ts_str,
+                            )
                     with col_time:
                         if vid_id:
                             link = youtube_timestamp_url(video_url, ts_sec)
