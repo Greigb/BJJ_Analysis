@@ -27,6 +27,12 @@ from collections import Counter
 TAXONOMY_PATH = Path(__file__).parent / "taxonomy.json"
 
 
+def format_timestamp(seconds):
+    """Format seconds as m:ss string."""
+    s = int(float(seconds))
+    return f"{s // 60}:{s % 60:02d}"
+
+
 def load_taxonomy():
     with open(TAXONOMY_PATH) as f:
         return json.load(f)
