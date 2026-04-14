@@ -2,7 +2,7 @@
 date: 2026-04-14
 partner: 
 duration: "3:42"
-frames_analysed: 37
+frames_analysed: 38
 guard_retention: 4
 positional_awareness: 6
 transition_quality: 5
@@ -14,14 +14,16 @@ tags: [roll, claude-analysis]
 
 **Player:** Greig
 **Duration:** 3:42
-**Moments analysed:** 37
+**Moments analysed:** 38
 **Method:** Claude Vision
 **Roll starts:** 0:03
-**Resets:** 3:42
+**Roll ends:** 2:26 (tap)
+**Actual roll time:** 2:23
+**Resets:** 2:31, 2:40, 2:49, 2:58, 3:07, 3:15, 3:24, 3:33, 3:39, 3:42
 
 ## Summary
 
-3:39 open mat roll at Tempo Jiu Jitsu. Roll starts with slap/bump at 0:03 and ends with time/mutual stop at 3:42. Three 50/50 leg entanglement exchanges in the first 1:55. Greig escaped all three using 80/20 and passed to side control multiple times but couldn't consolidate. Anthony swept from closed guard at 2:40 and spent the final minute on top advancing to mount. No submission — round ended by time.
+Open mat roll at Tempo Jiu Jitsu. Roll starts with slap/bump at 0:03. Greig (black) navigated two 50/50 entanglements, escaped both using 80/20, passed to side control multiple times, and secured a SUBMISSION at 2:26 from heavy side control pressure. Actual roll time: 2:23 (0:03 to 2:26). The footage continues with a second roll/continuation where Anthony swept Greig and advanced to mount.
 
 ## Scores
 
@@ -35,17 +37,17 @@ tags: [roll, claude-analysis]
 
 | Category | Count | % |
 |----------|-------|---|
-| Inside Guard (Top) | 13 | 35% |
-| Dominant Position (Top) | 6 | 16% |
+| Inside Guard (Top) | 13 | 34% |
+| Dominant Position (Top) | 7 | 18% |
 | Inferior Position (Bottom) | 6 | 16% |
-| Leg Entanglement | 5 | 14% |
+| Leg Entanglement | 5 | 13% |
 | Standing | 4 | 11% |
 | Scramble / Transition | 2 | 5% |
 | Guard (Bottom) | 1 | 3% |
 
 ### Position Timeline Bar
 
-⬜⬜⬜🟨🟨🟨🟧🟧🟧🟧🟪🟨🟩🟩🟨🟨🟨🟨🟨🟩🟩🟨🟧🟩🟨🟨🟩🟨🟪🟥🟥🟥🟥🟥🟥🟦⬜
+⬜⬜⬜🟨🟨🟨🟧🟧🟧🟧🟪🟨🟩🟩🟨🟨🟨🟨🟨🟩🟩🟨🟧🟩🟨🟨🟩🟩🟨🟪🟥🟥🟥🟥🟥🟥🟦⬜
 
 Legend: ⬜Standing 🟦Guard(Bottom) 🟨Guard(Top) 🟩Dominant(Top) 🟥Inferior(Bottom) 🟧Leg Entanglement 🟪Scramble
 
@@ -59,6 +61,8 @@ Legend: ⬜Standing 🟦Guard(Bottom) 🟨Guard(Top) 🟩Dominant(Top) 🟥Infer
   - *Suggestion:* This is the correct 50/50 escape. Backstep out faster.
 - **1:46** [bad] - Third 50/50 entry — Anthony's pattern identified.
   - *Suggestion:* You know it's coming. Prevent the mirrored leg wrapping.
+- **2:26** [good] - TAP! Greig submits Anthony from side control. Heavy pressure submission.
+  - *Suggestion:* The submission came from relentless top pressure. The pass → side control → submission chain worked perfectly here.
 - **2:40** [bad] - Anthony sweeps from closed guard.
   - *Suggestion:* STAND UP in closed guard. Every time.
 - **3:33** [bad] - Anthony advances to mount.
@@ -108,16 +112,17 @@ Legend: ⬜Standing 🟦Guard(Bottom) 🟨Guard(Top) 🟩Dominant(Top) 🟥Infer
 | **1:55** | [[Side Control (Top)]] | [[Bottom Side Control]] |  | Greig passes again from 50/50. *Tip: ADVANCE immediately.* |
 | **2:04** | [[Headquarters / Passing Position]] | [[Open Guard (generic)]] |  | Greig in headquarters. *Tip: Commit to the pass.* |
 | **2:13** | [[Passing Open Guard (Top)]] | [[Open Guard (generic)]] |  | Open guard exchange. *Tip: Mix up passing.* |
-| **2:22** | [[Side Control (Top)]] | [[Bottom Side Control]] |  | Another pass completed. *Tip: GO TO MOUNT.* |
-| **2:31** | [[Inside Closed Guard (Top)]] | [[Closed Guard (Bottom)]] |  | Anthony recovers to closed guard. *Tip: STAND UP to break guard.* |
-| **2:40** | [[Sweep in Progress]] | [[Sweep in Progress]] |  | SWEEP! Anthony sweeps from closed guard. *Tip: Broken posture = swept. Stand up in closed guard.* |
-| **2:49** | [[Bottom Side Control]] | [[Side Control (Top)]] |  | Sweep complete. Anthony on top. *Tip: Frame and hip escape immediately.* |
-| **2:58** | [[Bottom Side Control]] | [[Side Control (Top)]] |  | Anthony maintaining side control. *Tip: Frame on neck and hip. Shrimp.* |
-| **3:07** | [[Bottom Side Control]] | [[Side Control (Top)]] |  | Anthony still controlling from top. *Tip: Keep fighting for space.* |
-| **3:15** | [[North-South (Bottom)]] | [[North-South (Top)]] |  | Anthony transitions to north-south. *Tip: Frame and spin.* |
-| **3:24** | [[Bottom Side Control]] | [[Side Control (Top)]] |  | Anthony back to side control. *Tip: Keep creating frames.* |
-| **3:33** | [[Bottom Mount]] | [[Mount (Top)]] |  | Anthony advances to mount. *Tip: Trap and roll or elbow-knee escape.* |
-| **3:39** | [[Open Guard (generic)]] | [[Passing Open Guard (Top)]] |  | Roll winding down. Both disengaging. |
+| **2:22** | [[Side Control (Top)]] | [[Bottom Side Control]] | submission_attempt | Greig on top with VERY heavy pressure. Working a submission from side control. Anthony being smothered. *Tip: Great pressure. Keep the crossface tight and look to isolate the arm.* |
+| **2:26** | [[Side Control (Top)]] | [[Bottom Side Control]] | submission | **TAP (submission)** TAP! Anthony taps to Greig's pressure/submission from side control. ROLL ENDS. *Tip: Great finish. The pressure passing paid off — the side control was so heavy Anthony had to tap.* |
+| **2:31** | [[Inside Closed Guard (Top)]] | [[Closed Guard (Bottom)]] |  | **RESET** (Post-tap / second roll) Anthony recovers to closed guard. *Tip: STAND UP to break guard.* |
+| **2:40** | [[Sweep in Progress]] | [[Sweep in Progress]] |  | **RESET** (Post-tap / second roll) SWEEP! Anthony sweeps from closed guard. *Tip: Broken posture = swept. Stand up in closed guard.* |
+| **2:49** | [[Bottom Side Control]] | [[Side Control (Top)]] |  | **RESET** (Post-tap / second roll) Sweep complete. Anthony on top. *Tip: Frame and hip escape immediately.* |
+| **2:58** | [[Bottom Side Control]] | [[Side Control (Top)]] |  | **RESET** (Post-tap / second roll) Anthony maintaining side control. *Tip: Frame on neck and hip. Shrimp.* |
+| **3:07** | [[Bottom Side Control]] | [[Side Control (Top)]] |  | **RESET** (Post-tap / second roll) Anthony still controlling from top. *Tip: Keep fighting for space.* |
+| **3:15** | [[North-South (Bottom)]] | [[North-South (Top)]] |  | **RESET** (Post-tap / second roll) Anthony transitions to north-south. *Tip: Frame and spin.* |
+| **3:24** | [[Bottom Side Control]] | [[Side Control (Top)]] |  | **RESET** (Post-tap / second roll) Anthony back to side control. *Tip: Keep creating frames.* |
+| **3:33** | [[Bottom Mount]] | [[Mount (Top)]] |  | **RESET** (Post-tap / second roll) Anthony advances to mount. *Tip: Trap and roll or elbow-knee escape.* |
+| **3:39** | [[Open Guard (generic)]] | [[Passing Open Guard (Top)]] |  | **RESET** (Post-tap / second roll) Roll winding down. Both disengaging. |
 | **3:42** | [[Standing - Neutral]] | [[Standing - Neutral]] |  | **RESET** Round ends. Both players separate. Time called or mutual stop. |
 
 ## Overall Notes
