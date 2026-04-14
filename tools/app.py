@@ -22,11 +22,11 @@ from datetime import timedelta
 from io import BytesIO
 from streamlit_agraph import agraph, Node, Edge, Config
 
-# Add tools dir to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
 TAXONOMY_PATH = Path(__file__).parent / "taxonomy.json"
 ROLL_LOG_DIR = Path(__file__).parent.parent / "Roll Log"
+
 
 # ─── Taxonomy ─────────────────────────────────────────────────────────────────
 
@@ -37,7 +37,6 @@ def load_taxonomy():
 
 
 def get_position_ids(taxonomy):
-    """Build formatted position ID list for the prompt."""
     groups = {}
     for pos in taxonomy["positions"]:
         cat = taxonomy["categories"][pos["category"]]["label"]
@@ -48,9 +47,19 @@ def get_position_ids(taxonomy):
     return "\n".join(lines)
 
 
+def build_taxonomy_string(taxonomy):
+    lines = []
+    for pos in taxonomy["positions"]:
+        cat = taxonomy["categories"][pos["category"]]["label"]
+        lines.append(f'  "{pos["id"]}" — {pos["name"]} [{cat}]')
+    return "\n".join(lines)
+
+
 # ─── YouTube Helpers ──────────────────────────────────────────────────────────
 
 def extract_youtube_id(url):
+    if not url:
+        return None
     if "youtu.be/" in url:
         return url.split("youtu.be/")[1].split("?")[0]
     elif "v=" in url:
@@ -65,11 +74,56 @@ def youtube_timestamp_url(video_url, seconds):
     return video_url
 
 
-def youtube_embed_url(video_url, start_sec=0):
+def youtube_embed_html(video_url, start_sec=0, player_id="yt-player"):
+    """Generate YouTube IFrame embed with JS seek control."""
     vid_id = extract_youtube_id(video_url)
-    if vid_id:
-        return f"https://www.youtube.com/embed/{vid_id}?start={int(start_sec)}&autoplay=1"
-    return None
+    if not vid_id:
+        return ""
+    return f"""
+    <div id="{player_id}-container" style="position:sticky;top:0;z-index:100;background:#0B0C0F;padding:8px 0;">
+        <iframe id="{player_id}" width="100%" height="400"
+            src="https://www.youtube.com/embed/{vid_id}?enablejsapi=1&start={int(start_sec)}"
+            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen style="border-radius:12px;">
+        </iframe>
+    </div>
+    <script>
+        var ytPlayer;
+        function onYouTubeIframeAPIReady() {{
+            ytPlayer = new YT.Player('{player_id}');
+        }}
+        function seekTo(seconds) {{
+            if (ytPlayer && ytPlayer.seekTo) {{
+                ytPlayer.seekTo(seconds, true);
+                ytPlayer.playVideo();
+            }}
+        }}
+        if (!document.getElementById('yt-api-script')) {{
+            var tag = document.createElement('script');
+            tag.id = 'yt-api-script';
+            tag.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(tag);
+        }}
+    </script>
+    """
+
+
+def safe_parse_timestamp(ts_str):
+    """Parse a timestamp string like '1:30', '27.7', '90' into seconds."""
+    try:
+        if ":" in str(ts_str):
+            parts = str(ts_str).split(":")
+            return int(float(parts[0])) * 60 + int(float(parts[1]))
+        else:
+            return int(float(ts_str))
+    except (ValueError, IndexError):
+        return 0
+
+
+def format_timestamp(seconds):
+    """Format seconds as m:ss string."""
+    s = int(float(seconds))
+    return f"{s // 60}:{s % 60:02d}"
 
 
 # ─── Colours ──────────────────────────────────────────────────────────────────
@@ -104,7 +158,7 @@ def run_groq_analysis(video_path, player_name, interval, max_frames, groq_key, t
         from PIL import Image
         from groq import Groq
     except ImportError as e:
-        return None, f"Missing dependency: {e}. Install with: pip install groq opencv-python Pillow"
+        return None, f"Missing dependency: {e}."
 
     taxonomy_str = build_taxonomy_string(taxonomy)
     system_prompt = f"""You are an expert Brazilian Jiu-Jitsu analyst with black belt-level knowledge.
@@ -137,20 +191,22 @@ Return a JSON array with one object per frame. Return ONLY valid JSON, no markdo
 {{timeline_json}}
 Session duration: {{duration}}. Player: {{player_name}}.
 
-Return a JSON object:
+Return a JSON object with these fields. For each score, include a "reason" explaining why you gave that score:
 {{
   "session_overview": "<2-3 sentences>",
   "key_moments": [{{"timestamp": "<mm:ss>", "description": "<what>", "assessment": "<good/bad/neutral>", "suggestion": "<advice>"}}],
-  "top_3_improvements": ["<1>", "<2>", "<3>"],
+  "top_3_improvements": ["<specific actionable improvement 1>", "<2>", "<3>"],
   "strengths_observed": ["<1>", "<2>"],
   "guard_retention_score": <1-10>,
+  "guard_retention_reason": "<why this score>",
   "positional_awareness_score": <1-10>,
+  "positional_awareness_reason": "<why this score>",
   "transition_quality_score": <1-10>,
+  "transition_quality_reason": "<why this score>",
   "overall_notes": "<remarks>"
 }}
 Return ONLY valid JSON, no markdown, no backticks."""
 
-    # Extract frames
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         return None, f"Could not open video: {video_path}"
@@ -192,7 +248,6 @@ Return ONLY valid JSON, no markdown, no backticks."""
     if not frames:
         return None, "No frames extracted from video"
 
-    # Analyse in batches
     client = Groq(api_key=groq_key)
     model = "meta-llama/llama-4-scout-17b-16e-instruct"
     batch_size = 4
@@ -245,7 +300,6 @@ Return ONLY valid JSON, no markdown, no backticks."""
 
     progress.progress(1.0, text="Generating summary...")
 
-    # Summary
     try:
         resp = client.chat.completions.create(
             model=model,
@@ -270,19 +324,10 @@ Return ONLY valid JSON, no markdown, no backticks."""
     return {"timeline": timeline, "summary": summary, "duration_sec": duration}, None
 
 
-def build_taxonomy_string(taxonomy):
-    lines = []
-    for pos in taxonomy["positions"]:
-        cat = taxonomy["categories"][pos["category"]]["label"]
-        lines.append(f'  "{pos["id"]}" — {pos["name"]} [{cat}]')
-    return "\n".join(lines)
-
-
 # ─── Graph Data Helpers ───────────────────────────────────────────────────────
 
 @st.cache_data
 def load_jsx_techniques():
-    """Parse technique lists from the JSX taxonomy component."""
     jsx_path = Path(__file__).parent / "components" / "bjj-position-taxonomy.jsx"
     if not jsx_path.exists():
         return {}
@@ -298,13 +343,11 @@ def load_jsx_techniques():
 
 @st.cache_data
 def load_jsx_youtube_links():
-    """Parse YouTube links from the JSX graph component."""
     jsx_path = Path(__file__).parent / "components" / "bjj-position-graph.jsx"
     if not jsx_path.exists():
         return {}
     text = jsx_path.read_text()
     result = {}
-    # Match: id: "xxx", ... yt: "url", ytTitle: "title"
     node_pattern = r'id:\s*"([^"]+)".*?yt:\s*"([^"]+)".*?ytTitle:\s*"([^"]+)"'
     for match in re.finditer(node_pattern, text, re.DOTALL):
         result[match.group(1)] = {"url": match.group(2), "title": match.group(3)}
@@ -312,7 +355,6 @@ def load_jsx_youtube_links():
 
 
 def match_position_to_techniques(pos_name, jsx_techniques):
-    """Fuzzy match a taxonomy position name to JSX technique list."""
     pos_lower = pos_name.lower()
     best_match = None
     best_score = 0
@@ -332,62 +374,11 @@ def match_position_to_techniques(pos_name, jsx_techniques):
     return best_match or []
 
 
-# ─── Analysis Prompt ──────────────────────────────────────────────────────────
-
-def build_prompt(taxonomy):
-    position_ids = ", ".join(p["id"] for p in taxonomy["positions"])
-    return f"""You are a BJJ black belt analyst. Analyse this rolling/sparring video.
-
-Return ONLY a valid JSON object (no markdown, no backticks, no explanation), in this exact format:
-
-{{
-  "timeline": [
-    {{
-      "timestamp": "0:00",
-      "timestamp_sec": 0,
-      "player_a_position": "standing_neutral",
-      "player_b_position": "standing_neutral",
-      "active_technique": null,
-      "notes": "Both players standing",
-      "coaching_tip": null
-    }}
-  ],
-  "summary": {{
-    "session_overview": "2-3 sentence summary",
-    "key_moments": [
-      {{
-        "timestamp": "0:00",
-        "description": "what happened",
-        "assessment": "good",
-        "suggestion": "what to do differently"
-      }}
-    ],
-    "top_3_improvements": ["improvement 1", "improvement 2", "improvement 3"],
-    "strengths_observed": ["strength 1", "strength 2"],
-    "guard_retention_score": 7,
-    "positional_awareness_score": 6,
-    "transition_quality_score": 5,
-    "overall_notes": "coaching remarks"
-  }}
-}}
-
-POSITION IDS — use ONLY these:
-
-{get_position_ids(taxonomy)}
-
-Be SPECIFIC with leg entanglements — identify the exact ashi garami / sankaku position.
-
-Sample a moment every 10-15 seconds throughout the video. Track both players."""
-
-
 # ─── Export to Obsidian ───────────────────────────────────────────────────────
 
 def export_to_obsidian(data, player_name, video_name, video_url):
-    """Export analysis to Obsidian vault Roll Log."""
     taxonomy = load_taxonomy()
     pos_map = {p["id"]: p for p in taxonomy["positions"]}
-    cat_map = taxonomy["categories"]
-
     timeline = data.get("timeline", [])
     summary = data.get("summary", {})
     today = time.strftime("%Y-%m-%d")
@@ -399,58 +390,40 @@ def export_to_obsidian(data, player_name, video_name, video_url):
         duration_str = "unknown"
 
     lines = [
-        "---",
-        f"date: {today}",
-        f"partner: ",
-        f'duration: "{duration_str}"',
+        "---", f"date: {today}", f"partner: ", f'duration: "{duration_str}"',
         f"frames_analysed: {len(timeline)}",
         f"guard_retention: {summary.get('guard_retention_score', '')}",
         f"positional_awareness: {summary.get('positional_awareness_score', '')}",
         f"transition_quality: {summary.get('transition_quality_score', '')}",
-        f"method: streamlit-app",
-        f"tags: [roll, app-analysis]",
-        "---",
-        "",
-        f"# Roll Analysis - {video_name}",
-        "",
-        f"**Player:** {player_name}",
-        f"**Duration:** {duration_str}",
+        f"method: streamlit-app", f"tags: [roll, app-analysis]",
+        "---", "", f"# Roll Analysis - {video_name}", "",
+        f"**Player:** {player_name}", f"**Duration:** {duration_str}",
         f"**Moments analysed:** {len(timeline)}",
     ]
     if video_url:
         lines.append(f"**Video:** [{video_url}]({video_url})")
     lines.append("")
-
     if summary.get("session_overview"):
         lines.extend(["## Summary", "", summary["session_overview"], ""])
-
     lines.extend([
-        "## Scores", "",
-        "| Metric | Score |",
-        "|--------|-------|",
+        "## Scores", "", "| Metric | Score |", "|--------|-------|",
         f"| Guard Retention | {summary.get('guard_retention_score', '-')}/10 |",
         f"| Positional Awareness | {summary.get('positional_awareness_score', '-')}/10 |",
-        f"| Transition Quality | {summary.get('transition_quality_score', '-')}/10 |",
-        "",
+        f"| Transition Quality | {summary.get('transition_quality_score', '-')}/10 |", "",
     ])
-
-    # Timeline
-    lines.extend([
-        "## Position Timeline", "",
+    lines.extend(["## Position Timeline", "",
         "| Time | Player A | Player B | Technique | Notes |",
         "|------|----------|----------|-----------|-------|",
     ])
     for entry in timeline:
-        ts = entry.get("timestamp", "?")
         ts_sec = entry.get("timestamp_sec", 0)
+        ts_str = format_timestamp(ts_sec)
         if video_url and extract_youtube_id(video_url):
-            ts_link = f"[**{ts}**]({youtube_timestamp_url(video_url, ts_sec)})"
+            ts_link = f"[**{ts_str}**]({youtube_timestamp_url(video_url, ts_sec)})"
         else:
-            ts_link = f"**{ts}**"
-        pos_a_id = entry.get("player_a_position", "unclear")
-        pos_b_id = entry.get("player_b_position", "unclear")
-        pos_a = pos_map.get(pos_a_id, {}).get("name", pos_a_id)
-        pos_b = pos_map.get(pos_b_id, {}).get("name", pos_b_id)
+            ts_link = f"**{ts_str}**"
+        pos_a = pos_map.get(entry.get("player_a_position", ""), {}).get("name", "?")
+        pos_b = pos_map.get(entry.get("player_b_position", ""), {}).get("name", "?")
         tech = entry.get("active_technique") or ""
         notes = entry.get("notes", "")
         tip = entry.get("coaching_tip") or ""
@@ -459,13 +432,11 @@ def export_to_obsidian(data, player_name, video_name, video_url):
             note_text += f" *Tip: {tip}*"
         lines.append(f"| {ts_link} | [[{pos_a}]] | [[{pos_b}]] | {tech} | {note_text} |")
     lines.append("")
-
     if summary.get("overall_notes"):
         lines.extend(["## Overall Notes", "", summary["overall_notes"], ""])
 
     ROLL_LOG_DIR.mkdir(exist_ok=True)
-    filename = f"{today} - {video_name} (app).md"
-    filepath = ROLL_LOG_DIR / filename
+    filepath = ROLL_LOG_DIR / f"{time.strftime('%Y-%m-%d')} - {video_name} (app).md"
     filepath.write_text("\n".join(lines))
     return str(filepath)
 
@@ -473,46 +444,19 @@ def export_to_obsidian(data, player_name, video_name, video_url):
 # ─── App ──────────────────────────────────────────────────────────────────────
 
 def main():
-    st.set_page_config(
-        page_title="BJJ Rolling Analyser",
-        page_icon="🥋",
-        layout="wide",
-    )
+    st.set_page_config(page_title="BJJ Rolling Analyser", page_icon="🥋", layout="wide")
 
-    # Custom CSS
     st.markdown("""
     <style>
     .stApp { background-color: #0B0C0F; }
-    .score-box {
-        background: #12141A;
-        border: 1px solid #1E2030;
-        border-radius: 12px;
-        padding: 16px;
-        text-align: center;
-    }
-    .score-value {
-        font-size: 36px;
-        font-weight: 700;
-        margin: 0;
-    }
-    .score-label {
-        font-size: 12px;
-        color: #9CA3AF;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-    }
-    .timeline-bar {
-        font-size: 24px;
-        letter-spacing: 2px;
-        line-height: 1.8;
-    }
-    .moment-card {
-        background: #12141A;
-        border: 1px solid #1E2030;
-        border-radius: 10px;
-        padding: 14px;
-        margin-bottom: 8px;
-    }
+    .score-box { background:#12141A; border:1px solid #1E2030; border-radius:12px; padding:16px; text-align:center; }
+    .score-value { font-size:36px; font-weight:700; margin:0; }
+    .score-label { font-size:12px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.08em; }
+    .score-reason { font-size:12px; color:#6B7280; margin-top:6px; line-height:1.4; }
+    .timeline-bar { font-size:24px; letter-spacing:2px; line-height:1.8; }
+    .legend-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:6px; }
+    .legend-pill { display:inline-flex; align-items:center; gap:4px; font-size:12px; color:#9CA3AF; }
+    .seek-btn { color:#4A90D9; cursor:pointer; text-decoration:underline; font-weight:700; font-size:16px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -521,57 +465,50 @@ def main():
 
     taxonomy = load_taxonomy()
 
-    # ─── Sidebar
+    # ─── Sidebar (simplified)
     with st.sidebar:
         st.header("Settings")
         player_name = st.text_input("Player name", value="Greig")
         video_name = st.text_input("Roll name", value="", placeholder="e.g. Tuesday Open Mat")
-        video_url = st.text_input("YouTube URL (optional)", value="", placeholder="https://youtube.com/watch?v=...")
 
-        st.divider()
-        st.header("Groq API (free)")
-        groq_key = st.text_input("Groq API Key", type="password", placeholder="gsk_...")
-        st.caption("Free key from [console.groq.com/keys](https://console.groq.com/keys)")
+        with st.expander("Advanced", expanded=False):
+            groq_key = st.text_input("Groq API Key", type="password", placeholder="gsk_...")
+            st.caption("Free from [console.groq.com/keys](https://console.groq.com/keys)")
+            st.divider()
+            if st.button("📋 Copy AI Studio Prompt"):
+                st.session_state["show_prompt"] = True
 
-        st.divider()
-        if st.button("📋 Copy AI Studio Prompt"):
-            st.session_state["show_prompt"] = True
-
-    # ─── Prompt display
     if st.session_state.get("show_prompt"):
-        with st.expander("Analysis Prompt (copy this to AI Studio)", expanded=True):
+        with st.expander("Analysis Prompt (copy to AI Studio)", expanded=True):
             st.code(build_prompt(taxonomy), language=None)
 
-    # ─── Main input
+    # ─── State
     json_input = ""
     analyse_btn = False
+    video_url = ""
 
-    tab_auto, tab_graph, tab_paste, tab_upload, tab_previous = st.tabs([
-        "🤖 Auto-Analyse Video", "🗺️ Position Map", "📋 Paste JSON", "📁 Upload JSON", "📂 Previous"
+    # ─── Tabs (simplified: main analysis + position map + advanced)
+    tab_auto, tab_graph, tab_advanced = st.tabs([
+        "🤖 Analyse Video", "🗺️ Position Map", "⚙️ Advanced"
     ])
 
+    # ━━━ TAB: Analyse Video ━━━
     with tab_auto:
-        st.markdown("**Upload a video file** or **paste a YouTube link** — fully automated analysis with Groq (free).")
-
         input_method = st.radio("Video source", ["YouTube URL", "Upload file"], horizontal=True)
 
         yt_url_input = ""
         uploaded_video = None
 
         if input_method == "YouTube URL":
-            yt_url_input = st.text_input(
-                "YouTube URL",
-                placeholder="https://www.youtube.com/watch?v=...",
-                key="yt_auto_url",
-            )
-            if yt_url_input and not video_url:
+            yt_url_input = st.text_input("YouTube URL", placeholder="https://www.youtube.com/watch?v=...", key="yt_auto_url")
+            if yt_url_input:
                 video_url = yt_url_input
         else:
             uploaded_video = st.file_uploader("Upload video file", type=["mp4", "mov", "avi", "mkv"])
 
         col_int, col_max = st.columns(2)
         with col_int:
-            auto_interval = st.slider("Sample interval (seconds)", 3, 15, 5)
+            auto_interval = st.slider("Sample every N seconds", 3, 15, 5)
         with col_max:
             auto_max = st.slider("Max frames", 10, 80, 30)
 
@@ -579,7 +516,7 @@ def main():
         auto_btn = st.button("🚀 Analyse Video", type="primary", use_container_width=True, disabled=not (has_video and groq_key))
 
         if not groq_key:
-            st.info("Enter your free Groq API key in the sidebar to enable auto-analysis.")
+            st.info("Enter your Groq API key in **Settings > Advanced** in the sidebar.")
 
         if auto_btn and has_video and groq_key:
             import tempfile
@@ -587,50 +524,31 @@ def main():
             dl_error = None
 
             if input_method == "YouTube URL" and yt_url_input:
-                # Download YouTube video
                 with st.spinner("Downloading YouTube video..."):
                     try:
                         import subprocess
                         tmp_dir = tempfile.mkdtemp(prefix="bjj_dl_")
                         out_template = os.path.join(tmp_dir, "video.mp4")
                         result = subprocess.run(
-                            ["yt-dlp", "-f", "best[height<=480]",
-                             "--max-filesize", "50M",
-                             "-o", out_template,
-                             "--no-warnings", "--quiet",
-                             "--force-overwrites",
+                            ["yt-dlp", "-f", "best[height<=480]", "--max-filesize", "50M",
+                             "-o", out_template, "--no-warnings", "--quiet", "--force-overwrites",
                              yt_url_input],
-                            capture_output=True, text=True, timeout=120,
-                        )
+                            capture_output=True, text=True, timeout=120)
                         if result.returncode != 0:
-                            # Try with cookies from browser
                             result = subprocess.run(
-                                ["yt-dlp", "-f", "best[height<=480]",
-                                 "--max-filesize", "50M",
-                                 "--cookies-from-browser", "chrome",
-                                 "-o", out_template,
-                                 "--no-warnings", "--quiet",
-                                 "--force-overwrites",
-                                 yt_url_input],
-                                capture_output=True, text=True, timeout=120,
-                            )
-                        # Find the downloaded file (yt-dlp may change extension)
+                                ["yt-dlp", "-f", "best[height<=480]", "--max-filesize", "50M",
+                                 "--cookies-from-browser", "chrome", "-o", out_template,
+                                 "--no-warnings", "--quiet", "--force-overwrites", yt_url_input],
+                                capture_output=True, text=True, timeout=120)
                         downloaded = [f for f in os.listdir(tmp_dir) if os.path.isfile(os.path.join(tmp_dir, f))]
                         if result.returncode != 0 or not downloaded:
-                            dl_error = f"Failed to download video. Error: {result.stderr[:200]}"
-                            tmp_path = None
+                            dl_error = f"Failed to download video. {result.stderr[:200]}"
                         else:
                             tmp_path = os.path.join(tmp_dir, downloaded[0])
                     except FileNotFoundError:
                         dl_error = "yt-dlp not installed. Run: brew install yt-dlp"
-                        tmp_path = None
                     except subprocess.TimeoutExpired:
                         dl_error = "Download timed out. Try a shorter video."
-                        tmp_path = None
-
-                if not video_url:
-                    video_url = yt_url_input
-
             elif uploaded_video:
                 with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
                     tmp.write(uploaded_video.read())
@@ -641,44 +559,33 @@ def main():
             elif tmp_path:
                 data, error = run_groq_analysis(tmp_path, player_name, auto_interval, auto_max, groq_key, taxonomy)
                 os.unlink(tmp_path)
-
                 if error:
                     st.error(error)
                 elif data:
                     json_input = json.dumps(data)
                     analyse_btn = True
                     st.session_state["auto_result"] = json_input
-                    if yt_url_input:
-                        st.session_state["video_url"] = yt_url_input
+                    st.session_state["video_url"] = video_url
 
-        # Restore previous auto result
         if st.session_state.get("auto_result") and not analyse_btn:
             json_input = st.session_state["auto_result"]
             analyse_btn = True
-            if st.session_state.get("video_url"):
-                video_url = st.session_state["video_url"]
+            video_url = st.session_state.get("video_url", "")
 
+    # ━━━ TAB: Position Map ━━━
     with tab_graph:
         st.markdown("### BJJ Position Map")
         st.caption(f"{len(taxonomy['positions'])} positions · {len(taxonomy['valid_transitions'])} transitions")
 
-        # Category filter
         all_cats = list(taxonomy["categories"].keys())
         cat_labels = {k: v["label"] for k, v in taxonomy["categories"].items()}
+        selected_cats = st.multiselect("Filter by category", options=all_cats, default=all_cats,
+                                       format_func=lambda x: cat_labels.get(x, x))
 
-        selected_cats = st.multiselect(
-            "Filter by category",
-            options=all_cats,
-            default=all_cats,
-            format_func=lambda x: cat_labels.get(x, x),
-        )
-
-        # Build graph
         pos_map = {p["id"]: p for p in taxonomy["positions"]}
         jsx_techniques = load_jsx_techniques()
         yt_links = load_jsx_youtube_links()
 
-        # Check if we have analysis data to highlight
         analysis_positions = Counter()
         analysis_edges = set()
         if st.session_state.get("auto_result") or st.session_state.get("data"):
@@ -696,7 +603,6 @@ def main():
             except (json.JSONDecodeError, TypeError):
                 pass
 
-        # Build nodes
         nodes = []
         for pos in taxonomy["positions"]:
             if pos["category"] not in selected_cats:
@@ -706,18 +612,11 @@ def main():
             is_active = pos["id"] in analysis_positions
             size = 25 + (analysis_positions.get(pos["id"], 0) * 5) if is_active else 20
             size = min(size, 45)
-
-            nodes.append(Node(
-                id=pos["id"],
-                label=pos["name"],
-                size=size,
+            nodes.append(Node(id=pos["id"], label=pos["name"], size=size,
                 color=colour if is_active or not analysis_positions else f"{colour}44",
                 font={"color": "#E5E7EB" if is_active or not analysis_positions else "#4B5563", "size": 11},
-                borderWidth=3 if is_active else 1,
-                borderWidthSelected=4,
-            ))
+                borderWidth=3 if is_active else 1, borderWidthSelected=4))
 
-        # Build edges
         edges = []
         for a, b in taxonomy["valid_transitions"]:
             if a not in pos_map or b not in pos_map:
@@ -725,41 +624,27 @@ def main():
             if pos_map[a]["category"] not in selected_cats or pos_map[b]["category"] not in selected_cats:
                 continue
             is_traversed = (a, b) in analysis_edges
-            edges.append(Edge(
-                source=a,
-                target=b,
+            edges.append(Edge(source=a, target=b,
                 color="#D4A843" if is_traversed else "#1E2030",
-                width=3 if is_traversed else 1,
-            ))
+                width=3 if is_traversed else 1))
 
-        # Graph config
-        config = Config(
-            width="100%",
-            height=600,
-            directed=True,
-            physics=True,
-            hierarchical=False,
-            nodeHighlightBehavior=True,
-            highlightColor="#D4A843",
-            collapsible=False,
-            node={"highlightStrokeColor": "#D4A843"},
-            link={"highlightColor": "#D4A843"},
-            backgroundColor="#0B0C0F",
-        )
+        config = Config(width="100%", height=600, directed=True, physics=True,
+            hierarchical=False, nodeHighlightBehavior=True, highlightColor="#D4A843",
+            collapsible=False, node={"highlightStrokeColor": "#D4A843"},
+            link={"highlightColor": "#D4A843"}, backgroundColor="#0B0C0F")
 
-        # Render graph
         selected_node = agraph(nodes=nodes, edges=edges, config=config)
 
-        # Legend
-        legend_cols = st.columns(len(CAT_COLOURS))
-        for col, (label, colour) in zip(legend_cols, CAT_COLOURS.items()):
-            col.markdown(f"<span style='color:{colour}'>●</span> {label}", unsafe_allow_html=True)
+        # Legend (clean pill layout)
+        legend_html = '<div class="legend-row">'
+        for label, colour in CAT_COLOURS.items():
+            legend_html += f'<span class="legend-pill"><span style="color:{colour}">●</span> {label}</span>'
+        legend_html += '</div>'
+        st.markdown(legend_html, unsafe_allow_html=True)
 
-        # Analysis overlay info
         if analysis_positions:
-            st.caption(f"Highlighted: {sum(analysis_positions.values())} frames across {len(analysis_positions)} positions from loaded analysis")
+            st.caption(f"Highlighted: {sum(analysis_positions.values())} frames across {len(analysis_positions)} positions")
 
-        # Detail panel for selected node
         if selected_node and selected_node in pos_map:
             pos = pos_map[selected_node]
             cat = taxonomy["categories"][pos["category"]]
@@ -767,10 +652,9 @@ def main():
 
             st.markdown("---")
             st.markdown(f"### <span style='color:{colour}'>{pos['name']}</span>", unsafe_allow_html=True)
-            st.caption(f"Category: {cat['label']} · Position ID: {pos['id']}")
+            st.caption(f"{cat['label']} · {pos['id']}")
 
             col_tech, col_trans = st.columns(2)
-
             with col_tech:
                 techniques = match_position_to_techniques(pos["name"], jsx_techniques)
                 if techniques:
@@ -778,24 +662,17 @@ def main():
                     for t in techniques:
                         st.markdown(f"- {t}")
                 else:
-                    st.markdown("*No techniques listed yet*")
-
+                    st.markdown("*No techniques listed*")
             with col_trans:
-                # Transitions
-                to_positions = [pos_map[b]["name"] for a, b in taxonomy["valid_transitions"]
-                                if a == selected_node and b in pos_map]
-                from_positions = [pos_map[a]["name"] for a, b in taxonomy["valid_transitions"]
-                                  if b == selected_node and a in pos_map]
-
-                if to_positions:
+                to_pos = [pos_map[b]["name"] for a, b in taxonomy["valid_transitions"] if a == selected_node and b in pos_map]
+                from_pos = [pos_map[a]["name"] for a, b in taxonomy["valid_transitions"] if b == selected_node and a in pos_map]
+                if to_pos:
                     st.markdown("**Transitions to**")
-                    st.markdown(", ".join(to_positions))
-                if from_positions:
+                    st.markdown(", ".join(to_pos))
+                if from_pos:
                     st.markdown("**Transitions from**")
-                    st.markdown(", ".join(from_positions))
+                    st.markdown(", ".join(from_pos))
 
-            # YouTube link
-            # Try matching by node ID patterns
             yt_id_map = {
                 "standing_neutral": "standing", "standing_clinch": "clinch",
                 "closed_guard_bottom": "closedGuard", "half_guard_bottom": "halfGuard",
@@ -813,44 +690,45 @@ def main():
             jsx_id = yt_id_map.get(selected_node)
             if jsx_id and jsx_id in yt_links:
                 yt = yt_links[jsx_id]
-                st.markdown(f"**📺 [{yt['title']}]({yt['url']})**")
+                st.markdown(f"📺 **[{yt['title']}]({yt['url']})**")
 
-            # Analysis count
             if selected_node in analysis_positions:
-                count = analysis_positions[selected_node]
-                st.info(f"This position appeared **{count} time(s)** in the loaded analysis")
+                st.info(f"Appeared **{analysis_positions[selected_node]}x** in loaded analysis")
 
-    with tab_paste:
-        pasted = st.text_area(
-            "Paste JSON response from AI Studio or other source",
-            height=200,
-            placeholder='{"timeline": [...], "summary": {...}}',
-        )
-        paste_btn = st.button("🔍 Analyse JSON", type="primary", use_container_width=True)
-        if paste_btn and pasted:
-            json_input = pasted
-            analyse_btn = True
+    # ━━━ TAB: Advanced ━━━
+    with tab_advanced:
+        st.markdown("### Advanced Input")
+        st.caption("For developers: paste JSON from AI Studio or upload analysis files.")
 
-    with tab_upload:
-        uploaded = st.file_uploader("Upload a JSON analysis file", type=["json"])
-        if uploaded:
-            json_input = uploaded.read().decode("utf-8")
-            analyse_btn = True
+        adv_tab_paste, adv_tab_upload, adv_tab_prev = st.tabs(["📋 Paste JSON", "📁 Upload JSON", "📂 Previous"])
 
-    with tab_previous:
-        json_files = sorted(Path(__file__).parent.parent.glob("assets/*.json"), reverse=True)
-        if json_files:
-            selected = st.selectbox("Load previous analysis", [f.name for f in json_files])
-            if st.button("Load"):
-                sel_path = Path(__file__).parent.parent / "assets" / selected
-                json_input = sel_path.read_text()
+        with adv_tab_paste:
+            pasted = st.text_area("Paste JSON response", height=200, placeholder='{"timeline": [...], "summary": {...}}')
+            adv_video_url = st.text_input("Video URL (for timestamps)", placeholder="https://youtube.com/watch?v=...", key="adv_video_url")
+            if st.button("🔍 Analyse JSON", type="primary", use_container_width=True) and pasted:
+                json_input = pasted
                 analyse_btn = True
-        else:
-            st.info("No previous analyses found in assets/")
+                if adv_video_url:
+                    video_url = adv_video_url
 
-    # ─── Process
+        with adv_tab_upload:
+            uploaded = st.file_uploader("Upload JSON file", type=["json"])
+            if uploaded:
+                json_input = uploaded.read().decode("utf-8")
+                analyse_btn = True
+
+        with adv_tab_prev:
+            json_files = sorted(Path(__file__).parent.parent.glob("assets/*.json"), reverse=True)
+            if json_files:
+                selected = st.selectbox("Load previous analysis", [f.name for f in json_files])
+                if st.button("Load"):
+                    json_input = (Path(__file__).parent.parent / "assets" / selected).read_text()
+                    analyse_btn = True
+            else:
+                st.info("No previous analyses in assets/")
+
+    # ━━━ RESULTS ━━━
     if analyse_btn and json_input:
-        # Clean markdown fences
         raw = json_input.strip()
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1]
@@ -873,55 +751,78 @@ def main():
             st.warning("No timeline data found in JSON")
             st.stop()
 
-        # Store in session
         st.session_state["data"] = data
-        st.session_state["video_url"] = video_url
-
-        # ─── Video embed
         if video_url:
-            vid_id = extract_youtube_id(video_url)
-            if vid_id:
-                st.video(video_url)
+            st.session_state["video_url"] = video_url
+
+        st.markdown("---")
+
+        # ─── Video embed (sticky, at top of results)
+        vid_id = extract_youtube_id(video_url)
+        if vid_id:
+            st.markdown(youtube_embed_html(video_url), unsafe_allow_html=True)
 
         # ─── Summary
         if summary.get("session_overview"):
-            st.markdown(f"### Summary")
+            st.markdown("### Summary")
             st.markdown(summary["session_overview"])
 
-        # ─── Scores
+        # ─── Scores (with reasons)
         st.markdown("### Scores")
         col1, col2, col3 = st.columns(3)
         scores = [
-            ("Guard Retention", summary.get("guard_retention_score", "-")),
-            ("Positional Awareness", summary.get("positional_awareness_score", "-")),
-            ("Transition Quality", summary.get("transition_quality_score", "-")),
+            ("Guard Retention", summary.get("guard_retention_score", "-"), summary.get("guard_retention_reason", "")),
+            ("Positional Awareness", summary.get("positional_awareness_score", "-"), summary.get("positional_awareness_reason", "")),
+            ("Transition Quality", summary.get("transition_quality_score", "-"), summary.get("transition_quality_reason", "")),
         ]
-        for col, (label, score) in zip([col1, col2, col3], scores):
+        for col, (label, score, reason) in zip([col1, col2, col3], scores):
             with col:
                 colour = "#34C759" if isinstance(score, (int, float)) and score >= 7 else "#D4A843" if isinstance(score, (int, float)) and score >= 4 else "#E85D4A"
+                reason_html = f'<p class="score-reason">{reason}</p>' if reason else ""
                 st.markdown(f"""
                 <div class="score-box">
                     <p class="score-value" style="color:{colour}">{score}<span style="font-size:16px;color:#6B7280">/10</span></p>
                     <p class="score-label">{label}</p>
+                    {reason_html}
                 </div>
                 """, unsafe_allow_html=True)
 
-        # ─── Position Timeline Bar
+        # ─── Top Improvements (prominent, right after scores)
+        if summary.get("top_3_improvements"):
+            st.markdown("### Top 3 Things to Work On")
+            for i, imp in enumerate(summary["top_3_improvements"], 1):
+                st.markdown(f"**{i}.** {imp}")
+
+        # ─── Position Timeline Bar (with time markers)
         st.markdown("### Position Timeline")
         bar = ""
         for entry in timeline:
             pos_id = entry.get("player_a_position", "unclear")
+            ts_sec = entry.get("timestamp_sec", 0)
+            ts_label = format_timestamp(ts_sec)
             if pos_id in pos_map:
                 cat_id = pos_map[pos_id]["category"]
                 cat_label = cat_map.get(cat_id, {}).get("label", "")
-                bar += CAT_EMOJI.get(cat_label, "⬛")
+                emoji = CAT_EMOJI.get(cat_label, "⬛")
             else:
-                bar += "⬛"
+                emoji = "⬛"
+            bar += f'<span title="{ts_label} — {pos_map.get(pos_id, {}).get("name", pos_id)}">{emoji}</span>'
 
         st.markdown(f'<div class="timeline-bar">{bar}</div>', unsafe_allow_html=True)
 
-        legend_parts = [f'{emoji} {label}' for label, emoji in CAT_EMOJI.items()]
-        st.caption(" · ".join(legend_parts))
+        # Time markers
+        if len(timeline) > 1:
+            first_ts = timeline[0].get("timestamp_sec", 0)
+            last_ts = timeline[-1].get("timestamp_sec", 0)
+            mid_ts = timeline[len(timeline) // 2].get("timestamp_sec", 0)
+            st.caption(f"{format_timestamp(first_ts)} {'·' * 20} {format_timestamp(mid_ts)} {'·' * 20} {format_timestamp(last_ts)}")
+
+        # Legend
+        legend_html = '<div class="legend-row">'
+        for label, emoji in CAT_EMOJI.items():
+            legend_html += f'<span class="legend-pill">{emoji} {label}</span>'
+        legend_html += '</div>'
+        st.markdown(legend_html, unsafe_allow_html=True)
 
         # ─── Position Distribution
         st.markdown("### Position Distribution")
@@ -932,85 +833,85 @@ def main():
                 cat_id = pos_map[pid]["category"]
                 cat_label = cat_map.get(cat_id, {}).get("label", cat_id)
                 cat_counts[cat_label] += 1
-
         total = sum(cat_counts.values())
         for cat_label, count in cat_counts.most_common():
             pct = count / total if total else 0
-            colour = CAT_COLOURS.get(cat_label, "#666")
             st.markdown(f"**{cat_label}** — {count} ({pct:.0%})")
             st.progress(pct)
-
-        # ─── Timeline Detail
-        st.markdown("### Frame-by-Frame")
-
-        for i, entry in enumerate(timeline):
-            ts = entry.get("timestamp", "?")
-            ts_sec = entry.get("timestamp_sec", 0)
-            pos_a_id = entry.get("player_a_position", "unclear")
-            pos_b_id = entry.get("player_b_position", "unclear")
-            pos_a = pos_map.get(pos_a_id, {}).get("name", pos_a_id)
-            pos_b = pos_map.get(pos_b_id, {}).get("name", pos_b_id)
-            cat_a = pos_map.get(pos_a_id, {}).get("category", "scramble")
-            cat_label = cat_map.get(cat_a, {}).get("label", "")
-            colour = CAT_COLOURS.get(cat_label, "#666")
-            tech = entry.get("active_technique") or "—"
-            notes = entry.get("notes", "")
-            tip = entry.get("coaching_tip") or ""
-
-            with st.container():
-                col_time, col_pos, col_detail = st.columns([1, 2, 4])
-
-                with col_time:
-                    if video_url and extract_youtube_id(video_url):
-                        link = youtube_timestamp_url(video_url, ts_sec)
-                        st.markdown(f"### [{ts}]({link})")
-                    else:
-                        st.markdown(f"### {ts}")
-
-                with col_pos:
-                    st.markdown(f"<span style='color:{colour};font-weight:700'>{pos_a}</span>", unsafe_allow_html=True)
-                    st.caption(f"vs {pos_b}")
-
-                with col_detail:
-                    st.markdown(f"**{tech}** — {notes}")
-                    if tip:
-                        st.info(f"💡 {tip}")
-
-                st.divider()
 
         # ─── Key Moments
         if summary.get("key_moments"):
             st.markdown("### Key Moments")
             for km in summary["key_moments"]:
                 ts = km.get("timestamp", "?")
+                ts_sec = safe_parse_timestamp(ts)
                 assessment = km.get("assessment", "neutral")
                 icon = {"good": "✅", "excellent": "🌟", "perfect": "🏆", "bad": "⚠️", "neutral": "📌"}.get(assessment, "📌")
-                if video_url and extract_youtube_id(video_url):
-                    parts = ts.split(":")
-                    ts_sec = int(parts[0]) * 60 + int(parts[1]) if len(parts) == 2 else 0
+                if vid_id:
                     link = youtube_timestamp_url(video_url, ts_sec)
-                    header = f"{icon} [{ts}]({link}) — {km.get('description', '')}"
+                    header = f"{icon} [{format_timestamp(ts_sec)}]({link}) — {km.get('description', '')}"
                 else:
-                    header = f"{icon} {ts} — {km.get('description', '')}"
+                    header = f"{icon} {format_timestamp(ts_sec)} — {km.get('description', '')}"
                 st.markdown(header)
                 if km.get("suggestion"):
                     st.caption(f"→ {km['suggestion']}")
 
-        # ─── Improvements & Strengths
-        col_imp, col_str = st.columns(2)
-        with col_imp:
-            if summary.get("top_3_improvements"):
-                st.markdown("### Top Improvements")
-                for i, imp in enumerate(summary["top_3_improvements"], 1):
-                    st.markdown(f"{i}. {imp}")
+        # ─── Frame-by-Frame (collapsible by position phase)
+        st.markdown("### Frame-by-Frame Analysis")
 
-        with col_str:
-            if summary.get("strengths_observed"):
-                st.markdown("### Strengths")
-                for s in summary["strengths_observed"]:
-                    st.markdown(f"✓ {s}")
+        # Group frames by position category phase
+        phases = []
+        current_phase = None
+        for entry in timeline:
+            pos_id = entry.get("player_a_position", "unclear")
+            cat_id = pos_map.get(pos_id, {}).get("category", "scramble")
+            cat_label = cat_map.get(cat_id, {}).get("label", "Unknown")
+            if cat_label != current_phase:
+                phases.append({"label": cat_label, "frames": []})
+                current_phase = cat_label
+            phases[-1]["frames"].append(entry)
 
-        # ─── Overall Notes
+        for phase in phases:
+            first_ts = format_timestamp(phase["frames"][0].get("timestamp_sec", 0))
+            last_ts = format_timestamp(phase["frames"][-1].get("timestamp_sec", 0))
+            colour = CAT_COLOURS.get(phase["label"], "#666")
+            header = f'{phase["label"]} ({first_ts} - {last_ts}) · {len(phase["frames"])} frames'
+
+            with st.expander(header, expanded=False):
+                for entry in phase["frames"]:
+                    ts_sec = entry.get("timestamp_sec", 0)
+                    ts_str = format_timestamp(ts_sec)
+                    pos_a_id = entry.get("player_a_position", "unclear")
+                    pos_b_id = entry.get("player_b_position", "unclear")
+                    pos_a = pos_map.get(pos_a_id, {}).get("name", pos_a_id)
+                    pos_b = pos_map.get(pos_b_id, {}).get("name", pos_b_id)
+                    tech = entry.get("active_technique") or "—"
+                    notes = entry.get("notes", "")
+                    tip = entry.get("coaching_tip") or ""
+
+                    col_time, col_pos, col_detail = st.columns([1, 2, 4])
+                    with col_time:
+                        if vid_id:
+                            link = youtube_timestamp_url(video_url, ts_sec)
+                            st.markdown(f"### [{ts_str}]({link})")
+                        else:
+                            st.markdown(f"### {ts_str}")
+                    with col_pos:
+                        st.markdown(f"<span style='color:{colour};font-weight:700'>{pos_a}</span>", unsafe_allow_html=True)
+                        st.caption(f"vs {pos_b}")
+                    with col_detail:
+                        st.markdown(f"**{tech}** — {notes}")
+                        if tip:
+                            st.info(f"💡 {tip}")
+                    st.divider()
+
+        # ─── Strengths
+        if summary.get("strengths_observed"):
+            st.markdown("### Strengths")
+            for s in summary["strengths_observed"]:
+                st.markdown(f"✓ {s}")
+
+        # ─── Coach's Notes
         if summary.get("overall_notes"):
             st.markdown("### Coach's Notes")
             st.markdown(summary["overall_notes"])
@@ -1018,21 +919,15 @@ def main():
         # ─── Export
         st.divider()
         col_export, col_download = st.columns(2)
-
         with col_export:
             vname = video_name or "Analysis"
             if st.button("💾 Export to Obsidian Vault", use_container_width=True):
                 path = export_to_obsidian(data, player_name, vname, video_url)
                 st.success(f"Saved to: {path}")
-
         with col_download:
-            st.download_button(
-                "📥 Download JSON",
-                data=json.dumps(data, indent=2),
+            st.download_button("📥 Download JSON", data=json.dumps(data, indent=2),
                 file_name=f"bjj_analysis_{time.strftime('%Y%m%d')}.json",
-                mime="application/json",
-                use_container_width=True,
-            )
+                mime="application/json", use_container_width=True)
 
 
 if __name__ == "__main__":
