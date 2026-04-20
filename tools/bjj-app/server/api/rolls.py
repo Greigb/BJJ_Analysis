@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from server.analysis.vault import RollSummary, list_rolls
 from server.analysis.video import read_duration
 from server.config import Settings, load_settings
-from server.db import connect, create_roll
+from server.db import connect, create_roll, get_roll
 
 
 class RollSummaryOut(BaseModel):
@@ -68,39 +68,47 @@ async def upload_roll(
     partner: str | None = Form(default=None),
     settings: Settings = Depends(load_settings),
 ) -> RollDetailOut:
+    # roll_id is a 32-char hex string (no hyphens). Server-generated, never user input.
     roll_id = uuid.uuid4().hex
     roll_dir = settings.project_root / "assets" / roll_id
     roll_dir.mkdir(parents=True, exist_ok=False)
     video_path = roll_dir / "source.mp4"
 
-    # Stream to disk so large uploads don't hold memory.
-    with video_path.open("wb") as out:
-        shutil.copyfileobj(video.file, out)
-
-    # Validate it's a real video before we persist a row.
     try:
-        duration_s = read_duration(video_path)
-    except (ValueError, FileNotFoundError) as exc:
-        # Clean up the bad upload.
-        shutil.rmtree(roll_dir, ignore_errors=True)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Uploaded file is not a readable video: {exc}",
-        ) from exc
+        # Stream to disk so large uploads don't hold memory.
+        with video_path.open("wb") as out:
+            shutil.copyfileobj(video.file, out)
 
-    relative_video_path = f"assets/{roll_id}/source.mp4"
-    with connect(settings.db_path) as conn:
-        create_roll(
-            conn,
-            id=roll_id,
-            title=title,
-            date=date,
-            video_path=relative_video_path,
-            duration_s=duration_s,
-            partner=partner,
-            result="unknown",
-            created_at=int(time.time()),
-        )
+        # Validate it's a real video before we persist a row.
+        try:
+            duration_s = read_duration(video_path)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Uploaded file is not a readable video: {exc}",
+            ) from exc
+
+        relative_video_path = f"assets/{roll_id}/source.mp4"
+        conn = connect(settings.db_path)
+        try:
+            create_roll(
+                conn,
+                id=roll_id,
+                title=title,
+                date=date,
+                video_path=relative_video_path,
+                duration_s=duration_s,
+                partner=partner,
+                result="unknown",
+                created_at=int(time.time()),
+            )
+        finally:
+            conn.close()
+    except Exception:
+        # Any failure after mkdir — bad upload, DB error, disk-full — must not
+        # leave an orphan roll_dir behind.
+        shutil.rmtree(roll_dir, ignore_errors=True)
+        raise
 
     return RollDetailOut(
         id=roll_id,
@@ -118,10 +126,11 @@ def get_roll_detail(
     roll_id: str,
     settings: Settings = Depends(load_settings),
 ) -> RollDetailOut:
-    from server.db import get_roll as db_get_roll  # local import to avoid top-level cycle
-
-    with connect(settings.db_path) as conn:
-        row = db_get_roll(conn, roll_id)
+    conn = connect(settings.db_path)
+    try:
+        row = get_roll(conn, roll_id)
+    finally:
+        conn.close()
 
     if row is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found")

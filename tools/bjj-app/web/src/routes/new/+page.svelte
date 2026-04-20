@@ -40,6 +40,11 @@
 <section class="space-y-6 max-w-xl">
   <h1 class="text-2xl font-semibold tracking-tight">New Roll</h1>
 
+  <!--
+    novalidate: works around a jsdom + user-event quirk where <input type="file" required>
+    silently aborts requestSubmit() in tests. Real-browser UX is preserved by the disabled
+    submit button (no file → disabled) and the `if (!file || submitting) return` guard above.
+  -->
   <form class="space-y-5" novalidate onsubmit={onSubmit}>
     <label class="block space-y-1">
       <span class="text-sm text-white/70">Title</span>
