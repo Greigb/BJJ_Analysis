@@ -76,3 +76,36 @@ def connect(db_path: Path) -> sqlite3.Connection:
     conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def create_roll(
+    conn,
+    *,
+    id: str,
+    title: str,
+    date: str,
+    video_path: str,
+    duration_s: float | None,
+    partner: str | None,
+    result: str,
+    created_at: int,
+) -> sqlite3.Row:
+    """Insert a roll row and return it. Callers pass an open connection."""
+    conn.execute(
+        """
+        INSERT INTO rolls (
+            id, title, date, video_path, duration_s, partner,
+            result, scores_json, finalised_at, created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?)
+        """,
+        (id, title, date, video_path, duration_s, partner, result, created_at),
+    )
+    conn.commit()
+    return get_roll(conn, id)  # type: ignore[return-value]
+
+
+def get_roll(conn, roll_id: str) -> sqlite3.Row | None:
+    """Return the roll row, or None if not found."""
+    cur = conn.execute("SELECT * FROM rolls WHERE id = ?", (roll_id,))
+    return cur.fetchone()
