@@ -1,0 +1,78 @@
+"""SQLite connection + schema initialisation.
+
+Schema matches the spec at docs/superpowers/specs/2026-04-20-bjj-local-review-app-design.md.
+M1 only initialises the schema — no reads/writes from/to these tables yet.
+Later milestones populate them.
+"""
+from __future__ import annotations
+
+import sqlite3
+from pathlib import Path
+
+SCHEMA_SQL = """
+CREATE TABLE IF NOT EXISTS rolls (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    date TEXT NOT NULL,
+    video_path TEXT NOT NULL,
+    duration_s REAL,
+    partner TEXT,
+    result TEXT,
+    scores_json TEXT,
+    finalised_at INTEGER,
+    created_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS moments (
+    id TEXT PRIMARY KEY,
+    roll_id TEXT NOT NULL REFERENCES rolls(id) ON DELETE CASCADE,
+    frame_idx INTEGER NOT NULL,
+    timestamp_s REAL NOT NULL,
+    pose_delta REAL,
+    selected_for_analysis INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS analyses (
+    id TEXT PRIMARY KEY,
+    moment_id TEXT NOT NULL REFERENCES moments(id) ON DELETE CASCADE,
+    player TEXT NOT NULL,
+    position_id TEXT NOT NULL,
+    confidence REAL,
+    description TEXT,
+    coach_tip TEXT,
+    claude_version TEXT,
+    created_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS annotations (
+    id TEXT PRIMARY KEY,
+    moment_id TEXT NOT NULL REFERENCES moments(id) ON DELETE CASCADE,
+    body TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS claude_cache (
+    prompt_hash TEXT,
+    frame_hash TEXT,
+    response_json TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (prompt_hash, frame_hash)
+);
+"""
+
+
+def init_db(db_path: Path) -> None:
+    """Create the schema if it doesn't already exist. Safe to call every startup."""
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(db_path) as conn:
+        conn.executescript(SCHEMA_SQL)
+        conn.commit()
+
+
+def connect(db_path: Path) -> sqlite3.Connection:
+    """Open a connection with foreign-key enforcement enabled."""
+    conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA foreign_keys = ON")
+    conn.row_factory = sqlite3.Row
+    return conn
