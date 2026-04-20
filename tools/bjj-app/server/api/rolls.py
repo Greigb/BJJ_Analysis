@@ -1,15 +1,21 @@
-"""GET /api/rolls — list roll summaries from the Obsidian vault."""
+"""Rolls API — list summaries, create (upload) a new roll."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+import shutil
+import time
+import uuid
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from pydantic import BaseModel
 
 from server.analysis.vault import RollSummary, list_rolls
+from server.analysis.video import read_duration
 from server.config import Settings, load_settings
+from server.db import connect, create_roll
 
 
 class RollSummaryOut(BaseModel):
-    """HTTP-exposed shape. Intentionally excludes `path` (filesystem leak)."""
+    """Compact shape for the home page roll list."""
 
     id: str
     title: str
@@ -19,7 +25,7 @@ class RollSummaryOut(BaseModel):
     result: str | None
 
     @classmethod
-    def from_domain(cls, r: RollSummary) -> "RollSummaryOut":
+    def from_vault(cls, r: RollSummary) -> "RollSummaryOut":
         return cls(
             id=r.id,
             title=r.title,
@@ -30,9 +36,78 @@ class RollSummaryOut(BaseModel):
         )
 
 
+class RollDetailOut(BaseModel):
+    """Full roll shape used by POST /api/rolls response and GET /api/rolls/:id."""
+
+    id: str
+    title: str
+    date: str
+    partner: str | None
+    duration_s: float | None
+    result: str
+    video_url: str
+
+
 router = APIRouter(prefix="/api", tags=["rolls"])
 
 
 @router.get("/rolls", response_model=list[RollSummaryOut])
 def get_rolls(settings: Settings = Depends(load_settings)) -> list[RollSummaryOut]:
-    return [RollSummaryOut.from_domain(r) for r in list_rolls(settings.vault_root)]
+    return [RollSummaryOut.from_vault(r) for r in list_rolls(settings.vault_root)]
+
+
+@router.post(
+    "/rolls",
+    response_model=RollDetailOut,
+    status_code=status.HTTP_201_CREATED,
+)
+async def upload_roll(
+    video: UploadFile = File(...),
+    title: str = Form(...),
+    date: str = Form(...),
+    partner: str | None = Form(default=None),
+    settings: Settings = Depends(load_settings),
+) -> RollDetailOut:
+    roll_id = uuid.uuid4().hex
+    roll_dir = settings.project_root / "assets" / roll_id
+    roll_dir.mkdir(parents=True, exist_ok=False)
+    video_path = roll_dir / "source.mp4"
+
+    # Stream to disk so large uploads don't hold memory.
+    with video_path.open("wb") as out:
+        shutil.copyfileobj(video.file, out)
+
+    # Validate it's a real video before we persist a row.
+    try:
+        duration_s = read_duration(video_path)
+    except (ValueError, FileNotFoundError) as exc:
+        # Clean up the bad upload.
+        shutil.rmtree(roll_dir, ignore_errors=True)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Uploaded file is not a readable video: {exc}",
+        ) from exc
+
+    relative_video_path = f"assets/{roll_id}/source.mp4"
+    with connect(settings.db_path) as conn:
+        create_roll(
+            conn,
+            id=roll_id,
+            title=title,
+            date=date,
+            video_path=relative_video_path,
+            duration_s=duration_s,
+            partner=partner,
+            result="unknown",
+            created_at=int(time.time()),
+        )
+
+    return RollDetailOut(
+        id=roll_id,
+        title=title,
+        date=date,
+        partner=partner,
+        duration_s=duration_s,
+        result="unknown",
+        video_url=f"/assets/{roll_id}/source.mp4",
+    )
