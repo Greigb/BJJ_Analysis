@@ -8,6 +8,12 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true
+      },
+      // Uploaded videos live at /assets/<id>/source.mp4 on the FastAPI backend;
+      // without this proxy, the <video> element in /review/[id] 404s in dev mode.
+      '/assets': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true
       }
     }
   },
