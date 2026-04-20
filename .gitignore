@@ -25,3 +25,6 @@ bjj_frames_*
 # Analysis outputs (generated, not source)
 *_report.html
 *_analysis.json
+
+# Brainstorming visual companion session files
+.superpowers/
