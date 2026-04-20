@@ -12,8 +12,14 @@ _TITLE_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 
 @dataclass(frozen=True)
 class RollSummary:
-    """One row in the home page's roll list."""
+    """One row in the home page's roll list.
 
+    `id` is the markdown filename stem — a stable, vault-relative identifier
+    safe to send over HTTP and use in URLs. `path` is the full filesystem
+    Path for internal use by later-milestone code that reads/writes the file.
+    """
+
+    id: str
     path: Path
     title: str
     date: str
@@ -41,6 +47,7 @@ def list_rolls(vault_root: Path) -> list[RollSummary]:
         title = _extract_title(post.content, fallback=md_path.stem)
         summaries.append(
             RollSummary(
+                id=md_path.stem,
                 path=md_path,
                 title=title,
                 date=str(post.metadata.get("date", "")),

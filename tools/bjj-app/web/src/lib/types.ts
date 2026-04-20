@@ -1,5 +1,5 @@
 export type RollSummary = {
-  path: string;
+  id: string;
   title: string;
   date: string;
   partner: string | null;

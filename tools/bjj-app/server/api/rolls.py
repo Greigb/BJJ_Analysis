@@ -9,7 +9,9 @@ from server.config import Settings, load_settings
 
 
 class RollSummaryOut(BaseModel):
-    path: str
+    """HTTP-exposed shape. Intentionally excludes `path` (filesystem leak)."""
+
+    id: str
     title: str
     date: str
     partner: str | None
@@ -19,7 +21,7 @@ class RollSummaryOut(BaseModel):
     @classmethod
     def from_domain(cls, r: RollSummary) -> "RollSummaryOut":
         return cls(
-            path=str(r.path),
+            id=r.id,
             title=r.title,
             date=r.date,
             partner=r.partner,

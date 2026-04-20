@@ -5,7 +5,7 @@ import Page from '../src/routes/+page.svelte';
 
 const sampleRolls = [
   {
-    path: '/vault/Roll Log/2026-04-14 - sample.md',
+    id: '2026-04-14 - sample',
     title: 'Roll 1: Greig vs Anthony — WIN by Submission',
     date: '2026-04-14',
     partner: 'Anthony',
@@ -13,7 +13,7 @@ const sampleRolls = [
     result: 'win_submission'
   },
   {
-    path: '/vault/Roll Log/2026-04-01 - other.md',
+    id: '2026-04-01 - other',
     title: 'Other roll — continuation',
     date: '2026-04-01',
     partner: 'Bob',

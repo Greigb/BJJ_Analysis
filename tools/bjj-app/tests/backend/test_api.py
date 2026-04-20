@@ -33,7 +33,9 @@ async def test_get_rolls_returns_list_from_vault(
     assert body[0]["partner"] == "Anthony"
     assert body[0]["title"] == "Roll 1: Greig vs Anthony — WIN by Submission"
     assert body[0]["result"] == "win_submission"
-    assert "path" in body[0]
+    assert body[0]["id"] == "2026-04-14 - sample roll (win)"
+    # Absolute filesystem path must NOT leak over the wire.
+    assert "path" not in body[0]
 
 
 @pytest.mark.asyncio

@@ -54,10 +54,10 @@
     </div>
   {:else}
     <ul class="space-y-2">
-      {#each rolls as roll (roll.path)}
+      {#each rolls as roll (roll.id)}
         <li>
           <a
-            href={`/review/${encodeURIComponent(roll.path)}`}
+            href={`/review/${encodeURIComponent(roll.id)}`}
             class="block rounded-lg border border-white/8 bg-white/[0.02] hover:bg-white/[0.05] p-4 transition-colors"
           >
             <div class="flex items-start justify-between gap-4">

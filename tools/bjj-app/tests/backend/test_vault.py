@@ -16,10 +16,12 @@ def test_list_rolls_returns_summaries_sorted_newest_first(sample_vault: Path):
     assert rolls[0].duration == "2:23"
     assert rolls[0].result == "win_submission"
     assert rolls[0].title == "Roll 1: Greig vs Anthony — WIN by Submission"
+    assert rolls[0].id == "2026-04-14 - sample roll (win)"
     assert rolls[0].path.name == "2026-04-14 - sample roll (win).md"
 
     assert rolls[1].date == "2026-04-01"
     assert rolls[1].partner == "Bob"
+    assert rolls[1].id == "2026-04-01 - other roll (continuation)"
 
 
 def test_list_rolls_handles_missing_roll_log_dir(tmp_path: Path):
