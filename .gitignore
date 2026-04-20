@@ -28,3 +28,14 @@ bjj_frames_*
 
 # Brainstorming visual companion session files
 .superpowers/
+
+# bjj-app — local build artifacts
+tools/bjj-app/.venv/
+tools/bjj-app/web/node_modules/
+tools/bjj-app/web/build/
+tools/bjj-app/web/.svelte-kit/
+tools/bjj-app/**/__pycache__/
+tools/bjj-app/**/*.egg-info/
+tools/bjj-app/bjj-app.db
+tools/bjj-app/bjj-app.db.broken.*
+tools/bjj-app/.pytest_cache/
