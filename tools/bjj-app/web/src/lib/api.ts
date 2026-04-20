@@ -1,4 +1,4 @@
-import type { CreateRollInput, RollDetail, RollSummary } from './types';
+import type { AnalyseEvent, CreateRollInput, RollDetail, RollSummary } from './types';
 
 export class ApiError extends Error {
   constructor(
@@ -42,4 +42,48 @@ export function createRoll(input: CreateRollInput): Promise<RollDetail> {
     method: 'POST',
     body: form
   });
+}
+
+/**
+ * Analyse a roll — returns an async iterator of SSE events from the backend.
+ *
+ * Usage:
+ *   for await (const event of analyseRoll(id)) { ... }
+ */
+export async function* analyseRoll(id: string): AsyncIterator<AnalyseEvent> {
+  const response = await fetch(`/api/rolls/${encodeURIComponent(id)}/analyse`, {
+    method: 'POST'
+  });
+  if (!response.ok) {
+    throw new ApiError(response.status, `${response.status} ${response.statusText}`);
+  }
+  if (!response.body) {
+    throw new Error('Analyse response has no body');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE frames are separated by blank lines.
+      const frames = buffer.split('\n\n');
+      buffer = frames.pop() ?? '';
+
+      for (const frame of frames) {
+        const dataLine = frame
+          .split('\n')
+          .find((line) => line.startsWith('data: '));
+        if (!dataLine) continue;
+        yield JSON.parse(dataLine.slice(6)) as AnalyseEvent;
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
 }
