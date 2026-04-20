@@ -111,3 +111,27 @@ async def upload_roll(
         result="unknown",
         video_url=f"/assets/{roll_id}/source.mp4",
     )
+
+
+@router.get("/rolls/{roll_id}", response_model=RollDetailOut)
+def get_roll_detail(
+    roll_id: str,
+    settings: Settings = Depends(load_settings),
+) -> RollDetailOut:
+    from server.db import get_roll as db_get_roll  # local import to avoid top-level cycle
+
+    with connect(settings.db_path) as conn:
+        row = db_get_roll(conn, roll_id)
+
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found")
+
+    return RollDetailOut(
+        id=row["id"],
+        title=row["title"],
+        date=row["date"],
+        partner=row["partner"],
+        duration_s=row["duration_s"],
+        result=row["result"],
+        video_url=f"/{row['video_path']}",
+    )
