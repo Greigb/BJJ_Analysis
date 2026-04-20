@@ -164,3 +164,41 @@ def get_moments(conn, roll_id: str) -> list[sqlite3.Row]:
         (roll_id,),
     )
     return list(cur.fetchall())
+
+
+def cache_get(conn, *, prompt_hash: str, frame_hash: str) -> dict | None:
+    """Return the cached Claude response for this (prompt, frame) pair, or None."""
+    import json as _json
+
+    cur = conn.execute(
+        "SELECT response_json FROM claude_cache WHERE prompt_hash = ? AND frame_hash = ?",
+        (prompt_hash, frame_hash),
+    )
+    row = cur.fetchone()
+    if row is None:
+        return None
+    return _json.loads(row["response_json"])
+
+
+def cache_put(
+    conn,
+    *,
+    prompt_hash: str,
+    frame_hash: str,
+    response: dict,
+) -> None:
+    """Upsert a cached response. Re-putting on the same key replaces the value."""
+    import json as _json
+    import time as _time
+
+    conn.execute(
+        """
+        INSERT INTO claude_cache (prompt_hash, frame_hash, response_json, created_at)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(prompt_hash, frame_hash) DO UPDATE SET
+            response_json = excluded.response_json,
+            created_at    = excluded.created_at
+        """,
+        (prompt_hash, frame_hash, _json.dumps(response), int(_time.time())),
+    )
+    conn.commit()
