@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from server.api import rolls as rolls_api
 from server.config import load_settings
@@ -15,7 +16,6 @@ def create_app() -> FastAPI:
 
     app = FastAPI(title="BJJ Review App", version="0.1.0")
 
-    # Dev-time CORS so Vite on :5173 can call /api directly if proxy is bypassed.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -29,6 +29,15 @@ def create_app() -> FastAPI:
     @app.get("/api/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    # Serve the built SvelteKit SPA when the build dir exists (production mode).
+    # Must be mounted LAST so /api/* is matched first.
+    if settings.frontend_build_dir.exists():
+        app.mount(
+            "/",
+            StaticFiles(directory=settings.frontend_build_dir, html=True),
+            name="frontend",
+        )
 
     return app
 
