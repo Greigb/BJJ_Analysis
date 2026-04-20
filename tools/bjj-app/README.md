@@ -52,6 +52,7 @@ cd web && npm test
 ## Milestones
 
 - **M1 (shipped):** Scaffolding. Home page lists vault's `Roll Log/` via `GET /api/rolls`.
-- **M2a (this milestone):** Video upload (`POST /api/rolls`), review page skeleton (`/review/[id]` with video player + empty timeline), `/assets/` static mount.
-- **M2b (next):** MediaPipe pose pre-pass, `POST /api/rolls/:id/analyse` SSE stream, timeline populates with flagged moments.
-- **M3–M8:** Claude CLI adapter, annotations, graph page, summary + PDF, PWA, cleanup.
+- **M2a (shipped):** Video upload (`POST /api/rolls`), review page skeleton (`/review/[id]` with video player + empty timeline), `/assets/` static mount.
+- **M2b (this milestone):** MediaPipe pose pre-pass, `POST /api/rolls/:id/analyse` SSE endpoint, timeline chips render in `/review/[id]` and seek the video on click. No Claude calls yet — chips are unlabeled.
+- **M3 (next):** Claude CLI adapter. Click a chip → call `claude -p --model claude-opus-4-7` on that frame → label the moment with the detected BJJ position + coaching tip.
+- **M4–M8:** Annotations + vault write-back, graph page, summary + PDF, PWA, cleanup.
