@@ -23,10 +23,16 @@ class Settings:
 
 def load_settings() -> Settings:
     project_root = Path(os.getenv("BJJ_PROJECT_ROOT", str(_project_root()))).resolve()
+    db_override = os.getenv("BJJ_DB_OVERRIDE")
+    db_path = (
+        Path(db_override)
+        if db_override
+        else project_root / "tools" / "bjj-app" / "bjj-app.db"
+    )
     return Settings(
         project_root=project_root,
-        vault_root=project_root,  # vault IS the project root per the spec
-        db_path=project_root / "tools" / "bjj-app" / "bjj-app.db",
+        vault_root=project_root,
+        db_path=db_path,
         host=os.getenv("BJJ_HOST", "0.0.0.0"),
         port=int(os.getenv("BJJ_PORT", "8000")),
         frontend_build_dir=project_root / "tools" / "bjj-app" / "web" / "build",
