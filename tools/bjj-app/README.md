@@ -8,8 +8,8 @@ See `docs/superpowers/specs/2026-04-20-bjj-local-review-app-design.md` for full 
 ```bash
 cd tools/bjj-app
 
-# Backend
-python3.11 -m venv .venv
+# Backend (Python 3.12 — MediaPipe does not yet support 3.13/3.14)
+/usr/local/bin/python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 
@@ -49,7 +49,9 @@ pytest tests/backend -v
 cd web && npm test
 ```
 
-## Current milestone: M1 (Scaffolding)
+## Milestones
 
-Home page lists rolls already in the Obsidian vault's `Roll Log/` folder.
-Upload, analysis, graph, annotations, and PDF export come in M2–M7.
+- **M1 (shipped):** Scaffolding. Home page lists vault's `Roll Log/` via `GET /api/rolls`.
+- **M2a (this milestone):** Video upload (`POST /api/rolls`), review page skeleton (`/review/[id]` with video player + empty timeline), `/assets/` static mount.
+- **M2b (next):** MediaPipe pose pre-pass, `POST /api/rolls/:id/analyse` SSE stream, timeline populates with flagged moments.
+- **M3–M8:** Claude CLI adapter, annotations, graph page, summary + PDF, PWA, cleanup.

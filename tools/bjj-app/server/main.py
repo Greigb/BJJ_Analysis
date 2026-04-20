@@ -30,8 +30,18 @@ def create_app() -> FastAPI:
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
+    # Serve uploaded videos at /assets/<id>/source.mp4. Created on demand —
+    # only mount if the dir exists so dev-fresh installs don't 500 on startup.
+    assets_dir = settings.project_root / "assets"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    app.mount(
+        "/assets",
+        StaticFiles(directory=assets_dir, check_dir=False),
+        name="assets",
+    )
+
     # Serve the built SvelteKit SPA when the build dir exists (production mode).
-    # Must be mounted LAST so /api/* is matched first.
+    # Must be mounted LAST so /api/* and /assets/* are matched first.
     if settings.frontend_build_dir.exists():
         app.mount(
             "/",
