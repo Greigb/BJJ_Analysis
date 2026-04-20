@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from server.analysis.vault import RollSummary, list_rolls
 from server.analysis.video import read_duration
 from server.config import Settings, load_settings
-from server.db import connect, create_roll, get_roll
+from server.db import connect, create_roll, get_moments, get_roll
 
 
 class RollSummaryOut(BaseModel):
@@ -36,6 +36,13 @@ class RollSummaryOut(BaseModel):
         )
 
 
+class MomentOut(BaseModel):
+    id: str
+    frame_idx: int
+    timestamp_s: float
+    pose_delta: float | None
+
+
 class RollDetailOut(BaseModel):
     """Full roll shape used by POST /api/rolls response and GET /api/rolls/:id."""
 
@@ -46,6 +53,7 @@ class RollDetailOut(BaseModel):
     duration_s: float | None
     result: str
     video_url: str
+    moments: list[MomentOut] = []
 
 
 router = APIRouter(prefix="/api", tags=["rolls"])
@@ -118,6 +126,7 @@ async def upload_roll(
         duration_s=duration_s,
         result="unknown",
         video_url=f"/assets/{roll_id}/source.mp4",
+        moments=[],
     )
 
 
@@ -129,11 +138,13 @@ def get_roll_detail(
     conn = connect(settings.db_path)
     try:
         row = get_roll(conn, roll_id)
+        if row is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found"
+            )
+        moment_rows = get_moments(conn, roll_id)
     finally:
         conn.close()
-
-    if row is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found")
 
     return RollDetailOut(
         id=row["id"],
@@ -143,4 +154,13 @@ def get_roll_detail(
         duration_s=row["duration_s"],
         result=row["result"],
         video_url=f"/{row['video_path']}",
+        moments=[
+            MomentOut(
+                id=m["id"],
+                frame_idx=m["frame_idx"],
+                timestamp_s=m["timestamp_s"],
+                pose_delta=m["pose_delta"],
+            )
+            for m in moment_rows
+        ],
     )
