@@ -7,6 +7,7 @@ Later milestones populate them.
 from __future__ import annotations
 
 import sqlite3
+import uuid
 from pathlib import Path
 
 SCHEMA_SQL = """
@@ -109,3 +110,57 @@ def get_roll(conn, roll_id: str) -> sqlite3.Row | None:
     """Return the roll row, or None if not found."""
     cur = conn.execute("SELECT * FROM rolls WHERE id = ?", (roll_id,))
     return cur.fetchone()
+
+
+def insert_moments(
+    conn,
+    *,
+    roll_id: str,
+    moments: list[dict],
+) -> list[sqlite3.Row]:
+    """Replace all moments for `roll_id` with the supplied list.
+
+    Each moment dict must contain: frame_idx (int), timestamp_s (float),
+    pose_delta (float or None). `selected_for_analysis` defaults to 0.
+    Returns the newly inserted rows in insertion order.
+    """
+    conn.execute("DELETE FROM moments WHERE roll_id = ?", (roll_id,))
+    inserted_ids: list[str] = []
+    for m in moments:
+        moment_id = uuid.uuid4().hex
+        conn.execute(
+            """
+            INSERT INTO moments (
+                id, roll_id, frame_idx, timestamp_s, pose_delta, selected_for_analysis
+            )
+            VALUES (?, ?, ?, ?, ?, 0)
+            """,
+            (
+                moment_id,
+                roll_id,
+                int(m["frame_idx"]),
+                float(m["timestamp_s"]),
+                None if m.get("pose_delta") is None else float(m["pose_delta"]),
+            ),
+        )
+        inserted_ids.append(moment_id)
+    conn.commit()
+
+    if not inserted_ids:
+        return []
+
+    cur = conn.execute(
+        f"SELECT * FROM moments WHERE id IN ({','.join('?' * len(inserted_ids))})",
+        inserted_ids,
+    )
+    rows_by_id = {r["id"]: r for r in cur.fetchall()}
+    return [rows_by_id[i] for i in inserted_ids]
+
+
+def get_moments(conn, roll_id: str) -> list[sqlite3.Row]:
+    """Return all moments for a roll in timestamp order."""
+    cur = conn.execute(
+        "SELECT * FROM moments WHERE roll_id = ? ORDER BY timestamp_s",
+        (roll_id,),
+    )
+    return list(cur.fetchall())
