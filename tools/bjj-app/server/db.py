@@ -202,3 +202,68 @@ def cache_put(
         (prompt_hash, frame_hash, _json.dumps(response), int(_time.time())),
     )
     conn.commit()
+
+
+def insert_analyses(
+    conn,
+    *,
+    moment_id: str,
+    players: list[dict],
+    claude_version: str,
+) -> list[sqlite3.Row]:
+    """Replace all analyses for `moment_id` with one row per entry in `players`.
+
+    Each player dict must contain: player ('greig'|'anthony'), position_id (str),
+    confidence (float | None), description (str | None), coach_tip (str | None).
+    """
+    import time as _time
+
+    conn.execute("DELETE FROM analyses WHERE moment_id = ?", (moment_id,))
+    inserted_ids: list[str] = []
+    now = int(_time.time())
+    for p in players:
+        analysis_id = uuid.uuid4().hex
+        conn.execute(
+            """
+            INSERT INTO analyses (
+                id, moment_id, player, position_id, confidence,
+                description, coach_tip, claude_version, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                analysis_id,
+                moment_id,
+                p["player"],
+                p["position_id"],
+                None if p.get("confidence") is None else float(p["confidence"]),
+                p.get("description"),
+                p.get("coach_tip"),
+                claude_version,
+                now,
+            ),
+        )
+        inserted_ids.append(analysis_id)
+    conn.commit()
+
+    if not inserted_ids:
+        return []
+    cur = conn.execute(
+        f"SELECT * FROM analyses WHERE id IN ({','.join('?' * len(inserted_ids))})",
+        inserted_ids,
+    )
+    rows_by_id = {r["id"]: r for r in cur.fetchall()}
+    return [rows_by_id[i] for i in inserted_ids]
+
+
+def get_analyses(conn, moment_id: str) -> list[sqlite3.Row]:
+    """Return all analyses for a moment. Order is stable: greig first, then anthony."""
+    cur = conn.execute(
+        """
+        SELECT * FROM analyses
+        WHERE moment_id = ?
+        ORDER BY CASE player WHEN 'greig' THEN 0 ELSE 1 END, created_at
+        """,
+        (moment_id,),
+    )
+    return list(cur.fetchall())
