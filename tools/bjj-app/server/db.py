@@ -7,6 +7,7 @@ Later milestones populate them.
 from __future__ import annotations
 
 import sqlite3
+import uuid
 from pathlib import Path
 
 SCHEMA_SQL = """
@@ -123,8 +124,6 @@ def insert_moments(
     pose_delta (float or None). `selected_for_analysis` defaults to 0.
     Returns the newly inserted rows in insertion order.
     """
-    import uuid
-
     conn.execute("DELETE FROM moments WHERE roll_id = ?", (roll_id,))
     inserted_ids: list[str] = []
     for m in moments:

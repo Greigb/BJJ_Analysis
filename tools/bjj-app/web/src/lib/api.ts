@@ -84,6 +84,14 @@ export async function* analyseRoll(id: string): AsyncIterator<AnalyseEvent> {
       }
     }
   } finally {
+    // Cancel drains any buffered body bytes and closes the underlying fetch
+    // so the server's TCP connection isn't held open if the iterator is
+    // abandoned (e.g. user navigates away mid-stream).
+    try {
+      await reader.cancel();
+    } catch {
+      /* already cancelled or errored — safe to ignore */
+    }
     reader.releaseLock();
   }
 }

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import Iterator
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -10,6 +11,8 @@ from fastapi.responses import StreamingResponse
 from server.analysis.pipeline import run_analysis
 from server.config import Settings, load_settings
 from server.db import connect, get_roll, insert_moments
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(prefix="/api", tags=["analyse"])
@@ -43,10 +46,14 @@ def analyse_roll(
             yield f"data: {json.dumps(event)}\n\n".encode("utf-8")
 
         # Persist after streaming completes. Done inline so the client sees the
-        # moments event *before* the connection closes.
+        # moments event *before* the connection closes. A failure here would
+        # otherwise be silent to the client (already sent "done") — log it so
+        # an operator can notice the mismatch when they refresh and see no chips.
         conn = connect(settings.db_path)
         try:
             insert_moments(conn, roll_id=roll_id, moments=last_moments)
+        except Exception:
+            logger.exception("Failed to persist moments for %s", roll_id)
         finally:
             conn.close()
 
