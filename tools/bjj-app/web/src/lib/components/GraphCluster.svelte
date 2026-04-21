@@ -3,6 +3,7 @@
   import type { GraphFilter, GraphPaths, GraphTaxonomy } from '$lib/types';
   import {
     buildCytoscapeElements,
+    currentPositionIds,
     headPositionAt,
     type Point2D
   } from '$lib/graph-layout';
@@ -134,6 +135,30 @@
           'border-color': '#f43f5e',
           'z-index': 999
         }
+      },
+      {
+        selector: '.mini-bg node[isCategory]',
+        style: { 'background-opacity': 0.1 }
+      },
+      {
+        selector: '.mini-bg node[!isCategory]',
+        style: { opacity: 0.35 }
+      },
+      {
+        selector: '.mini-bg edge.taxonomy',
+        style: { opacity: 0.35 }
+      },
+      {
+        selector: '.mini-bg edge.path-greig, .mini-bg edge.path-anthony',
+        style: { 'line-style': 'dashed' }
+      },
+      {
+        selector: 'node.current-moment',
+        style: {
+          'border-width': 4,
+          'border-color': 'rgba(251,191,36,0.85)',
+          opacity: 1.0
+        }
       }
     ];
   }
@@ -148,25 +173,16 @@
 
     registerCoseOnce();
 
-    const { nodes, edges } = buildCytoscapeElements(taxonomy, effectivePaths);
+    const { nodes, edges } = buildCytoscapeElements(
+      taxonomy,
+      effectivePaths,
+      variant === 'mini' ? scrubTimeS : undefined
+    );
 
     cy = cytoscape({
       container: host,
       elements: [],
       style: baseStyle(),
-      layout: {
-        name: 'cose-bilkent',
-        animate: false,
-        randomize: false,
-        fit: true,
-        padding: 20,
-        nodeRepulsion: 4500,
-        idealEdgeLength: 80,
-        edgeElasticity: 0.1,
-        gravityRangeCompound: 1.5,
-        gravityCompound: 1.0,
-        tile: true
-      } as any,
       userZoomingEnabled: variant === 'full',
       userPanningEnabled: variant === 'full',
       boxSelectionEnabled: false,
@@ -174,7 +190,16 @@
     });
 
     // Add all taxonomy elements via cy.add so stubs/trackers capture them.
-    cy.add([...nodes, ...edges]);
+    const miniClass = variant === 'mini' ? ' mini-bg' : '';
+    const taggedNodes = nodes.map((n) => ({
+      ...n,
+      classes: ((n as any).classes ? (n as any).classes + ' ' : '') + miniClass.trim()
+    }));
+    const taggedEdges = edges.map((e) => ({
+      ...e,
+      classes: ((e.classes ?? '') + ' ' + miniClass).trim()
+    }));
+    cy.add([...taggedNodes, ...taggedEdges]);
 
     if (onnodeclick) {
       cy.on('tap', 'node', (evt: { target: { id: () => string } }) => {
@@ -191,17 +216,47 @@
       { data: { id: 'head-greig' }, position: { x: 0, y: 0 }, classes: 'head' },
       { data: { id: 'head-anthony' }, position: { x: 0, y: 0 }, classes: 'head' }
     ]);
+
+    // Layout the taxonomy nodes. Must run AFTER cy.add(), because the
+    // constructor `layout` option only applies to elements present at
+    // construction time (we construct with an empty elements list so the
+    // test stub can observe add calls).
+    cy.layout({
+      name: 'cose-bilkent',
+      animate: false,
+      randomize: false,
+      fit: true,
+      padding: 20,
+      nodeRepulsion: 4500,
+      idealEdgeLength: 80,
+      edgeElasticity: 0.1,
+      gravityRangeCompound: 1.5,
+      gravityCompound: 1.0,
+      tile: true
+    } as any).run();
+
+    updateCurrentMomentPulse();
   }
 
   function rebuildElements() {
     if (!cy) return;
     // Remove only path overlay edges + head markers; keep taxonomy intact.
     cy.remove('edge.path-greig, edge.path-anthony');
-    const { edges: newEdges } = buildCytoscapeElements(taxonomy, effectivePaths);
+    const { edges: newEdges } = buildCytoscapeElements(
+      taxonomy,
+      effectivePaths,
+      variant === 'mini' ? scrubTimeS : undefined
+    );
     const overlayEdges = newEdges.filter(
       (e) => e.classes === 'path-greig' || e.classes === 'path-anthony'
     );
-    cy.add(overlayEdges);
+    const miniClass = variant === 'mini' ? ' mini-bg' : '';
+    const taggedOverlays = overlayEdges.map((e) => ({
+      ...e,
+      classes: ((e.classes ?? '') + ' ' + miniClass).trim()
+    }));
+    cy.add(taggedOverlays);
+    updateCurrentMomentPulse();
   }
 
   function updateHeadMarkers() {
@@ -235,9 +290,11 @@
     if (filter.kind === 'category') {
       // Dim everything NOT in the selected category.
       cy.nodes('[!isCategory]').forEach((n: any) => {
-        // Cytoscape returns parent id via n.data('parent').
         const parent = n.data('parent');
         if (parent !== `cat:${filter.id}`) n.addClass('dim');
+      });
+      cy.nodes('[isCategory]').forEach((n: any) => {
+        if (n.id() !== `cat:${filter.id}`) n.addClass('dim');
       });
       cy.edges('.taxonomy').addClass('dim');
       cy.edges('.path-greig, .path-anthony').addClass('dim');
@@ -246,6 +303,20 @@
       cy.edges(`.path-${other}`).addClass('dim');
       const otherHead = cy.getElementById(`head-${other}`);
       if (otherHead && otherHead.length > 0) otherHead.addClass('dim');
+    }
+  }
+
+  function updateCurrentMomentPulse() {
+    if (!cy || variant !== 'mini') return;
+    cy.nodes('.current-moment').removeClass('current-moment');
+    const ids = currentPositionIds(effectivePaths, scrubTimeS);
+    if (ids.greig) {
+      const n = cy.getElementById(ids.greig);
+      if (n && n.length > 0) n.addClass('current-moment');
+    }
+    if (ids.anthony) {
+      const n = cy.getElementById(ids.anthony);
+      if (n && n.length > 0) n.addClass('current-moment');
     }
   }
 
@@ -277,6 +348,13 @@
   $effect(() => {
     void filter;
     if (cy) applyFilter();
+  });
+
+  // Update current-moment pulse on the mini variant.
+  $effect(() => {
+    void scrubTimeS;
+    void effectivePaths;
+    if (cy) updateCurrentMomentPulse();
   });
 
   onDestroy(() => {

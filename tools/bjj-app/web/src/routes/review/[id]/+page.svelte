@@ -44,6 +44,23 @@
       } catch {
         // Mini graph is a nice-to-have; ignore failures so the review page still loads.
       }
+
+      // Honor ?t=<seconds> by pre-seeking the video once it's loaded.
+      const queryT = $page.url.searchParams.get('t');
+      if (queryT !== null && videoEl) {
+        const t = Number(queryT);
+        if (!Number.isNaN(t)) {
+          // If the video metadata hasn't loaded yet, defer the seek.
+          const seek = () => {
+            if (videoEl) videoEl.currentTime = t;
+          };
+          if (videoEl.readyState >= 1) {
+            seek();
+          } else {
+            videoEl.addEventListener('loadedmetadata', seek, { once: true });
+          }
+        }
+      }
     } catch (err) {
       error = err instanceof ApiError ? err.message : String(err);
     } finally {

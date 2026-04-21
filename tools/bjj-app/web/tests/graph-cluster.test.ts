@@ -48,7 +48,7 @@ function stubCytoscape() {
     }),
     remove: vi.fn(),
     getElementById: vi.fn(() => mockEle),
-    nodes: vi.fn(() => ({ forEach: vi.fn() })),
+    nodes: vi.fn(() => ({ forEach: vi.fn(), removeClass: vi.fn(), addClass: vi.fn() })),
     edges: vi.fn(() => ({ forEach: vi.fn(), length: added.length })),
     elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn() })),
     layout: vi.fn(() => ({ run: vi.fn() })),

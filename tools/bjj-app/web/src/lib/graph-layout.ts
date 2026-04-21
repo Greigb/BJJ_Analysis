@@ -36,7 +36,8 @@ export function lerp(a: number, b: number, t: number): number {
  */
 export function buildCytoscapeElements(
   taxonomy: GraphTaxonomy,
-  paths: GraphPaths
+  paths: GraphPaths,
+  maxTimeS?: number
 ): { nodes: CyNode[]; edges: CyEdge[] } {
   const nodes: CyNode[] = [];
   const edges: CyEdge[] = [];
@@ -73,10 +74,14 @@ export function buildCytoscapeElements(
     });
   }
 
-  for (const [who, points] of [
+  for (const [who, allPoints] of [
     ['greig', paths.paths.greig],
     ['anthony', paths.paths.anthony]
   ] as const) {
+    const points =
+      maxTimeS === undefined
+        ? allPoints
+        : allPoints.filter((p) => p.timestamp_s <= maxTimeS);
     for (let i = 1; i < points.length; i++) {
       const prev = points[i - 1];
       const curr = points[i];
@@ -141,5 +146,28 @@ export function headPositionAt(
   return {
     x: lerp(prevPos.x, nextPos.x, t),
     y: lerp(prevPos.y, nextPos.y, t)
+  };
+}
+
+/**
+ * Return the position_ids each player is at at `scrubTimeS` (the last point
+ * where timestamp_s <= scrubTimeS). Null per player if their path has no
+ * points at or before scrubTimeS.
+ */
+export function currentPositionIds(
+  paths: GraphPaths,
+  scrubTimeS: number
+): { greig: string | null; anthony: string | null } {
+  function last(pts: Array<{ timestamp_s: number; position_id: string }>): string | null {
+    let id: string | null = null;
+    for (const p of pts) {
+      if (p.timestamp_s <= scrubTimeS) id = p.position_id;
+      else break;
+    }
+    return id;
+  }
+  return {
+    greig: last(paths.paths.greig),
+    anthony: last(paths.paths.anthony)
   };
 }

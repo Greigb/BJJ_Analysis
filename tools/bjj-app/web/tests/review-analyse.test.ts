@@ -10,8 +10,8 @@ const { mockId } = vi.hoisted(() => ({ mockId: { value: 'abc123' } }));
 
 vi.mock('$app/stores', () => ({
   page: {
-    subscribe: (run: (v: { params: { id: string } }) => void) => {
-      run({ params: { id: mockId.value } });
+    subscribe: (run: (v: { params: { id: string }; url: { searchParams: { get: () => null } } }) => void) => {
+      run({ params: { id: mockId.value }, url: { searchParams: { get: () => null } } });
       return () => {};
     }
   }
@@ -307,7 +307,7 @@ describe('Review page — analyse flow', () => {
     globalThis.cytoscape = vi.fn(() => ({
       on: vi.fn(), add: vi.fn(), remove: vi.fn(),
       getElementById: vi.fn(() => ({ length: 0, style: vi.fn(), position: vi.fn(), addClass: vi.fn() })),
-      nodes: vi.fn(() => ({ forEach: vi.fn() })),
+      nodes: vi.fn(() => ({ forEach: vi.fn(), removeClass: vi.fn(), addClass: vi.fn() })),
       edges: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn(), length: 0, remove: vi.fn() })),
       elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn(), remove: vi.fn() })),
       layout: vi.fn(() => ({ run: vi.fn() })),

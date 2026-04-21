@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildCytoscapeElements,
+  currentPositionIds,
   headPositionAt,
   lerp
 } from '../src/lib/graph-layout';
@@ -157,5 +158,41 @@ describe('headPositionAt', () => {
   it('returns null when a referenced node is missing from the lookup', () => {
     const p = path([[10, 'unknown_id'], [20, 'closed_guard_bottom']]);
     expect(headPositionAt(p, 15, nodeLookup)).toBeNull();
+  });
+});
+
+describe('currentPositionIds', () => {
+  const paths: GraphPaths = {
+    duration_s: 60,
+    paths: {
+      greig: [
+        { timestamp_s: 5, position_id: 'standing_neutral', moment_id: 'g1' },
+        { timestamp_s: 20, position_id: 'closed_guard_bottom', moment_id: 'g2' }
+      ],
+      anthony: [
+        { timestamp_s: 5, position_id: 'standing_neutral', moment_id: 'a1' }
+      ]
+    }
+  };
+
+  it('returns null for players with no points before scrubTimeS', () => {
+    const ids = currentPositionIds(paths, 2);
+    expect(ids).toEqual({ greig: null, anthony: null });
+  });
+
+  it('returns the last position each player was at as of scrubTimeS', () => {
+    const ids = currentPositionIds(paths, 10);
+    expect(ids).toEqual({
+      greig: 'standing_neutral',
+      anthony: 'standing_neutral'
+    });
+  });
+
+  it('advances greig to closed_guard_bottom after his second point', () => {
+    const ids = currentPositionIds(paths, 25);
+    expect(ids).toEqual({
+      greig: 'closed_guard_bottom',
+      anthony: 'standing_neutral'
+    });
   });
 });

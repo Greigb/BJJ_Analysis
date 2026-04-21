@@ -45,6 +45,11 @@
     class="fixed right-0 top-0 z-40 h-full w-full max-w-[400px] overflow-y-auto border-l border-white/10 bg-black/90 backdrop-blur-md shadow-lg"
   >
     <header class="flex items-center justify-between gap-2 border-b border-white/10 p-4">
+      {#if !positionNote}
+        <h2 class="text-sm font-semibold text-white/95">Position</h2>
+      {:else}
+        <span class="text-[10px] uppercase tracking-wider text-white/40">Position details</span>
+      {/if}
       <button
         type="button"
         onclick={onclose}
