@@ -51,6 +51,9 @@ function detailWithoutMoments() {
     vault_published_at: null,
     player_a_name: 'Player A',
     player_b_name: 'Player B',
+    finalised_at: null,
+    scores: null,
+    distribution: null,
     moments: []
   };
 }

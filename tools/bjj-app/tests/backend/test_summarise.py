@@ -275,8 +275,40 @@ def test_parse_summary_response_rejects_top_improvements_length_not_3():
         parse_summary_response(json.dumps(payload), _VALID_IDS)
 
 
-def test_parse_summary_response_requires_strengths_non_empty():
+def test_parse_summary_response_requires_strengths_between_2_and_4_items():
+    # 0 items — reject
     payload = _valid_payload()
     payload["strengths"] = []
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), _VALID_IDS)
+
+    # 1 item — reject (spec says 2-4)
+    payload = _valid_payload()
+    payload["strengths"] = ["only one"]
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), _VALID_IDS)
+
+    # 5 items — reject (spec says 2-4)
+    payload = _valid_payload()
+    payload["strengths"] = ["a", "b", "c", "d", "e"]
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), _VALID_IDS)
+
+    # 2 items — accept
+    payload = _valid_payload()
+    payload["strengths"] = ["first", "second"]
+    out = parse_summary_response(json.dumps(payload), _VALID_IDS)
+    assert out["strengths"] == ["first", "second"]
+
+    # 4 items — accept
+    payload = _valid_payload()
+    payload["strengths"] = ["a", "b", "c", "d"]
+    out = parse_summary_response(json.dumps(payload), _VALID_IDS)
+    assert len(out["strengths"]) == 4
+
+
+def test_parse_summary_response_rejects_bool_scores():
+    payload = _valid_payload()
+    payload["scores"]["guard_retention"] = True  # noqa: disallow bool score
     with pytest.raises(SummaryResponseError):
         parse_summary_response(json.dumps(payload), _VALID_IDS)

@@ -189,15 +189,16 @@ def _extract_section_by_heading(text: str, heading: str) -> str:
     return text[body_start:end].strip()
 
 
-def _splice_section_by_heading(current_text: str, heading: str, new_body: str) -> str:
-    """Replace the body of a section with matching heading; if heading absent,
-    append the section at the end."""
+def _replace_section_body_if_present(current_text: str, heading: str, new_body: str) -> str | None:
+    """Replace the body of a section if the heading is present. Return None if absent.
+
+    Reuses the existing boundary-detection logic. The caller handles the 'absent'
+    case by inserting the section at the correct ordered position via
+    `_insert_section_at_ordered_position`.
+    """
     m = _heading_regex(heading).search(current_text)
     if m is None:
-        separator = "" if current_text.endswith("\n\n") else (
-            "\n" if current_text.endswith("\n") else "\n\n"
-        )
-        return f"{current_text}{separator}{heading}\n\n{new_body}\n"
+        return None
 
     body_start = current_text.find("\n", m.end())
     if body_start == -1:
@@ -214,6 +215,40 @@ def _splice_section_by_heading(current_text: str, heading: str, new_body: str) -
     if not after:
         after = "\n"
     return f"{before}\n\n{new_body}\n{after}"
+
+
+def _insert_section_at_ordered_position(
+    current_text: str,
+    heading: str,
+    new_body: str,
+    ordered_headings_after: list[str],
+) -> str:
+    """Insert a missing owned section at its correct ordered position.
+
+    `ordered_headings_after` is the list of owned-section headings that should
+    appear AFTER `heading` in the canonical order (e.g. for `## Summary`, that's
+    `['## Scores', '## Position Distribution', ...,  '## Your Notes']`).
+
+    We insert just before the first of those that's actually present in the file.
+    If none are present, insert at EOF (fallback).
+    """
+    insert_at: int | None = None
+    for following in ordered_headings_after:
+        m = _heading_regex(following).search(current_text)
+        if m is not None:
+            insert_at = m.start()
+            break
+
+    block = f"{heading}\n\n{new_body}\n\n"
+    if insert_at is None:
+        # Fallback — append at end with a separator.
+        if current_text.endswith("\n\n"):
+            return current_text + block
+        if current_text.endswith("\n"):
+            return current_text + "\n" + block
+        return current_text + "\n\n" + block
+
+    return current_text[:insert_at] + block + current_text[insert_at:]
 
 
 def publish(
@@ -313,13 +348,23 @@ def publish(
                 ):
                     raise ConflictError(current_hash=current_hash, stored_hash=stored_hash)
 
-        # Splice all owned sections.
+        # Splice or insert each owned section in canonical order.
         new_text = current_text
         if is_finalised:
-            for section_id, heading in _SUMMARY_SECTION_ORDER:
-                new_text = _splice_section_by_heading(
+            for idx, (section_id, heading) in enumerate(_SUMMARY_SECTION_ORDER):
+                replaced = _replace_section_body_if_present(
                     new_text, heading, summary_section_bodies[section_id]
                 )
+                if replaced is not None:
+                    new_text = replaced
+                else:
+                    # Heading absent — insert at correct ordered position.
+                    # "After" = remaining summary sections + Your Notes.
+                    after_headings = [h for _, h in _SUMMARY_SECTION_ORDER[idx + 1:]]
+                    after_headings.append(_YOUR_NOTES_HEADING)
+                    new_text = _insert_section_at_ordered_position(
+                        new_text, heading, summary_section_bodies[section_id], after_headings
+                    )
         new_text = _splice_your_notes(new_text, your_notes_body)
     else:
         new_text = _build_skeleton(
@@ -546,7 +591,8 @@ def render_summary_sections(
         CATEGORY_EMOJI.get(cat, "⬛") for cat in distribution["timeline"]
     )
     legend = "Legend: " + " ".join(
-        f"{CATEGORY_EMOJI[cat]}{cat}" for cat in CATEGORY_EMOJI.keys()
+        f"{CATEGORY_EMOJI[cat]}{category_label_by_id.get(cat, cat)}"
+        for cat in CATEGORY_EMOJI.keys()
     )
     position_distribution_body = (
         "\n".join(dist_rows)

@@ -146,6 +146,10 @@ _REQUIRED_SCORES = ("guard_retention", "positional_awareness", "transition_quali
 
 
 def _clamp_score(value) -> int:
+    # Reject bool explicitly — isinstance(True, int) is True in Python, and
+    # silently interpreting True as score=1 is surprising.
+    if isinstance(value, bool):
+        raise SummaryResponseError(f"score must not be a bool: {value!r}")
     if not isinstance(value, (int, float)):
         raise SummaryResponseError(f"score is not a number: {value!r}")
     return max(0, min(10, int(round(value))))
@@ -184,8 +188,8 @@ def parse_summary_response(raw: str, valid_moment_ids: set[str]) -> dict:
             raise SummaryResponseError("each top_improvements item must be a non-empty string")
 
     st = data["strengths"]
-    if not isinstance(st, list) or len(st) == 0:
-        raise SummaryResponseError("strengths must be a non-empty list")
+    if not isinstance(st, list) or len(st) < 2 or len(st) > 4:
+        raise SummaryResponseError("strengths must be a list of 2 to 4 items")
     for item in st:
         if not isinstance(item, str) or not item.strip():
             raise SummaryResponseError("each strengths item must be a non-empty string")

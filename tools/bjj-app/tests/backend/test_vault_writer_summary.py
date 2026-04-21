@@ -89,6 +89,9 @@ def test_render_summary_sections_position_distribution_includes_counts_and_bar()
     assert "🟦" in body
     assert "🟪" in body
     assert "Legend:" in body
+    # Legend uses human labels (not raw ids).
+    assert "Standing" in body.split("Legend:")[-1]
+    assert "Guard (Bottom)" in body.split("Legend:")[-1]
 
 
 def test_render_summary_sections_key_moments_cite_timestamps():
@@ -267,3 +270,71 @@ def test_publish_conflict_does_not_fire_on_unrelated_section_edit(db_finalised_r
     text = full.read_text() + "\n## Extra thoughts\n\nUser added this, not owned.\n"
     full.write_text(text)
     publish(conn, roll_id="r-1", vault_root=vault_root, taxonomy=taxonomy)
+
+
+def test_publish_unfinalised_then_finalised_emits_sections_in_canonical_order(db_finalised_roll):
+    """Regression: a file first published without scores, then finalised,
+    must end up with summary sections BEFORE Your Notes (canonical order)."""
+    conn, vault_root, taxonomy = db_finalised_roll
+    # Un-finalise for the first publish.
+    conn.execute("UPDATE rolls SET scores_json = NULL, finalised_at = NULL WHERE id = 'r-1'")
+    conn.commit()
+    first = publish(conn, roll_id="r-1", vault_root=vault_root, taxonomy=taxonomy)
+    text_first = (vault_root / first.vault_path).read_text()
+    assert "## Summary" not in text_first
+    assert "## Your Notes" in text_first
+
+    # Re-finalise (restore scores_json + finalised_at).
+    scores_payload = {
+        "summary": "A second-pass roll.",
+        "scores": {"guard_retention": 7, "positional_awareness": 7, "transition_quality": 7},
+        "top_improvements": ["x", "y", "z"],
+        "strengths": ["s1", "s2"],
+        "key_moments": [
+            {"moment_id": m["id"], "note": f"n{i}"}
+            for i, m in enumerate(
+                conn.execute(
+                    "SELECT id FROM moments WHERE roll_id='r-1' ORDER BY timestamp_s"
+                ).fetchall()[:3]
+            )
+        ],
+    }
+    set_summary_state(conn, roll_id="r-1", scores_payload=scores_payload, finalised_at=1700000500)
+
+    second = publish(conn, roll_id="r-1", vault_root=vault_root, taxonomy=taxonomy)
+    text_second = (vault_root / second.vault_path).read_text()
+
+    # All six summary sections present, and all before Your Notes.
+    your_notes_idx = text_second.index("## Your Notes")
+    for heading in (
+        "## Summary", "## Scores", "## Position Distribution",
+        "## Key Moments", "## Top Improvements", "## Strengths Observed",
+    ):
+        assert heading in text_second
+        assert text_second.index(heading) < your_notes_idx
+
+
+def test_publish_after_user_deletes_summary_section_reinserts_in_order(db_finalised_roll):
+    """Regression: if the user deletes one summary section in Obsidian, the next
+    (force) publish must reinsert it at its canonical position — NOT at EOF."""
+    conn, vault_root, taxonomy = db_finalised_roll
+    first = publish(conn, roll_id="r-1", vault_root=vault_root, taxonomy=taxonomy)
+    full = vault_root / first.vault_path
+    text = full.read_text()
+
+    # Delete the `## Summary` section block (from `## Summary` line through the next `## `).
+    import re as _re
+    text_minus_summary = _re.sub(
+        r"## Summary\n\n.*?(?=\n## )", "", text, count=1, flags=_re.DOTALL
+    )
+    full.write_text(text_minus_summary)
+    assert "## Summary" not in full.read_text()
+
+    # Re-publish with force (hash changed because section removed).
+    publish(conn, roll_id="r-1", vault_root=vault_root, taxonomy=taxonomy, force=True)
+    text_after = full.read_text()
+
+    # Summary is back AND before Scores AND before Your Notes.
+    assert "## Summary" in text_after
+    assert text_after.index("## Summary") < text_after.index("## Scores")
+    assert text_after.index("## Summary") < text_after.index("## Your Notes")

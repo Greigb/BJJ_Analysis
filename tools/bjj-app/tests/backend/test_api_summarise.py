@@ -73,7 +73,7 @@ _VALID_SUMMARY_OUTPUT_TEMPLATE = {
     "summary": "Tight roll in closed guard.",
     "scores": {"guard_retention": 8, "positional_awareness": 6, "transition_quality": 7},
     "top_improvements": ["imp a", "imp b", "imp c"],
-    "strengths": ["patient grips"],
+    "strengths": ["patient grips", "solid base"],
     "key_moments": [],
 }
 
