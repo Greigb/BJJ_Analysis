@@ -201,9 +201,9 @@ def test_publish_first_time_creates_file_with_frontmatter_title_and_your_notes(d
     text = full.read_text()
     # Frontmatter present with roll_id and tags
     assert text.startswith("---\n")
-    assert "roll_id: r-1" in text
-    assert "date: 2026-04-21" in text
-    assert "partner: Anthony" in text
+    assert 'roll_id: "r-1"' in text
+    assert 'date: "2026-04-21"' in text
+    assert 'partner: "Anthony"' in text
     assert "tags: [roll]" in text
     # Title + Your Notes
     assert "# Sample Roll" in text
@@ -332,3 +332,127 @@ def test_publish_raises_for_unknown_roll(db_roll_annotations):
     conn, vault_root = db_roll_annotations
     with pytest.raises(LookupError):
         publish(conn, roll_id="no-such-roll", vault_root=vault_root)
+
+
+# ---------- review-fix regression tests ----------
+
+
+def test_publish_heading_match_is_line_anchored_not_substring(db_roll_annotations):
+    """Regression: a pre-existing section headed `## Your Notes Archive` must not
+    be mistaken for `## Your Notes` during splicing."""
+    conn, vault_root = db_roll_annotations
+    first = publish(conn, roll_id="r-1", vault_root=vault_root)
+    full = vault_root / first.vault_path
+
+    # Hand-edit: add a section that starts with the same words but is distinct.
+    text = full.read_text()
+    # Insert an archive section before the real Your Notes heading.
+    archive = "\n## Your Notes Archive\n\n- historical note\n\n"
+    text = text.replace("## Your Notes", archive + "## Your Notes", 1)
+    full.write_text(text)
+
+    # The archive heading now appears before `## Your Notes`. Publishing should
+    # not splice over the archive section — the real `## Your Notes` heading
+    # is still a distinct line.
+    moment_id = conn.execute(
+        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    ).fetchone()["id"]
+    insert_annotation(conn, moment_id=moment_id, body="new note", created_at=1700000999)
+
+    # Force because the Your Notes section hash does change (we shifted it).
+    publish(conn, roll_id="r-1", vault_root=vault_root, force=True)
+    text_after = full.read_text()
+
+    # Archive section preserved.
+    assert "## Your Notes Archive" in text_after
+    assert "- historical note" in text_after
+    # New annotation landed in the real Your Notes section.
+    assert "new note" in text_after
+
+
+def test_publish_hash_is_stable_under_crlf_line_endings(db_roll_annotations):
+    """Regression: CRLF should not cause a false conflict on re-publish."""
+    conn, vault_root = db_roll_annotations
+    first = publish(conn, roll_id="r-1", vault_root=vault_root)
+    full = vault_root / first.vault_path
+
+    # Simulate a CRLF re-save (Obsidian on Windows, or a cross-platform editor).
+    lf_text = full.read_text()
+    crlf_text = lf_text.replace("\n", "\r\n")
+    full.write_bytes(crlf_text.encode("utf-8"))
+
+    # Add a new annotation and re-publish WITHOUT force. Should NOT raise
+    # ConflictError because only line endings changed — semantic content
+    # of the Your Notes section is identical.
+    moment_id = conn.execute(
+        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    ).fetchone()["id"]
+    insert_annotation(conn, moment_id=moment_id, body="followup", created_at=1700001000)
+
+    # Should complete without raising ConflictError.
+    result = publish(conn, roll_id="r-1", vault_root=vault_root, force=False)
+    assert "followup" in (vault_root / result.vault_path).read_text()
+
+
+def test_publish_hash_is_stable_under_extra_blank_lines(db_roll_annotations):
+    """Regression: runs of 3+ newlines should not cause a false conflict."""
+    conn, vault_root = db_roll_annotations
+    first = publish(conn, roll_id="r-1", vault_root=vault_root)
+    full = vault_root / first.vault_path
+
+    # Simulate an auto-formatter that inserts extra blank lines inside the section.
+    lf_text = full.read_text()
+    # Add 2 extra blank lines between bullets in Your Notes.
+    crunched = lf_text.replace("- _(", "\n\n- _(", 1)
+    full.write_text(crunched)
+
+    moment_id = conn.execute(
+        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    ).fetchone()["id"]
+    insert_annotation(conn, moment_id=moment_id, body="followup2", created_at=1700001100)
+
+    # Should NOT raise ConflictError — the extra blank line is whitespace-only.
+    result = publish(conn, roll_id="r-1", vault_root=vault_root, force=False)
+    assert "followup2" in (vault_root / result.vault_path).read_text()
+
+
+def test_publish_frontmatter_survives_partner_with_colon(tmp_path: Path):
+    """Regression: partner='A: colon' must not corrupt YAML frontmatter.
+
+    Round-trip: publish → read file with frontmatter library → partner string intact.
+    """
+    import frontmatter
+
+    db_path = tmp_path / "test.db"
+    init_db(db_path)
+    conn = connect(db_path)
+    try:
+        create_roll(
+            conn,
+            id="r-yaml",
+            title="Yaml test roll",
+            date="2026-04-21",
+            video_path="assets/r-yaml/source.mp4",
+            duration_s=30.0,
+            partner='A: colon "bob"',   # adversarial: colon + embedded quotes
+            result="unknown",
+            created_at=1700000000,
+        )
+        moments = insert_moments(
+            conn,
+            roll_id="r-yaml",
+            moments=[{"frame_idx": 1, "timestamp_s": 1.0, "pose_delta": 0.5}],
+        )
+        insert_annotation(
+            conn, moment_id=moments[0]["id"], body="note", created_at=1700000100
+        )
+
+        result = publish(conn, roll_id="r-yaml", vault_root=tmp_path)
+    finally:
+        conn.close()
+
+    full = tmp_path / result.vault_path
+    # python-frontmatter must parse the file without raising.
+    post = frontmatter.load(full)
+    assert post.metadata["partner"] == 'A: colon "bob"'
+    assert post.metadata["roll_id"] == "r-yaml"

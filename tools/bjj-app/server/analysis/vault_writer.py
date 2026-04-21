@@ -141,6 +141,7 @@ class ConflictError(Exception):
 
 
 _YOUR_NOTES_HEADING = "## Your Notes"
+_YOUR_NOTES_HEADING_RE = _re.compile(r"^## Your Notes\s*$", _re.MULTILINE)
 _SECTION_BOUNDARY = _re.compile(r"^## ", _re.MULTILINE)
 
 
@@ -228,6 +229,17 @@ def _assert_under_roll_log(target: Path, vault_root: Path) -> None:
         raise ValueError(f"target {target} escapes Roll Log directory {roll_log}")
 
 
+def _yaml_quote(value: str) -> str:
+    """Quote a string value safely for YAML frontmatter.
+
+    Uses double quotes; escapes embedded backslashes and double-quote characters.
+    Protects against YAML-ambiguous inputs like colons, brackets, the literal
+    "null", leading @/!, and newlines (which become \\n in the quoted form).
+    """
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+    return f'"{escaped}"'
+
+
 def _build_skeleton(
     *,
     title: str,
@@ -238,16 +250,16 @@ def _build_skeleton(
     your_notes_body: str,
 ) -> str:
     duration = _format_duration(duration_s)
-    partner_line = f"partner: {partner}" if partner else "partner:"
-    duration_line = f'duration: "{duration}"' if duration else "duration:"
+    partner_line = f"partner: {_yaml_quote(partner)}" if partner else "partner:"
+    duration_line = f"duration: {_yaml_quote(duration)}" if duration else "duration:"
 
     frontmatter = "\n".join([
         "---",
-        f"date: {date}",
+        f"date: {_yaml_quote(date)}",
         partner_line,
         duration_line,
         "tags: [roll]",
-        f"roll_id: {roll_id}",
+        f"roll_id: {_yaml_quote(roll_id)}",
         "---",
     ])
 
@@ -276,11 +288,11 @@ def _extract_your_notes_section(text: str) -> str:
     `## ` heading (exclusive) or EOF. Leading/trailing whitespace is stripped
     so whitespace-only differences don't trigger false conflicts.
     """
-    heading_idx = text.find(_YOUR_NOTES_HEADING)
-    if heading_idx == -1:
+    m = _YOUR_NOTES_HEADING_RE.search(text)
+    if m is None:
         return ""
-    # Start after the heading line.
-    body_start = text.find("\n", heading_idx)
+    # Start at the character after the heading line's newline.
+    body_start = text.find("\n", m.end())
     if body_start == -1:
         return ""
     body_start += 1
@@ -298,12 +310,13 @@ def _splice_your_notes(current_text: str, new_body: str) -> str:
 
     If the section heading is absent, append a new section at the end.
     """
-    heading_idx = current_text.find(_YOUR_NOTES_HEADING)
-    if heading_idx == -1:
+    m = _YOUR_NOTES_HEADING_RE.search(current_text)
+    if m is None:
         # Append a new section.
         separator = "" if current_text.endswith("\n\n") else ("\n" if current_text.endswith("\n") else "\n\n")
         return f"{current_text}{separator}{_YOUR_NOTES_HEADING}\n\n{new_body}\n"
 
+    heading_idx = m.start()
     # Find body span [body_start, end).
     body_start = current_text.find("\n", heading_idx)
     if body_start == -1:
@@ -329,8 +342,20 @@ def _splice_your_notes(current_text: str, new_body: str) -> str:
     return f"{before}\n\n{new_body}\n{after}"
 
 
+_EXTRA_BLANK_LINES = _re.compile(r"\n{2,}")
+
+
 def _hash_section(body: str) -> str:
-    return hashlib.sha256(body.strip().encode("utf-8")).hexdigest()
+    """Hash the section body after normalising whitespace.
+
+    Normalisation: CRLF → LF, strip leading/trailing whitespace, collapse runs
+    of 2+ newlines to exactly 1. This prevents false conflicts from Obsidian
+    re-saves that only touch whitespace (line-ending conversion, blank-line
+    cleanup) without changing the semantic content of the section.
+    """
+    normalised = body.replace("\r\n", "\n").replace("\r", "\n").strip()
+    normalised = _EXTRA_BLANK_LINES.sub("\n", normalised)
+    return hashlib.sha256(normalised.encode("utf-8")).hexdigest()
 
 
 def _atomic_write(target: Path, text: str) -> None:

@@ -64,7 +64,7 @@ async def test_publish_first_time_creates_file_and_returns_200(
     content = vault_file.read_text()
     assert "my note" in content
     assert "## Your Notes" in content
-    assert f"roll_id: {roll_id}" in content
+    assert f'roll_id: "{roll_id}"' in content
 
 
 @pytest.mark.asyncio
