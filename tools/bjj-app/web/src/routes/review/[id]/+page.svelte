@@ -1,8 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { analyseRoll, ApiError, getRoll } from '$lib/api';
+  import {
+    analyseRoll,
+    ApiError,
+    getRoll,
+    publishRoll,
+    PublishConflictError
+  } from '$lib/api';
   import MomentDetail from '$lib/components/MomentDetail.svelte';
+  import PublishConflictDialog from '$lib/components/PublishConflictDialog.svelte';
   import type { AnalyseEvent, Moment, RollDetail } from '$lib/types';
 
   let roll = $state<RollDetail | null>(null);
@@ -11,6 +18,10 @@
   let analysing = $state(false);
   let progress = $state<{ stage: string; pct: number } | null>(null);
   let selectedMomentId = $state<string | null>(null);
+  let publishing = $state(false);
+  let publishError = $state<string | null>(null);
+  let publishToast = $state<string | null>(null);
+  let conflictOpen = $state(false);
 
   let videoEl: HTMLVideoElement | undefined = $state();
 
@@ -53,7 +64,8 @@
         frame_idx: m.frame_idx,
         timestamp_s: m.timestamp_s,
         pose_delta: m.pose_delta,
-        analyses: []
+        analyses: [],
+        annotations: []
       })) as Moment[];
       progress = { stage: 'done', pct: 100 };
     } else {
@@ -99,18 +111,51 @@
     roll.moments = roll.moments.map((m) => (m.id === updated.id ? updated : m));
   }
 
+  function onMomentAnnotated(updated: Moment) {
+    if (!roll) return;
+    roll.moments = roll.moments.map((m) => (m.id === updated.id ? updated : m));
+  }
+
   function chipStateClass(m: Moment, isSelected: boolean): string {
     const base = 'rounded-md px-2.5 py-1 text-xs font-mono tabular-nums transition-colors';
     if (m.analyses.length > 0) {
-      // Analysed — solid chip.
       return `${base} border bg-emerald-500/15 border-emerald-400/40 text-emerald-100 hover:bg-emerald-500/25${
         isSelected ? ' ring-1 ring-emerald-300' : ''
       }`;
     }
-    // Unanalysed — dashed chip.
     return `${base} border border-dashed bg-white/[0.02] border-white/20 text-white/75 hover:bg-white/[0.05] hover:border-white/40${
       isSelected ? ' ring-1 ring-white/40' : ''
     }`;
+  }
+
+  async function onSaveToVault(options: { force?: boolean } = {}) {
+    if (!roll || publishing) return;
+    publishing = true;
+    publishError = null;
+    publishToast = null;
+    try {
+      const result = await publishRoll(roll.id, options);
+      publishToast = `Published to ${result.vault_path}`;
+      roll.vault_path = result.vault_path;
+      roll.vault_published_at = result.vault_published_at;
+    } catch (err) {
+      if (err instanceof PublishConflictError) {
+        conflictOpen = true;
+      } else {
+        publishError = err instanceof ApiError ? err.message : String(err);
+      }
+    } finally {
+      publishing = false;
+    }
+  }
+
+  async function onOverwrite() {
+    conflictOpen = false;
+    await onSaveToVault({ force: true });
+  }
+
+  function onCancelConflict() {
+    conflictOpen = false;
   }
 </script>
 
@@ -189,6 +234,7 @@
           rollId={roll.id}
           moment={selectedMoment}
           onanalysed={onMomentAnalysed}
+          onannotated={onMomentAnnotated}
         />
       {:else}
         <p class="text-[11px] text-white/35">
@@ -203,5 +249,40 @@
         </p>
       </div>
     {/if}
+
+    <footer class="flex items-center justify-between gap-3 border-t border-white/8 pt-4">
+      <div class="text-[11px] text-white/40">
+        {#if roll.vault_path}
+          Vault: <span class="font-mono">{roll.vault_path}</span>
+        {:else}
+          Not yet published to vault.
+        {/if}
+      </div>
+      <button
+        type="button"
+        onclick={() => onSaveToVault()}
+        disabled={publishing}
+        class="rounded-md border border-amber-400/40 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-100 hover:bg-amber-500/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {publishing ? 'Publishing…' : 'Save to Vault'}
+      </button>
+    </footer>
+
+    {#if publishToast}
+      <div class="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+        {publishToast}
+      </div>
+    {/if}
+    {#if publishError}
+      <div class="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+        {publishError}
+      </div>
+    {/if}
+
+    <PublishConflictDialog
+      open={conflictOpen}
+      onOverwrite={onOverwrite}
+      onCancel={onCancelConflict}
+    />
   </section>
 {/if}
