@@ -54,6 +54,7 @@ cd web && npm test
 - **M1 (shipped):** Scaffolding. Home page lists vault's `Roll Log/` via `GET /api/rolls`.
 - **M2a (shipped):** Video upload (`POST /api/rolls`), review page skeleton, `/assets/` static mount.
 - **M2b (shipped):** MediaPipe pose pre-pass, `POST /api/rolls/:id/analyse` SSE endpoint, timeline chips seek the video on click.
-- **M3 (this milestone):** Claude CLI adapter (`server/analysis/claude_cli.py` — sole caller of `claude -p`). `POST /api/rolls/:id/moments/:frame_idx/analyse` streams a Claude Opus 4.7 classification for one frame, with SQLite cache (`claude_cache`) and a 10/5-min sliding-window rate limiter. Selected-moment panel shows live streaming and the saved result. Security audit at `docs/superpowers/audits/2026-04-21-claude-cli-subprocess-audit.md`.
-- **M4 (next):** Annotations + vault write-back. Edit a note, save to SQLite AND vault markdown with hash-based conflict detection.
-- **M5–M8:** Graph page, summary + PDF, PWA, cleanup.
+- **M3 (shipped):** Claude CLI adapter (sole `claude -p` caller), `POST /api/rolls/:id/moments/:frame_idx/analyse` streaming, SQLite cache, sliding-window rate limiter. Security audit at `docs/superpowers/audits/2026-04-21-claude-cli-subprocess-audit.md`.
+- **M4 (this milestone):** Append-only annotations per moment, explicit "Save to Vault" publish to `Roll Log/*.md`, hash-based conflict detection on `## Your Notes` only, home page routes via `roll_id` frontmatter. Design at `docs/superpowers/specs/2026-04-21-bjj-app-m4-annotations-vault-writeback-design.md`.
+- **M5 (next):** Graph page + mini graph. Cytoscape.js clustered layout with both players' paths overlaid.
+- **M6–M8:** Summary step + PDF export, PWA + mobile polish, cleanup.
