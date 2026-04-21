@@ -23,7 +23,10 @@ CREATE TABLE IF NOT EXISTS rolls (
     result TEXT,
     scores_json TEXT,
     finalised_at INTEGER,
-    created_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL,
+    vault_path TEXT,
+    vault_your_notes_hash TEXT,
+    vault_published_at INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS moments (
@@ -65,11 +68,32 @@ CREATE TABLE IF NOT EXISTS claude_cache (
 """
 
 
+_ROLLS_M4_COLUMNS: tuple[tuple[str, str], ...] = (
+    ("vault_path", "TEXT"),
+    ("vault_your_notes_hash", "TEXT"),
+    ("vault_published_at", "INTEGER"),
+)
+
+
+def _migrate_rolls_m4(conn: sqlite3.Connection) -> None:
+    """Idempotently add M4 columns to an existing rolls table.
+
+    Only needed for databases created before M4 — CREATE TABLE IF NOT EXISTS
+    above handles fresh installs. SQLite has no ADD COLUMN IF NOT EXISTS,
+    so we inspect PRAGMA table_info and ALTER only when missing.
+    """
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(rolls)").fetchall()}
+    for name, sql_type in _ROLLS_M4_COLUMNS:
+        if name not in existing:
+            conn.execute(f"ALTER TABLE rolls ADD COLUMN {name} {sql_type}")
+
+
 def init_db(db_path: Path) -> None:
     """Create the schema if it doesn't already exist. Safe to call every startup."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(db_path) as conn:
         conn.executescript(SCHEMA_SQL)
+        _migrate_rolls_m4(conn)
         conn.commit()
 
 
