@@ -140,3 +140,195 @@ def test_slugify_filename_result_stays_under_roll_log(tmp_path: Path):
     roll_log = (tmp_path / "Roll Log").resolve()
     # resolved must be under roll_log
     assert resolved.is_relative_to(roll_log)
+
+
+# ---------- publish tests ----------
+
+
+from server.analysis.vault_writer import ConflictError, publish  # noqa: E402
+from server.db import (  # noqa: E402
+    connect,
+    create_roll,
+    init_db,
+    insert_annotation,
+    insert_moments,
+    get_vault_state,
+)
+
+
+@pytest.fixture
+def db_roll_annotations(tmp_path: Path):
+    db_path = tmp_path / "test.db"
+    init_db(db_path)
+    conn = connect(db_path)
+    create_roll(
+        conn,
+        id="r-1",
+        title="Sample Roll",
+        date="2026-04-21",
+        video_path="assets/r-1/source.mp4",
+        duration_s=225.0,
+        partner="Anthony",
+        result="unknown",
+        created_at=1700000000,
+    )
+    moments = insert_moments(
+        conn,
+        roll_id="r-1",
+        moments=[
+            {"frame_idx": 3, "timestamp_s": 3.0, "pose_delta": 1.2},
+            {"frame_idx": 10, "timestamp_s": 10.0, "pose_delta": 0.9},
+        ],
+    )
+    insert_annotation(conn, moment_id=moments[0]["id"], body="first thought", created_at=1700000100)
+    insert_annotation(conn, moment_id=moments[1]["id"], body="second thought", created_at=1700000200)
+    try:
+        yield conn, tmp_path
+    finally:
+        conn.close()
+
+
+def test_publish_first_time_creates_file_with_frontmatter_title_and_your_notes(db_roll_annotations):
+    conn, vault_root = db_roll_annotations
+
+    result = publish(conn, roll_id="r-1", vault_root=vault_root)
+
+    # File exists at returned path (under Roll Log/)
+    full = vault_root / result.vault_path
+    assert full.exists()
+    assert full.parent.name == "Roll Log"
+
+    text = full.read_text()
+    # Frontmatter present with roll_id and tags
+    assert text.startswith("---\n")
+    assert "roll_id: r-1" in text
+    assert "date: 2026-04-21" in text
+    assert "partner: Anthony" in text
+    assert "tags: [roll]" in text
+    # Title + Your Notes
+    assert "# Sample Roll" in text
+    assert "## Your Notes" in text
+    assert "first thought" in text
+    assert "second thought" in text
+
+    # DB state updated.
+    state = get_vault_state(conn, "r-1")
+    assert state["vault_path"] == result.vault_path
+    assert state["vault_your_notes_hash"] == result.your_notes_hash
+    assert state["vault_published_at"] == result.vault_published_at
+
+
+def test_publish_second_time_splices_only_your_notes(db_roll_annotations):
+    conn, vault_root = db_roll_annotations
+    first = publish(conn, roll_id="r-1", vault_root=vault_root)
+    full = vault_root / first.vault_path
+
+    # Simulate a user edit to a section OTHER than Your Notes.
+    existing = full.read_text()
+    existing += "\n## Overall Notes\n\nThis was a great roll.\n"
+    full.write_text(existing)
+
+    # Now add a new annotation and re-publish.
+    moment_id = conn.execute(
+        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    ).fetchone()["id"]
+    insert_annotation(conn, moment_id=moment_id, body="follow-up thought", created_at=1700000300)
+
+    second = publish(conn, roll_id="r-1", vault_root=vault_root)
+    text_after = full.read_text()
+
+    # New annotation in Your Notes
+    assert "follow-up thought" in text_after
+    # Unrelated section untouched
+    assert "## Overall Notes" in text_after
+    assert "This was a great roll." in text_after
+    # Hash updated
+    assert second.your_notes_hash != first.your_notes_hash
+
+
+def test_publish_raises_conflict_when_your_notes_edited_externally(db_roll_annotations):
+    conn, vault_root = db_roll_annotations
+    first = publish(conn, roll_id="r-1", vault_root=vault_root)
+    full = vault_root / first.vault_path
+
+    # Hand-edit Your Notes section (simulating Obsidian).
+    text = full.read_text()
+    text = text.replace("first thought", "first thought — edited in Obsidian")
+    full.write_text(text)
+
+    # Add a new annotation; re-publish without force → ConflictError.
+    moment_id = conn.execute(
+        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    ).fetchone()["id"]
+    insert_annotation(conn, moment_id=moment_id, body="new", created_at=1700000400)
+
+    with pytest.raises(ConflictError) as exc:
+        publish(conn, roll_id="r-1", vault_root=vault_root)
+    assert exc.value.current_hash != exc.value.stored_hash
+
+
+def test_publish_force_overrides_conflict(db_roll_annotations):
+    conn, vault_root = db_roll_annotations
+    first = publish(conn, roll_id="r-1", vault_root=vault_root)
+    full = vault_root / first.vault_path
+
+    # External edit.
+    text = full.read_text()
+    text = text.replace("first thought", "first thought — edited in Obsidian")
+    full.write_text(text)
+
+    moment_id = conn.execute(
+        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    ).fetchone()["id"]
+    insert_annotation(conn, moment_id=moment_id, body="forcey", created_at=1700000500)
+
+    result = publish(conn, roll_id="r-1", vault_root=vault_root, force=True)
+    text_after = full.read_text()
+    # Force overwrites — external edit is gone.
+    assert "edited in Obsidian" not in text_after
+    # New annotation is present.
+    assert "forcey" in text_after
+    # Hash updated.
+    assert result.your_notes_hash != first.your_notes_hash
+
+
+def test_publish_recreates_when_file_was_deleted(db_roll_annotations):
+    conn, vault_root = db_roll_annotations
+    first = publish(conn, roll_id="r-1", vault_root=vault_root)
+    full = vault_root / first.vault_path
+    # User deleted the file in Obsidian.
+    full.unlink()
+    assert not full.exists()
+
+    result = publish(conn, roll_id="r-1", vault_root=vault_root)
+    # Recreated at same path, new hash OK.
+    assert (vault_root / result.vault_path).exists()
+    assert result.vault_path == first.vault_path
+
+
+def test_publish_writes_atomically_leaves_no_tmp_file_on_success(db_roll_annotations):
+    conn, vault_root = db_roll_annotations
+    publish(conn, roll_id="r-1", vault_root=vault_root)
+    roll_log = vault_root / "Roll Log"
+    tmp_files = list(roll_log.glob("*.tmp"))
+    assert tmp_files == []
+
+
+def test_publish_refuses_to_write_outside_roll_log(db_roll_annotations, monkeypatch):
+    """Security: a malicious title that tries to traverse must be neutralised by slugify
+    before publish gets it, so the write target always lies under Roll Log/."""
+    conn, vault_root = db_roll_annotations
+    # Update the roll's title to something adversarial.
+    conn.execute("UPDATE rolls SET title = ? WHERE id = 'r-1'", ("../../../etc/evil",))
+    conn.commit()
+
+    result = publish(conn, roll_id="r-1", vault_root=vault_root)
+    full = (vault_root / result.vault_path).resolve()
+    roll_log = (vault_root / "Roll Log").resolve()
+    assert full.is_relative_to(roll_log)
+
+
+def test_publish_raises_for_unknown_roll(db_roll_annotations):
+    conn, vault_root = db_roll_annotations
+    with pytest.raises(LookupError):
+        publish(conn, roll_id="no-such-roll", vault_root=vault_root)
