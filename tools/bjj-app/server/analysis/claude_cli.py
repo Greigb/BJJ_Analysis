@@ -103,8 +103,10 @@ async def analyse_frame(
 
     if last_exit != 0:
         raise ClaudeProcessError(f"claude exited {last_exit}")
-
-    assert assistant_text is not None
+    if assistant_text is None:
+        # Exit code was 0 but every result event had is_error=true — treat as
+        # a process-level failure so the caller sees a consistent error type.
+        raise ClaudeProcessError("claude exited 0 but all result events had is_error=true")
     try:
         parsed = json.loads(assistant_text)
     except json.JSONDecodeError as exc:
@@ -165,8 +167,13 @@ async def _run_once(
                 partial += chunk
                 await stream_callback({"stage": "streaming", "text": partial})
         elif etype == "result":
-            # Final event with the full assistant text.
-            final_text = event.get("result") or partial or None
+            # Final event with the full assistant text. A truthy `is_error` means
+            # the CLI reported a problem even if exit code ended up zero — treat
+            # that the same as a non-zero exit so the outer retry logic fires.
+            if event.get("is_error"):
+                final_text = None
+            else:
+                final_text = event.get("result") or partial or None
 
     exit_code = await proc.wait()
     return final_text, exit_code

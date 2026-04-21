@@ -6,7 +6,9 @@ Later milestones populate them.
 """
 from __future__ import annotations
 
+import json
 import sqlite3
+import time
 import uuid
 from pathlib import Path
 
@@ -168,8 +170,6 @@ def get_moments(conn, roll_id: str) -> list[sqlite3.Row]:
 
 def cache_get(conn, *, prompt_hash: str, frame_hash: str) -> dict | None:
     """Return the cached Claude response for this (prompt, frame) pair, or None."""
-    import json as _json
-
     cur = conn.execute(
         "SELECT response_json FROM claude_cache WHERE prompt_hash = ? AND frame_hash = ?",
         (prompt_hash, frame_hash),
@@ -177,7 +177,7 @@ def cache_get(conn, *, prompt_hash: str, frame_hash: str) -> dict | None:
     row = cur.fetchone()
     if row is None:
         return None
-    return _json.loads(row["response_json"])
+    return json.loads(row["response_json"])
 
 
 def cache_put(
@@ -188,9 +188,6 @@ def cache_put(
     response: dict,
 ) -> None:
     """Upsert a cached response. Re-putting on the same key replaces the value."""
-    import json as _json
-    import time as _time
-
     conn.execute(
         """
         INSERT INTO claude_cache (prompt_hash, frame_hash, response_json, created_at)
@@ -199,7 +196,7 @@ def cache_put(
             response_json = excluded.response_json,
             created_at    = excluded.created_at
         """,
-        (prompt_hash, frame_hash, _json.dumps(response), int(_time.time())),
+        (prompt_hash, frame_hash, json.dumps(response), int(time.time())),
     )
     conn.commit()
 
@@ -216,11 +213,9 @@ def insert_analyses(
     Each player dict must contain: player ('greig'|'anthony'), position_id (str),
     confidence (float | None), description (str | None), coach_tip (str | None).
     """
-    import time as _time
-
     conn.execute("DELETE FROM analyses WHERE moment_id = ?", (moment_id,))
     inserted_ids: list[str] = []
-    now = int(_time.time())
+    now = int(time.time())
     for p in players:
         analysis_id = uuid.uuid4().hex
         conn.execute(

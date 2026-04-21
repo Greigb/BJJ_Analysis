@@ -121,8 +121,19 @@ async def analyse_moment(
 
     task = asyncio.create_task(driver())
 
-    # Try to surface a RateLimitedError as HTTP 429 *before* streaming starts.
-    # Wait briefly for the driver to report any early error.
+    # Pre-flight: surface RateLimitedError as HTTP 429 *before* opening the stream.
+    #
+    # Invariant the driver must uphold: `analyse_frame` emits its first
+    # `{"stage": "cache", ...}` event synchronously before any awaiting, so a
+    # healthy call puts something on the queue within milliseconds. On
+    # RateLimitedError the driver puts the None sentinel (no event). This
+    # two-outcome shape lets the timeout below act as a clean selector:
+    #   - event arrives → normal SSE path
+    #   - sentinel arrives (first=None) → check the task for RateLimitedError
+    #
+    # 5s is a generous safety net — if the cache SQLite lookup ever hangs
+    # longer than that we'd rather return a 429-looking error than stall the
+    # client. In the hot path this timeout is never approached.
     try:
         first = await asyncio.wait_for(queue.get(), timeout=5.0)
     except asyncio.TimeoutError:

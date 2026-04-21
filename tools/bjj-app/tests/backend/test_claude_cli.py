@@ -307,3 +307,52 @@ async def test_analyse_frame_refuses_frame_path_outside_project_root(
         await analyse_frame(
             outside, 0.0, noop, settings=settings, limiter=limiter, cache_conn=cache_conn
         )
+
+
+@pytest.mark.asyncio
+async def test_analyse_frame_treats_is_error_result_as_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    frame: Path,
+    taxonomy: Path,
+    cache_conn,
+) -> None:
+    """Even with exit 0, an is_error=true result must retry then raise."""
+    spawn_count = {"n": 0}
+
+    async def fake_spawn(*args, **kwargs):
+        spawn_count["n"] += 1
+        # Exit 0 but result event flags is_error=true
+        return _FakeProcess(
+            [
+                json.dumps({"type": "system", "subtype": "init"}).encode(),
+                json.dumps({
+                    "type": "result",
+                    "result": "refused",
+                    "is_error": True,
+                    "subtype": "error_max_turns",
+                }).encode(),
+            ],
+            exit_code=0,
+        )
+
+    monkeypatch.setattr(asyncio, "create_subprocess_exec", fake_spawn)
+
+    async def instant_sleep(_: float) -> None:
+        return None
+
+    monkeypatch.setattr(asyncio, "sleep", instant_sleep)
+
+    settings = _settings_with(monkeypatch, tmp_path, taxonomy)
+    limiter = SlidingWindowLimiter(max_calls=10, window_seconds=60)
+
+    async def noop(_: dict) -> None:
+        return None
+
+    with pytest.raises(ClaudeProcessError):
+        await analyse_frame(
+            frame, 17.0, noop, settings=settings, limiter=limiter, cache_conn=cache_conn
+        )
+
+    # Verify the adapter retried: initial + one retry = 2 spawns.
+    assert spawn_count["n"] == 2
