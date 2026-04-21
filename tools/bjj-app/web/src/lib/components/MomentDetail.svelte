@@ -1,23 +1,35 @@
 <script lang="ts">
-  import { analyseMoment, ApiError } from '$lib/api';
-  import type { Analysis, AnalyseMomentEvent, Moment } from '$lib/types';
+  import { addAnnotation, analyseMoment, ApiError } from '$lib/api';
+  import type { Analysis, AnalyseMomentEvent, Annotation, Moment } from '$lib/types';
 
-  let { rollId, moment, onanalysed }: {
+  let {
+    rollId,
+    moment,
+    onanalysed,
+    onannotated
+  }: {
     rollId: string;
     moment: Moment;
     onanalysed?: (m: Moment) => void;
+    onannotated?: (m: Moment) => void;
   } = $props();
 
   let analysing = $state(false);
   let partial = $state('');
-  let error = $state<string | null>(null);
+  let analyseError = $state<string | null>(null);
   let localAnalyses = $state<Analysis[]>(moment.analyses);
+  let localAnnotations = $state<Annotation[]>(moment.annotations);
+  let noteDraft = $state('');
+  let adding = $state(false);
+  let annotateError = $state<string | null>(null);
 
-  // Re-sync when the parent swaps in a different moment.
   $effect(() => {
     localAnalyses = moment.analyses;
+    localAnnotations = moment.annotations;
     partial = '';
-    error = null;
+    analyseError = null;
+    noteDraft = '';
+    annotateError = null;
   });
 
   const greig = $derived(localAnalyses.find((a) => a.player === 'greig'));
@@ -30,23 +42,32 @@
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 
+  function formatCreatedAt(unix_s: number): string {
+    const d = new Date(unix_s * 1000);
+    const mm = d.toLocaleString(undefined, { month: 'short' });
+    const dd = d.getDate();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${mm} ${dd} ${hh}:${mi}`;
+  }
+
   async function onAnalyseClick() {
     if (analysing) return;
     analysing = true;
     partial = '';
-    error = null;
+    analyseError = null;
     try {
       for await (const event of analyseMoment(rollId, moment.frame_idx)) {
-        handleEvent(event);
+        handleAnalyseEvent(event);
       }
     } catch (err) {
-      error = err instanceof ApiError ? err.message : String(err);
+      analyseError = err instanceof ApiError ? err.message : String(err);
     } finally {
       analysing = false;
     }
   }
 
-  function handleEvent(event: AnalyseMomentEvent) {
+  function handleAnalyseEvent(event: AnalyseMomentEvent) {
     if (event.stage === 'streaming') {
       partial = event.text;
     } else if (event.stage === 'done') {
@@ -71,15 +92,38 @@
       ];
       localAnalyses = fabricated;
       partial = '';
-      onanalysed?.({ ...moment, analyses: fabricated });
+      onanalysed?.({ ...moment, analyses: fabricated, annotations: localAnnotations });
     } else if (event.stage === 'error') {
       if (event.kind === 'rate_limited' && event.retry_after_s) {
-        error = `Claude cooldown — ${event.retry_after_s}s until next call`;
+        analyseError = `Claude cooldown — ${event.retry_after_s}s until next call`;
       } else {
-        error = event.detail ?? `Analyse failed (${event.kind})`;
+        analyseError = event.detail ?? `Analyse failed (${event.kind})`;
       }
     }
-    // 'cache' events are informational — nothing to render.
+  }
+
+  async function onAddNote() {
+    const body = noteDraft.trim();
+    if (!body || adding) return;
+    adding = true;
+    annotateError = null;
+    try {
+      const newRow = await addAnnotation(rollId, moment.id, body);
+      localAnnotations = [...localAnnotations, newRow];
+      noteDraft = '';
+      onannotated?.({ ...moment, analyses: localAnalyses, annotations: localAnnotations });
+    } catch (err) {
+      annotateError = err instanceof ApiError ? err.message : String(err);
+    } finally {
+      adding = false;
+    }
+  }
+
+  function onNoteKeydown(e: KeyboardEvent) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      onAddNote();
+    }
   }
 </script>
 
@@ -91,9 +135,9 @@
     <span class="text-[10px] uppercase tracking-wider text-white/40">Selected moment</span>
   </header>
 
-  {#if error}
+  {#if analyseError}
     <div class="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
-      {error}
+      {analyseError}
     </div>
   {/if}
 
@@ -149,4 +193,46 @@
       Analyse this moment with Claude Opus 4.7
     </button>
   {/if}
+
+  <!-- --- Your notes for this moment --- -->
+  <div class="space-y-2 border-t border-white/8 pt-3">
+    <div class="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+      Your notes for this moment
+    </div>
+
+    {#if localAnnotations.length > 0}
+      <ul class="space-y-1">
+        {#each localAnnotations as a (a.id)}
+          <li class="text-sm text-white/80">
+            <span class="text-[10px] text-white/40">({formatCreatedAt(a.created_at)})</span>
+            <span class="ml-1">{a.body}</span>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+
+    {#if annotateError}
+      <div class="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+        {annotateError}
+      </div>
+    {/if}
+
+    <textarea
+      bind:value={noteDraft}
+      onkeydown={onNoteKeydown}
+      placeholder="Type a new note…  (Cmd-Enter to submit)"
+      class="w-full min-h-[60px] rounded-md border border-white/10 bg-white/[0.02] p-2 text-sm text-white/85 placeholder:text-white/30 focus:border-white/30 outline-none"
+    ></textarea>
+
+    <div class="flex items-center justify-end">
+      <button
+        type="button"
+        onclick={onAddNote}
+        disabled={adding || !noteDraft.trim()}
+        class="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-white/85 hover:bg-white/[0.08] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {adding ? 'Adding…' : 'Add note'}
+      </button>
+    </div>
+  </div>
 </section>
