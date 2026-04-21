@@ -38,3 +38,26 @@ Re-open this audit if any of the following change:
 - `analyse_frame` is called from a new code path.
 - Claude CLI major version bump (currently 2.1.114).
 - App is exposed beyond the local LAN.
+
+---
+
+## Addendum (2026-04-21) — `run_claude` second call-site for summary prompts (M6a)
+
+M6a extracts `run_claude(prompt, settings, limiter, stream_callback)` from `analyse_frame` to reuse the subprocess seam for a second prompt type: the coaching summary call at `POST /api/rolls/:id/summarise`.
+
+### What differs from the classification prompt
+
+The classification prompt (M3) was deterministic and contained **no user input** — it interpolated only the taxonomy, a frame-path reference, and a timestamp. That invariant made the cache key stable and eliminated prompt-injection risk.
+
+The summary prompt includes **user-typed annotation text verbatim** (the user's notes on specific moments from M4). This is an explicit design trade-off: the summary endpoint is not cached, Claude's output is schema-validated + used only to populate SQLite + vault markdown (no downstream command execution), and the subprocess still spawns argv-only with `--max-turns 1` and `stderr=DEVNULL`.
+
+### Mitigations in place
+
+1. Prompt never interpolates file paths, shell metacharacters, or URLs. Only natural-language annotation bodies.
+2. Claude's output is strictly schema-validated (`parse_summary_response`); unknown keys are dropped, scores are clamped, hallucinated `moment_id`s are rejected.
+3. Rate limiting + single-retry behaviour from M3 is preserved.
+
+### Re-audit triggers for this call-site
+
+- If a future change lets the summary prompt execute shell commands based on Claude output, re-audit.
+- If `run_claude` is used with any user-supplied *prompt* string (e.g. a "custom coach tip" feature where the user controls the prompt template), re-audit — the current mitigation relies on the prompt structure being ours.
