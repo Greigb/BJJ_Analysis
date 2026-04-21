@@ -88,3 +88,112 @@ def test_category_emoji_covers_canonical_categories():
         "inferior_bottom", "leg_entanglement", "scramble",
     }
     assert expected.issubset(set(CATEGORY_EMOJI.keys()))
+
+
+# ---------- build_summary_prompt ----------
+
+
+def _roll(**overrides) -> dict:
+    base = {
+        "id": "roll-1", "title": "Sample", "date": "2026-04-21", "duration_s": 225.0,
+        "player_a_name": "Alice", "player_b_name": "Bob",
+    }
+    base.update(overrides)
+    return base
+
+
+def _moment(mid: str, frame_idx: int, timestamp_s: float) -> dict:
+    return {"id": mid, "frame_idx": frame_idx, "timestamp_s": timestamp_s}
+
+
+def test_build_summary_prompt_includes_player_names():
+    prompt = build_summary_prompt(
+        roll_row=_roll(), moment_rows=[], analyses_by_moment={}, annotations_by_moment={},
+    )
+    assert "Alice" in prompt
+    assert "Bob" in prompt
+    assert "Greig" not in prompt
+    assert "Anthony" not in prompt
+
+
+def test_build_summary_prompt_lists_analysed_moments_chronologically():
+    moments = [_moment("m1", 3, 3.0), _moment("m2", 12, 12.0)]
+    analyses = {
+        "m1": [
+            {"player": "a", "position_id": "closed_guard_bottom", "confidence": 0.8,
+             "description": "Greig in guard", "coach_tip": "Break posture"},
+            {"player": "b", "position_id": "closed_guard_top", "confidence": 0.75,
+             "description": None, "coach_tip": None},
+        ],
+        "m2": [
+            {"player": "a", "position_id": "half_guard_bottom", "confidence": 0.7,
+             "description": "Slipped to half", "coach_tip": "Underhook"},
+            {"player": "b", "position_id": "half_guard_top", "confidence": 0.68,
+             "description": None, "coach_tip": None},
+        ],
+    }
+    prompt = build_summary_prompt(
+        roll_row=_roll(), moment_rows=moments,
+        analyses_by_moment=analyses, annotations_by_moment={},
+    )
+    m1_idx = prompt.find("moment_id=m1")
+    m2_idx = prompt.find("moment_id=m2")
+    assert m1_idx != -1 and m2_idx != -1
+    assert m1_idx < m2_idx
+    assert "closed_guard_bottom" in prompt
+    assert "Break posture" in prompt
+    assert "Underhook" in prompt
+
+
+def test_build_summary_prompt_omits_annotations_block_when_no_annotations():
+    moments = [_moment("m1", 3, 3.0)]
+    analyses = {
+        "m1": [
+            {"player": "a", "position_id": "standing_neutral", "confidence": 0.9,
+             "description": "Standing", "coach_tip": "Engage"},
+            {"player": "b", "position_id": "standing_neutral", "confidence": 0.88,
+             "description": None, "coach_tip": None},
+        ],
+    }
+    prompt = build_summary_prompt(
+        roll_row=_roll(), moment_rows=moments,
+        analyses_by_moment=analyses, annotations_by_moment={"m1": []},
+    )
+    assert "User's own notes" not in prompt
+
+
+def test_build_summary_prompt_includes_annotations_when_present():
+    moments = [_moment("m1", 3, 3.0)]
+    analyses = {
+        "m1": [
+            {"player": "a", "position_id": "standing_neutral", "confidence": 0.9,
+             "description": "Standing", "coach_tip": "Engage"},
+            {"player": "b", "position_id": "standing_neutral", "confidence": 0.88,
+             "description": None, "coach_tip": None},
+        ],
+    }
+    annotations = {
+        "m1": [
+            {"id": "a1", "body": "I was too passive here", "created_at": 1},
+            {"id": "a2", "body": "could have shot a single", "created_at": 2},
+        ],
+    }
+    prompt = build_summary_prompt(
+        roll_row=_roll(), moment_rows=moments,
+        analyses_by_moment=analyses, annotations_by_moment=annotations,
+    )
+    assert "User's own notes" in prompt
+    assert "too passive" in prompt
+    assert "shot a single" in prompt
+
+
+def test_build_summary_prompt_includes_output_json_schema_keys():
+    prompt = build_summary_prompt(
+        roll_row=_roll(), moment_rows=[], analyses_by_moment={}, annotations_by_moment={},
+    )
+    for key in (
+        "summary", "scores", "guard_retention", "positional_awareness",
+        "transition_quality", "top_improvements", "strengths", "key_moments",
+        "moment_id",
+    ):
+        assert key in prompt
