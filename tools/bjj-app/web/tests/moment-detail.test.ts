@@ -101,9 +101,9 @@ describe('MomentDetail', () => {
 
     await user.click(screen.getByRole('button', { name: /analyse this moment/i }));
 
-    // Partial chunks render during streaming.
+    // Partial chunks render during streaming (may be one or two elements once final state lands).
     await waitFor(() => {
-      expect(screen.getByText(/standing_neutral/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/standing_neutral/i).length).toBeGreaterThan(0);
     });
 
     // Final parsed analysis renders the coach tip + description.
