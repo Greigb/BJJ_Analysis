@@ -101,12 +101,15 @@ describe('Review page — analyse flow', () => {
 
   it('clicking Analyse streams progress and then renders new chips', async () => {
     const fetchMock = vi.fn();
-    // First call: GET roll detail. Second: POST analyse (SSE body).
+    // First call: GET roll detail. Second: graph taxonomy (fails; inner catch swallows it,
+    // getGraphPaths is never called). Third: POST analyse (SSE body).
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
       json: async () => detailWithoutMoments()
     });
+    // graph taxonomy fails; inner catch swallows, getGraphPaths skipped
+    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -144,11 +147,15 @@ describe('Review page — analyse flow', () => {
 
   it('clicking Save to Vault calls POST /publish and toasts on success', async () => {
     const fetchMock = vi.fn();
+    // 1. GET roll detail
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
       json: async () => detailWithMoments()
     });
+    // 2. graph taxonomy fails; inner catch swallows, getGraphPaths skipped
+    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
+    // 3. POST /publish
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -173,8 +180,8 @@ describe('Review page — analyse flow', () => {
     await waitFor(() => {
       expect(screen.getByText(/published to/i)).toBeInTheDocument();
     });
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    const publishCall = fetchMock.mock.calls[1];
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const publishCall = fetchMock.mock.calls[2];
     expect(publishCall[0]).toContain('/publish');
   });
 
@@ -186,7 +193,9 @@ describe('Review page — analyse flow', () => {
       status: 200,
       json: async () => detailWithMoments()
     });
-    // 2. first POST /publish → 409
+    // 2. graph taxonomy fails; inner catch swallows, getGraphPaths skipped
+    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
+    // 3. first POST /publish → 409
     fetchMock.mockResolvedValueOnce({
       ok: false,
       status: 409,
@@ -196,7 +205,7 @@ describe('Review page — analyse flow', () => {
         stored_hash: 'stored'
       })
     });
-    // 3. second POST /publish with force → 200
+    // 4. second POST /publish with force → 200
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -226,8 +235,8 @@ describe('Review page — analyse flow', () => {
     await waitFor(() => {
       expect(screen.getByText(/published to/i)).toBeInTheDocument();
     });
-    expect(fetchMock).toHaveBeenCalledTimes(3);
-    const forceCall = fetchMock.mock.calls[2];
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    const forceCall = fetchMock.mock.calls[3];
     const forceBody = JSON.parse(forceCall[1].body);
     expect(forceBody.force).toBe(true);
   });
