@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from server.api import analyse as analyse_api
+from server.api import annotations as annotations_api
 from server.api import moments as moments_api
 from server.api import rolls as rolls_api
 from server.config import load_settings
@@ -29,6 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(rolls_api.router)
     app.include_router(analyse_api.router)
     app.include_router(moments_api.router)
+    app.include_router(annotations_api.router)
 
     @app.get("/api/health")
     def health() -> dict[str, str]:
