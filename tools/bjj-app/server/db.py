@@ -324,3 +324,54 @@ def get_vault_state(conn, roll_id: str) -> dict | None:
         "vault_your_notes_hash": row["vault_your_notes_hash"],
         "vault_published_at": row["vault_published_at"],
     }
+
+
+def insert_annotation(
+    conn,
+    *,
+    moment_id: str,
+    body: str,
+    created_at: int,
+) -> sqlite3.Row:
+    """Append a new annotation to a moment. Returns the inserted row."""
+    annotation_id = uuid.uuid4().hex
+    conn.execute(
+        """
+        INSERT INTO annotations (id, moment_id, body, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (annotation_id, moment_id, body, created_at, created_at),
+    )
+    conn.commit()
+    cur = conn.execute("SELECT * FROM annotations WHERE id = ?", (annotation_id,))
+    return cur.fetchone()
+
+
+def get_annotations_by_moment(conn, moment_id: str) -> list[sqlite3.Row]:
+    """Return all annotations for a moment ordered by created_at ascending."""
+    cur = conn.execute(
+        "SELECT * FROM annotations WHERE moment_id = ? ORDER BY created_at",
+        (moment_id,),
+    )
+    return list(cur.fetchall())
+
+
+def get_annotations_by_roll(conn, roll_id: str) -> list[sqlite3.Row]:
+    """Return all annotations for a roll, joined with moment timestamps.
+
+    Ordered for vault rendering: by moment timestamp_s ascending, then by
+    created_at ascending within each moment.
+    Each row carries: id, moment_id, body, created_at, updated_at, timestamp_s, frame_idx.
+    """
+    cur = conn.execute(
+        """
+        SELECT a.id, a.moment_id, a.body, a.created_at, a.updated_at,
+               m.timestamp_s, m.frame_idx
+          FROM annotations a
+          JOIN moments m ON m.id = a.moment_id
+         WHERE m.roll_id = ?
+         ORDER BY m.timestamp_s ASC, a.created_at ASC
+        """,
+        (roll_id,),
+    )
+    return list(cur.fetchall())
