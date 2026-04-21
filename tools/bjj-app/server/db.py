@@ -286,3 +286,41 @@ def get_analyses(conn, moment_id: str) -> list[sqlite3.Row]:
         (moment_id,),
     )
     return list(cur.fetchall())
+
+
+def set_vault_state(
+    conn,
+    *,
+    roll_id: str,
+    vault_path: str,
+    vault_your_notes_hash: str,
+    vault_published_at: int,
+) -> None:
+    """Record the outcome of a successful publish on the roll row."""
+    conn.execute(
+        """
+        UPDATE rolls
+           SET vault_path = ?,
+               vault_your_notes_hash = ?,
+               vault_published_at = ?
+         WHERE id = ?
+        """,
+        (vault_path, vault_your_notes_hash, vault_published_at, roll_id),
+    )
+    conn.commit()
+
+
+def get_vault_state(conn, roll_id: str) -> dict | None:
+    """Return the roll's vault_path/hash/published_at, or None if the roll doesn't exist."""
+    cur = conn.execute(
+        "SELECT vault_path, vault_your_notes_hash, vault_published_at FROM rolls WHERE id = ?",
+        (roll_id,),
+    )
+    row = cur.fetchone()
+    if row is None:
+        return None
+    return {
+        "vault_path": row["vault_path"],
+        "vault_your_notes_hash": row["vault_your_notes_hash"],
+        "vault_published_at": row["vault_published_at"],
+    }
