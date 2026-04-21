@@ -47,3 +47,187 @@ class TestSlugifyReportFilename:
 
     def test_whitespace_only_title_fallback(self):
         assert slugify_report_filename("   ", "2026-04-21") == "match-report-2026-04-21.pdf"
+
+
+from datetime import datetime, timezone
+
+from server.export.pdf import build_report_context
+
+
+def _fixture_taxonomy():
+    return {
+        "categories": [
+            {"id": "guard_top", "label": "Guard top"},
+            {"id": "guard_bottom", "label": "Guard bottom"},
+            {"id": "standing", "label": "Standing"},
+            {"id": "scramble", "label": "Scramble"},
+        ],
+        "positions": [
+            {"id": "closed_guard_bottom", "category": "guard_bottom"},
+            {"id": "closed_guard_top", "category": "guard_top"},
+        ],
+    }
+
+
+def _fixture_roll(**overrides):
+    base = {
+        "id": "abcdef1234567890abcdef1234567890",
+        "title": "Tuesday Roll",
+        "date": "2026-04-21",
+        "duration_s": 245.0,
+        "player_a_name": "Greig",
+        "player_b_name": "Partner",
+        "finalised_at": 1713700000,
+        "scores_json": None,  # unused — caller passes parsed dict separately
+    }
+    base.update(overrides)
+    return base
+
+
+def _fixture_scores():
+    return {
+        "summary": "Solid guard retention but limited offence from the bottom.",
+        "scores": {
+            "position_control": 7,
+            "submission_threat": 3,
+            "defensive_resilience": 8,
+        },
+        "top_improvements": [
+            "Chain sweeps from closed guard.",
+            "Break grips before shrimping.",
+        ],
+        "strengths": [
+            "Strong guard retention.",
+            "Calm under pressure.",
+        ],
+        "key_moments": [
+            {"moment_id": "m1", "why": "First sweep attempt."},
+            {"moment_id": "m2", "why": "Passed half guard."},
+            {"moment_id": "m3", "why": "Back take attempt."},
+        ],
+    }
+
+
+def _fixture_moments():
+    return [
+        {"id": "m1", "frame_idx": 30, "timestamp_s": 12.5, "category": "guard_bottom"},
+        {"id": "m2", "frame_idx": 60, "timestamp_s": 45.0, "category": "guard_top"},
+        {"id": "m3", "frame_idx": 90, "timestamp_s": 130.0, "category": "scramble"},
+    ]
+
+
+def _fixture_distribution():
+    return {
+        "timeline": ["guard_bottom", "guard_top", "scramble"],
+        "counts": {"guard_bottom": 1, "guard_top": 1, "scramble": 1},
+        "percentages": {"guard_bottom": 33, "guard_top": 34, "scramble": 33},
+    }
+
+
+class TestBuildReportContext:
+    def test_flattens_header_fields(self):
+        ctx = build_report_context(
+            roll=_fixture_roll(),
+            scores=_fixture_scores(),
+            distribution=_fixture_distribution(),
+            moments=_fixture_moments(),
+            taxonomy=_fixture_taxonomy(),
+            generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
+        )
+        assert ctx["title"] == "Tuesday Roll"
+        assert ctx["date_human"] == "21 April 2026"
+        assert ctx["player_a_name"] == "Greig"
+        assert ctx["player_b_name"] == "Partner"
+        assert ctx["duration_human"] == "04:05"
+        assert ctx["moments_analysed_count"] == 3
+        assert ctx["summary_sentence"] == "Solid guard retention but limited offence from the bottom."
+        assert ctx["generated_at_human"] == "2026-04-21 14:32 UTC"
+        assert ctx["roll_id_short"] == "abcdef12"
+
+    def test_scores_are_bucketed_and_widthed(self):
+        ctx = build_report_context(
+            roll=_fixture_roll(),
+            scores=_fixture_scores(),
+            distribution=_fixture_distribution(),
+            moments=_fixture_moments(),
+            taxonomy=_fixture_taxonomy(),
+            generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
+        )
+        assert ctx["scores"] == [
+            {"id": "position_control", "label": "Position Control", "value": 7, "bar_pct": 70, "color_bucket": "high"},
+            {"id": "submission_threat", "label": "Submission Threat", "value": 3, "bar_pct": 30, "color_bucket": "low"},
+            {"id": "defensive_resilience", "label": "Defensive Resilience", "value": 8, "bar_pct": 80, "color_bucket": "high"},
+        ]
+
+    def test_distribution_bar_uses_human_labels(self):
+        ctx = build_report_context(
+            roll=_fixture_roll(),
+            scores=_fixture_scores(),
+            distribution=_fixture_distribution(),
+            moments=_fixture_moments(),
+            taxonomy=_fixture_taxonomy(),
+            generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
+        )
+        # Every segment maps category id → human label, carries width + a CSS color variable name.
+        labels = {seg["label"]: seg["width_pct"] for seg in ctx["distribution_bar"]}
+        assert labels == {"Guard bottom": 33, "Guard top": 34, "Scramble": 33}
+        for seg in ctx["distribution_bar"]:
+            assert seg["color_class"].startswith("cat-")
+
+    def test_key_moments_resolve_to_mm_ss_and_category_labels(self):
+        ctx = build_report_context(
+            roll=_fixture_roll(),
+            scores=_fixture_scores(),
+            distribution=_fixture_distribution(),
+            moments=_fixture_moments(),
+            taxonomy=_fixture_taxonomy(),
+            generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
+        )
+        assert ctx["key_moments"] == [
+            {"timestamp_human": "00:12", "category_label": "Guard bottom", "blurb": "First sweep attempt."},
+            {"timestamp_human": "00:45", "category_label": "Guard top", "blurb": "Passed half guard."},
+            {"timestamp_human": "02:10", "category_label": "Scramble", "blurb": "Back take attempt."},
+        ]
+
+    def test_improvements_and_strengths_passthrough(self):
+        ctx = build_report_context(
+            roll=_fixture_roll(),
+            scores=_fixture_scores(),
+            distribution=_fixture_distribution(),
+            moments=_fixture_moments(),
+            taxonomy=_fixture_taxonomy(),
+            generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
+        )
+        assert ctx["improvements"] == [
+            "Chain sweeps from closed guard.",
+            "Break grips before shrimping.",
+        ]
+        assert ctx["strengths"] == [
+            "Strong guard retention.",
+            "Calm under pressure.",
+        ]
+
+    def test_missing_key_moment_id_is_skipped(self):
+        scores = _fixture_scores()
+        scores["key_moments"].append({"moment_id": "does-not-exist", "why": "should be dropped"})
+        ctx = build_report_context(
+            roll=_fixture_roll(),
+            scores=scores,
+            distribution=_fixture_distribution(),
+            moments=_fixture_moments(),
+            taxonomy=_fixture_taxonomy(),
+            generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
+        )
+        # Only the three valid moments come through.
+        assert len(ctx["key_moments"]) == 3
+
+    def test_raises_when_scores_missing(self):
+        with pytest.raises(ValueError, match="scores"):
+            build_report_context(
+                roll=_fixture_roll(),
+                scores=None,
+                distribution=_fixture_distribution(),
+                moments=_fixture_moments(),
+                taxonomy=_fixture_taxonomy(),
+                generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
+            )
