@@ -626,3 +626,69 @@ def render_summary_sections(
         "top_improvements": top_improvements_body,
         "strengths": strengths_body,
     }
+
+
+# ---------- M6b: report section ----------
+
+
+def update_report_section(
+    conn,
+    *,
+    roll_id: str,
+    vault_root: Path,
+    body: str,
+    force: bool = False,
+) -> str:
+    """Splice/insert the `## Report` section into a roll's existing markdown.
+
+    Assumes the roll has been published at least once (vault file exists).
+    Raises `FileNotFoundError` if the vault file is missing.
+    Raises `ConflictError` if the current `## Report` body hash doesn't match
+    `vault_summary_hashes['report']` and `force=False`.
+    On success returns the new hash and persists it to `vault_summary_hashes`.
+    """
+    import json as _json
+
+    roll_row = get_roll(conn, roll_id)
+    if roll_row is None:
+        raise LookupError(f"Roll not found: {roll_id}")
+
+    vault_state = get_vault_state(conn, roll_id)
+    if vault_state is None or not vault_state.get("vault_path"):
+        raise FileNotFoundError(
+            f"Roll {roll_id} has not been published to the vault — Save to Vault first."
+        )
+
+    target = vault_root / vault_state["vault_path"]
+    _assert_under_roll_log(target, vault_root)
+    if not target.exists():
+        raise FileNotFoundError(f"Vault file missing on disk: {target}")
+
+    current_text = target.read_text(encoding="utf-8")
+
+    # Conflict check against stored per-section hash.
+    stored_summary_hashes: dict[str, str] = {}
+    if roll_row["vault_summary_hashes"]:
+        stored_summary_hashes = _json.loads(roll_row["vault_summary_hashes"]) or {}
+    current_body = _extract_section_by_heading(current_text, "## Report")
+    current_hash = _hash_section(current_body)
+    stored_hash = stored_summary_hashes.get("report")
+    if stored_hash is not None and current_hash != stored_hash and not force:
+        raise ConflictError(current_hash=current_hash, stored_hash=stored_hash)
+
+    # Splice or insert.
+    replaced = _replace_section_body_if_present(current_text, "## Report", body)
+    if replaced is not None:
+        new_text = replaced
+    else:
+        # Report sits just above Your Notes (after all summary sections).
+        new_text = _insert_section_at_ordered_position(
+            current_text, "## Report", body, [_YOUR_NOTES_HEADING]
+        )
+
+    _atomic_write(target, new_text)
+
+    new_hash = _hash_section(body)
+    stored_summary_hashes["report"] = new_hash
+    set_vault_summary_hashes(conn, roll_id=roll_id, hashes=stored_summary_hashes)
+    return new_hash
