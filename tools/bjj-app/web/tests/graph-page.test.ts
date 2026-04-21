@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/svelte';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // $app/stores has to be mocked for page store access (matches home.test.ts pattern).
 vi.mock('$app/stores', () => ({
@@ -12,41 +12,29 @@ vi.mock('$app/stores', () => ({
   }
 }));
 
-function stubCytoscape() {
+vi.mock('cytoscape', () => {
   const cyInstance: any = {
     on: vi.fn(),
     add: vi.fn(),
     remove: vi.fn(),
-    getElementById: vi.fn(() => ({ length: 0, style: vi.fn(), position: vi.fn(), addClass: vi.fn() })),
-    nodes: vi.fn(() => ({ forEach: vi.fn() })),
+    getElementById: vi.fn(() => ({ length: 0, style: vi.fn(), position: vi.fn(), addClass: vi.fn(), removeClass: vi.fn() })),
+    nodes: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn() })),
     edges: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn(), length: 0, remove: vi.fn() })),
     elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn(), remove: vi.fn() })),
-    layout: vi.fn(() => ({ run: vi.fn() })),
+    layout: vi.fn(() => ({ run: vi.fn(), stop: vi.fn() })),
     fit: vi.fn(),
     resize: vi.fn(),
     destroy: vi.fn()
   };
-  // @ts-expect-error global
-  globalThis.cytoscape = vi.fn(() => cyInstance);
-  // @ts-expect-error global
-  globalThis.cytoscape.use = vi.fn();
-  // @ts-expect-error global
-  globalThis.cytoscapeCoseBilkent = () => {};
-  // @ts-expect-error global
-  globalThis.marked = { parse: (s: string) => s };
-}
+  const cytoscape = vi.fn(() => cyInstance);
+  (cytoscape as any).use = vi.fn();
+  return { default: cytoscape };
+});
+vi.mock('cytoscape-cose-bilkent', () => ({ default: () => {} }));
+vi.mock('marked', () => ({ marked: { parse: (s: string) => s } }));
 
 describe('/graph page', () => {
-  beforeEach(() => {
-    stubCytoscape();
-  });
   afterEach(() => {
-    // @ts-expect-error cleanup
-    delete globalThis.cytoscape;
-    // @ts-expect-error cleanup
-    delete globalThis.cytoscapeCoseBilkent;
-    // @ts-expect-error cleanup
-    delete globalThis.marked;
     vi.restoreAllMocks();
   });
 

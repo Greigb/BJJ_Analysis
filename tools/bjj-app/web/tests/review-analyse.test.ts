@@ -2,6 +2,27 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('cytoscape', () => {
+  const cyInstance: any = {
+    on: vi.fn(),
+    add: vi.fn(),
+    remove: vi.fn(),
+    getElementById: vi.fn(() => ({ length: 0, style: vi.fn(), position: vi.fn(), addClass: vi.fn(), removeClass: vi.fn() })),
+    nodes: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn() })),
+    edges: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn(), length: 0, remove: vi.fn() })),
+    elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn(), remove: vi.fn() })),
+    layout: vi.fn(() => ({ run: vi.fn(), stop: vi.fn() })),
+    fit: vi.fn(),
+    resize: vi.fn(),
+    destroy: vi.fn()
+  };
+  const cytoscape = vi.fn(() => cyInstance);
+  (cytoscape as any).use = vi.fn();
+  return { default: cytoscape };
+});
+vi.mock('cytoscape-cose-bilkent', () => ({ default: () => {} }));
+vi.mock('marked', () => ({ marked: { parse: (s: string) => s } }));
+
 import Page from '../src/routes/review/[id]/+page.svelte';
 
 // See M2a new.test.ts — vi.mock factories are hoisted, so any referenced
@@ -302,44 +323,21 @@ describe('Review page — analyse flow', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    // cytoscape stub so GraphCluster doesn't blow up when it mounts.
-    // @ts-expect-error global
-    globalThis.cytoscape = vi.fn(() => ({
-      on: vi.fn(), add: vi.fn(), remove: vi.fn(),
-      getElementById: vi.fn(() => ({ length: 0, style: vi.fn(), position: vi.fn(), addClass: vi.fn() })),
-      nodes: vi.fn(() => ({ forEach: vi.fn(), removeClass: vi.fn(), addClass: vi.fn() })),
-      edges: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn(), length: 0, remove: vi.fn() })),
-      elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn(), remove: vi.fn() })),
-      layout: vi.fn(() => ({ run: vi.fn() })),
-      destroy: vi.fn()
-    }));
-    // @ts-expect-error global
-    globalThis.cytoscape.use = vi.fn();
-    // @ts-expect-error global
-    globalThis.cytoscapeCoseBilkent = () => {};
+    const user = userEvent.setup();
+    const { default: Page } = await import('../src/routes/review/[id]/+page.svelte');
+    const { container } = render(Page);
 
-    try {
-      const user = userEvent.setup();
-      const { default: Page } = await import('../src/routes/review/[id]/+page.svelte');
-      const { container } = render(Page);
+    await waitFor(() => {
+      expect(screen.getByText('Review analyse test')).toBeInTheDocument();
+    });
 
-      await waitFor(() => {
-        expect(screen.getByText('Review analyse test')).toBeInTheDocument();
-      });
+    // Click the only chip.
+    await user.click(screen.getByRole('button', { name: /0:02/i }));
 
-      // Click the only chip.
-      await user.click(screen.getByRole('button', { name: /0:02/i }));
-
-      await waitFor(() => {
-        // Mini graph data-testid should appear.
-        const miniHost = container.querySelector('[data-graphcluster][data-variant="mini"]');
-        expect(miniHost).not.toBeNull();
-      });
-    } finally {
-      // @ts-expect-error cleanup
-      delete globalThis.cytoscape;
-      // @ts-expect-error cleanup
-      delete globalThis.cytoscapeCoseBilkent;
-    }
+    await waitFor(() => {
+      // Mini graph data-testid should appear.
+      const miniHost = container.querySelector('[data-graphcluster][data-variant="mini"]');
+      expect(miniHost).not.toBeNull();
+    });
   });
 });

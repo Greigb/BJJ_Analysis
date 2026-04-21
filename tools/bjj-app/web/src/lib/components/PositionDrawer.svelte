@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PositionNote } from '$lib/types';
+  import { marked } from 'marked';
 
   let {
     open,
@@ -11,17 +12,10 @@
     onclose: () => void;
   } = $props();
 
-  // marked is loaded as a global from a CDN <script> in app.html.
-  // In tests we stub it on globalThis; in dev/prod it's real.
   function renderMarkdown(md: string): string {
-    // @ts-expect-error marked is a global
-    const marked = globalThis.marked;
-    if (marked && typeof marked.parse === 'function') {
-      return marked.parse(md);
-    }
-    // Fallback: escape + wrap in <pre> so nothing breaks if marked didn't load.
-    const escaped = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return `<pre>${escaped}</pre>`;
+    const result = marked.parse(md);
+    // marked v11 returns string | Promise<string>; we use it synchronously so coerce.
+    return typeof result === 'string' ? result : '';
   }
 
   const rendered = $derived(positionNote ? renderMarkdown(positionNote.markdown) : '');

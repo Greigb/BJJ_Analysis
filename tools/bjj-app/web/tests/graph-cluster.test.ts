@@ -1,6 +1,46 @@
 import { render, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// Mock cytoscape + cose-bilkent imports at module boundary.
+// Must be BEFORE the component import so the mock is active when it resolves.
+vi.mock('cytoscape', () => {
+  const handlers: Record<string, Array<(evt: { target: { id: () => string } }) => void>> = {};
+  const added: Array<{ data: Record<string, unknown>; classes?: string }> = [];
+  const cyInstance = {
+    on: vi.fn(
+      (event: string, _selector: string, handler: (evt: { target: { id: () => string } }) => void) => {
+        handlers[event] = handlers[event] || [];
+        handlers[event].push(handler);
+      }
+    ),
+    add: vi.fn((eles: Array<{ data: Record<string, unknown>; classes?: string }>) => {
+      if (Array.isArray(eles)) added.push(...eles);
+    }),
+    remove: vi.fn(),
+    getElementById: vi.fn(() => ({
+      id: vi.fn(() => 'standing_neutral'),
+      position: vi.fn(),
+      addClass: vi.fn(),
+      removeClass: vi.fn(),
+      style: vi.fn(),
+      length: 1
+    })),
+    nodes: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn() })),
+    edges: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn(), length: 0, remove: vi.fn() })),
+    elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn(), remove: vi.fn() })),
+    layout: vi.fn(() => ({ run: vi.fn(), stop: vi.fn() })),
+    fit: vi.fn(),
+    resize: vi.fn(),
+    destroy: vi.fn(),
+    __captured: { added, handlers }
+  };
+  const cytoscape = vi.fn(() => cyInstance);
+  (cytoscape as any).use = vi.fn();
+  return { default: cytoscape, __cyInstance: cyInstance };
+});
+
+vi.mock('cytoscape-cose-bilkent', () => ({ default: () => {} }));
+
 import GraphCluster from '../src/lib/components/GraphCluster.svelte';
 import type { GraphPaths, GraphTaxonomy } from '../src/lib/types';
 
@@ -27,60 +67,22 @@ const paths: GraphPaths = {
   }
 };
 
-// Minimal Cytoscape + cose-bilkent stub for tests.
-function stubCytoscape() {
-  const handlers: Record<string, Array<(evt: { target: { id: () => string } }) => void>> = {};
-  const mockEle = {
-    id: vi.fn(() => 'standing_neutral'),
-    position: vi.fn(),
-    addClass: vi.fn(),
-    removeClass: vi.fn(),
-    style: vi.fn()
-  };
-  const added: Array<{ data: Record<string, unknown>; classes?: string }> = [];
-  const cyInstance = {
-    on: vi.fn((event: string, _selector: string, handler: (evt: { target: { id: () => string } }) => void) => {
-      handlers[event] = handlers[event] || [];
-      handlers[event].push(handler);
-    }),
-    add: vi.fn((eles: Array<{ data: Record<string, unknown>; classes?: string }>) => {
-      added.push(...eles);
-    }),
-    remove: vi.fn(),
-    getElementById: vi.fn(() => mockEle),
-    nodes: vi.fn(() => ({ forEach: vi.fn(), removeClass: vi.fn(), addClass: vi.fn() })),
-    edges: vi.fn(() => ({ forEach: vi.fn(), length: added.length })),
-    elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn() })),
-    layout: vi.fn(() => ({ run: vi.fn() })),
-    fit: vi.fn(),
-    resize: vi.fn(),
-    destroy: vi.fn(),
-    // Expose captured state for tests.
-    __captured: { added, handlers }
-  };
-  const cytoscape = vi.fn(() => cyInstance);
-  // cose-bilkent registers itself via cytoscape.use()
-  // @ts-expect-error extension method
-  cytoscape.use = vi.fn();
-  // @ts-expect-error global stub
-  globalThis.cytoscape = cytoscape;
-  // @ts-expect-error global stub
-  globalThis.cytoscapeCoseBilkent = () => {};
-  return cyInstance;
-}
-
 describe('GraphCluster', () => {
-  let cy: ReturnType<typeof stubCytoscape>;
+  let cy: any;
 
-  beforeEach(() => {
-    cy = stubCytoscape();
+  beforeEach(async () => {
+    // Read the shared mock instance exposed by the vi.mock factory.
+    const mod = await import('cytoscape');
+    cy = (mod as any).__cyInstance;
+    // Reset captures between tests.
+    cy.__captured.added.length = 0;
+    for (const k of Object.keys(cy.__captured.handlers)) {
+      delete cy.__captured.handlers[k];
+    }
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    // @ts-expect-error cleanup
-    delete globalThis.cytoscape;
-    // @ts-expect-error cleanup
-    delete globalThis.cytoscapeCoseBilkent;
     vi.restoreAllMocks();
   });
 

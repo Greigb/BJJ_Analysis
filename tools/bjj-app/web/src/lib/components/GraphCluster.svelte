@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import cytoscape from 'cytoscape';
+  import coseBilkent from 'cytoscape-cose-bilkent';
   import type { GraphFilter, GraphPaths, GraphTaxonomy } from '$lib/types';
   import {
     buildCytoscapeElements,
@@ -7,6 +9,10 @@
     headPositionAt,
     type Point2D
   } from '$lib/graph-layout';
+
+  // Register the cose-bilkent layout extension exactly once, at module load.
+  // `cytoscape.use` is idempotent — duplicate calls are no-ops.
+  cytoscape.use(coseBilkent as unknown as cytoscape.Ext);
 
   let {
     variant,
@@ -26,23 +32,12 @@
 
   let host: HTMLDivElement | undefined = $state();
   let cy: any = null;          // Cytoscape instance
-  let coseRegistered = false;  // one-time registration
 
   const effectivePaths: GraphPaths = $derived(
     paths ?? { duration_s: null, paths: { greig: [], anthony: [] } }
   );
 
   // ---------- Cytoscape lifecycle ----------
-
-  function registerCoseOnce() {
-    if (coseRegistered) return;
-    // @ts-expect-error globals from CDN
-    if (typeof globalThis.cytoscape === 'function' && typeof globalThis.cytoscapeCoseBilkent === 'function') {
-      // @ts-expect-error cytoscape.use global
-      globalThis.cytoscape.use(globalThis.cytoscapeCoseBilkent);
-      coseRegistered = true;
-    }
-  }
 
   function baseStyle(): any[] {
     return [
@@ -165,13 +160,6 @@
 
   function mount() {
     if (!host) return;
-    // @ts-expect-error cytoscape global
-    const cytoscape = globalThis.cytoscape;
-    if (typeof cytoscape !== 'function') {
-      return; // CDN not loaded; graceful no-op
-    }
-
-    registerCoseOnce();
 
     const { nodes, edges } = buildCytoscapeElements(
       taxonomy,
