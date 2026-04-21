@@ -46,6 +46,56 @@ class ClaudeResponseError(Exception):
 _RETRY_BACKOFF_SECONDS = 2.0
 
 
+async def run_claude(
+    prompt: str,
+    *,
+    settings: Settings,
+    limiter: SlidingWindowLimiter,
+    stream_callback: StreamCallback | None = None,
+) -> str:
+    """Spawn claude -p with the given prompt, return raw assistant text.
+
+    Owns: rate-limit acquisition, subprocess spawn, stream-json stdout parsing,
+    one retry on non-zero exit with 2s backoff.
+    Does NOT own: prompt construction, caching, response schema validation.
+    Callers layer those on top.
+
+    Raises:
+      RateLimitedError  — limiter rejected the call; caller surfaces 429.
+      ClaudeProcessError — subprocess failed after retry.
+    """
+    wait = limiter.try_acquire()
+    if wait is not None:
+        raise RateLimitedError(retry_after_s=wait)
+
+    assistant_text: str | None = None
+    last_exit: int | None = None
+    cb: StreamCallback = stream_callback if stream_callback is not None else _noop_stream_callback
+    for attempt in range(2):
+        assistant_text, last_exit = await _run_once(
+            settings=settings, prompt=prompt, stream_callback=cb
+        )
+        if last_exit == 0 and assistant_text is not None:
+            break
+        if attempt == 0:
+            await asyncio.sleep(_RETRY_BACKOFF_SECONDS)
+
+    if last_exit != 0:
+        raise ClaudeProcessError(f"claude exited {last_exit}")
+
+    if assistant_text is None:
+        # Exit code was 0 but every result event had is_error=true — treat as
+        # a process-level failure so the caller sees a consistent error type.
+        raise ClaudeProcessError("claude exited 0 but all result events had is_error=true")
+
+    return assistant_text
+
+
+async def _noop_stream_callback(evt: dict) -> None:
+    """Default stream callback — discards stream events."""
+    return None
+
+
 async def analyse_frame(
     frame_path: Path,
     timestamp_s: float,
@@ -88,29 +138,14 @@ async def analyse_frame(
 
     await stream_callback({"stage": "cache", "hit": False})
 
-    # --- Rate limit (check BEFORE spawning, count toward the window) ---
-    wait = limiter.try_acquire()
-    if wait is not None:
-        raise RateLimitedError(retry_after_s=wait)
+    # --- Rate limit + spawn + retry — delegated to run_claude ---
+    assistant_text = await run_claude(
+        prompt,
+        settings=settings,
+        limiter=limiter,
+        stream_callback=stream_callback,
+    )
 
-    # --- Spawn with one retry on non-zero exit ---
-    assistant_text: str | None = None
-    last_exit: int | None = None
-    for attempt in range(2):
-        assistant_text, last_exit = await _run_once(
-            settings=settings, prompt=prompt, stream_callback=stream_callback
-        )
-        if last_exit == 0 and assistant_text is not None:
-            break
-        if attempt == 0:
-            await asyncio.sleep(_RETRY_BACKOFF_SECONDS)
-
-    if last_exit != 0:
-        raise ClaudeProcessError(f"claude exited {last_exit}")
-    if assistant_text is None:
-        # Exit code was 0 but every result event had is_error=true — treat as
-        # a process-level failure so the caller sees a consistent error type.
-        raise ClaudeProcessError("claude exited 0 but all result events had is_error=true")
     try:
         parsed = json.loads(assistant_text)
     except json.JSONDecodeError as exc:
