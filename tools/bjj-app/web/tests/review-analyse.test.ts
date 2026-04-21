@@ -231,4 +231,106 @@ describe('Review page — analyse flow', () => {
     const forceBody = JSON.parse(forceCall[1].body);
     expect(forceBody.force).toBe(true);
   });
+
+  it('mounts a mini graph below MomentDetail when a moment is selected', async () => {
+    const fetchMock = vi.fn();
+    // 1. GET roll detail (with moments + one analysed)
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...detailWithoutMoments(),
+        moments: [
+          {
+            id: 'm1',
+            frame_idx: 2,
+            timestamp_s: 2.0,
+            pose_delta: 0.5,
+            analyses: [
+              {
+                id: 'a1',
+                player: 'greig',
+                position_id: 'standing_neutral',
+                confidence: 0.9,
+                description: 'd',
+                coach_tip: 't'
+              },
+              {
+                id: 'a2',
+                player: 'anthony',
+                position_id: 'standing_neutral',
+                confidence: 0.9,
+                description: null,
+                coach_tip: null
+              }
+            ],
+            annotations: []
+          }
+        ]
+      })
+    });
+    // 2. GET /api/graph (taxonomy for mini graph)
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        categories: [{ id: 'standing', label: 'Standing', dominance: 0, tint: '#e6f2ff' }],
+        positions: [{ id: 'standing_neutral', name: 'Standing', category: 'standing' }],
+        transitions: []
+      })
+    });
+    // 3. GET /api/graph/paths/<id>
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        duration_s: 10,
+        paths: {
+          greig: [{ timestamp_s: 2, position_id: 'standing_neutral', moment_id: 'm1' }],
+          anthony: [{ timestamp_s: 2, position_id: 'standing_neutral', moment_id: 'm1' }]
+        }
+      })
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    // cytoscape stub so GraphCluster doesn't blow up when it mounts.
+    // @ts-expect-error global
+    globalThis.cytoscape = vi.fn(() => ({
+      on: vi.fn(), add: vi.fn(), remove: vi.fn(),
+      getElementById: vi.fn(() => ({ length: 0, style: vi.fn(), position: vi.fn(), addClass: vi.fn() })),
+      nodes: vi.fn(() => ({ forEach: vi.fn() })),
+      edges: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn(), length: 0, remove: vi.fn() })),
+      elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn(), remove: vi.fn() })),
+      layout: vi.fn(() => ({ run: vi.fn() })),
+      destroy: vi.fn()
+    }));
+    // @ts-expect-error global
+    globalThis.cytoscape.use = vi.fn();
+    // @ts-expect-error global
+    globalThis.cytoscapeCoseBilkent = () => {};
+
+    try {
+      const user = userEvent.setup();
+      const { default: Page } = await import('../src/routes/review/[id]/+page.svelte');
+      const { container } = render(Page);
+
+      await waitFor(() => {
+        expect(screen.getByText('Review analyse test')).toBeInTheDocument();
+      });
+
+      // Click the only chip.
+      await user.click(screen.getByRole('button', { name: /0:02/i }));
+
+      await waitFor(() => {
+        // Mini graph data-testid should appear.
+        const miniHost = container.querySelector('[data-graphcluster][data-variant="mini"]');
+        expect(miniHost).not.toBeNull();
+      });
+    } finally {
+      // @ts-expect-error cleanup
+      delete globalThis.cytoscape;
+      // @ts-expect-error cleanup
+      delete globalThis.cytoscapeCoseBilkent;
+    }
+  });
 });
