@@ -56,26 +56,48 @@
     <ul class="space-y-2">
       {#each rolls as roll (roll.id)}
         <li>
-          <a
-            href={`/review/${encodeURIComponent(roll.id)}`}
-            class="block rounded-lg border border-white/8 bg-white/[0.02] hover:bg-white/[0.05] p-4 transition-colors"
-          >
-            <div class="flex items-start justify-between gap-4">
-              <div class="min-w-0 flex-1">
-                <h2 class="text-base font-medium leading-tight truncate">{roll.title}</h2>
-                <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/55">
-                  <span>{roll.date}</span>
-                  {#if roll.partner}<span>{roll.partner}</span>{/if}
-                  {#if roll.duration}<span>{roll.duration}</span>{/if}
+          {#if roll.roll_id}
+            <a
+              href={`/review/${encodeURIComponent(roll.roll_id)}`}
+              class="block rounded-lg border border-white/8 bg-white/[0.02] hover:bg-white/[0.05] p-4 transition-colors"
+            >
+              <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0 flex-1">
+                  <h2 class="text-base font-medium leading-tight truncate">{roll.title}</h2>
+                  <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/55">
+                    <span>{roll.date}</span>
+                    {#if roll.partner}<span>{roll.partner}</span>{/if}
+                    {#if roll.duration}<span>{roll.duration}</span>{/if}
+                  </div>
                 </div>
+                <span
+                  class={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${resultBadgeClass(roll.result)}`}
+                >
+                  {resultLabel(roll.result)}
+                </span>
               </div>
-              <span
-                class={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${resultBadgeClass(roll.result)}`}
-              >
-                {resultLabel(roll.result)}
-              </span>
+            </a>
+          {:else}
+            <div
+              class="block rounded-lg border border-white/8 bg-white/[0.02] p-4 opacity-70 cursor-default"
+            >
+              <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0 flex-1">
+                  <h2 class="text-base font-medium leading-tight truncate">{roll.title}</h2>
+                  <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/55">
+                    <span>{roll.date}</span>
+                    {#if roll.partner}<span>{roll.partner}</span>{/if}
+                    {#if roll.duration}<span>{roll.duration}</span>{/if}
+                  </div>
+                </div>
+                <span
+                  class="shrink-0 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/50"
+                >
+                  md only
+                </span>
+              </div>
             </div>
-          </a>
+          {/if}
         </li>
       {/each}
     </ul>
