@@ -161,3 +161,85 @@ async def test_publish_returns_404_for_unknown_roll(
         response = await client.post("/api/rolls/no-such-roll/publish", json={})
 
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_publish_finalised_roll_writes_summary_sections_to_vault(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_project_root: Path,
+    short_video_path: Path,
+) -> None:
+    """Integration: finalised roll publishes with all six summary sections."""
+    import json
+    import time
+
+    tax_dir = tmp_project_root / "tools"
+    tax_dir.mkdir(exist_ok=True)
+    (tax_dir / "taxonomy.json").write_text(json.dumps({
+        "events": {},
+        "categories": {
+            "standing": {"label": "Standing", "dominance": 0, "visual_cues": "x"},
+            "guard_bottom": {"label": "Guard (Bottom)", "dominance": 1, "visual_cues": "y"},
+        },
+        "positions": [
+            {"id": "standing_neutral", "name": "Standing", "category": "standing", "visual_cues": "a"},
+            {"id": "closed_guard_bottom", "name": "CG Bottom", "category": "guard_bottom", "visual_cues": "b"},
+        ],
+        "valid_transitions": [],
+    }))
+
+    monkeypatch.setenv("BJJ_PROJECT_ROOT", str(tmp_project_root))
+    monkeypatch.setenv("BJJ_VAULT_ROOT", str(tmp_project_root))
+    monkeypatch.setenv("BJJ_DB_OVERRIDE", str(tmp_project_root / "test.db"))
+
+    from server.main import create_app
+
+    app = create_app()
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        roll_id, moment_id = await _upload_annotate(client, short_video_path)
+
+    from server.db import connect, set_summary_state
+
+    conn = connect(tmp_project_root / "test.db")
+    try:
+        rows = conn.execute(
+            "SELECT id FROM moments WHERE roll_id = ? ORDER BY timestamp_s", (roll_id,)
+        ).fetchall()
+        # Need at least 3 distinct moment_ids for key_moments validation.
+        if len(rows) < 3:
+            pytest.skip(f"fixture produced only {len(rows)} moments; need >= 3")
+        scores_payload = {
+            "summary": "Integration-test roll.",
+            "scores": {"guard_retention": 7, "positional_awareness": 6, "transition_quality": 8},
+            "top_improvements": ["one", "two", "three"],
+            "strengths": ["strong"],
+            "key_moments": [
+                {"moment_id": rows[0]["id"], "note": "first"},
+                {"moment_id": rows[1]["id"], "note": "second"},
+                {"moment_id": rows[2]["id"], "note": "third"},
+            ],
+        }
+        set_summary_state(
+            conn, roll_id=roll_id, scores_payload=scores_payload, finalised_at=int(time.time()),
+        )
+    finally:
+        conn.close()
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        response = await client.post(f"/api/rolls/{roll_id}/publish", json={})
+
+    assert response.status_code == 200
+    vault_path = tmp_project_root / response.json()["vault_path"]
+    text = vault_path.read_text()
+    assert "## Summary" in text
+    assert "Integration-test roll." in text
+    assert "## Scores" in text
+    assert "## Position Distribution" in text
+    assert "## Key Moments" in text
+    assert "## Top Improvements" in text
+    assert "## Strengths Observed" in text
+    assert "## Your Notes" in text
