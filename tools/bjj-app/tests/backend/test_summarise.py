@@ -197,3 +197,86 @@ def test_build_summary_prompt_includes_output_json_schema_keys():
         "moment_id",
     ):
         assert key in prompt
+
+
+# ---------- parse_summary_response ----------
+
+
+def _valid_payload() -> dict:
+    return {
+        "summary": "A good roll.",
+        "scores": {"guard_retention": 8, "positional_awareness": 6, "transition_quality": 7},
+        "top_improvements": ["a", "b", "c"],
+        "strengths": ["x", "y"],
+        "key_moments": [
+            {"moment_id": "m1", "note": "first"},
+            {"moment_id": "m2", "note": "second"},
+            {"moment_id": "m3", "note": "third"},
+        ],
+    }
+
+
+_VALID_IDS = {"m1", "m2", "m3", "m4"}
+
+
+def test_parse_summary_response_accepts_valid_payload():
+    raw = json.dumps(_valid_payload())
+    out = parse_summary_response(raw, _VALID_IDS)
+    assert out["summary"] == "A good roll."
+    assert out["scores"]["guard_retention"] == 8
+
+
+def test_parse_summary_response_rejects_non_json():
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response("not json", _VALID_IDS)
+
+
+def test_parse_summary_response_rejects_missing_top_level_keys():
+    payload = _valid_payload()
+    del payload["scores"]
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), _VALID_IDS)
+
+
+def test_parse_summary_response_clamps_out_of_range_scores():
+    payload = _valid_payload()
+    payload["scores"] = {"guard_retention": 42, "positional_awareness": -3, "transition_quality": 7}
+    out = parse_summary_response(json.dumps(payload), _VALID_IDS)
+    assert out["scores"]["guard_retention"] == 10
+    assert out["scores"]["positional_awareness"] == 0
+    assert out["scores"]["transition_quality"] == 7
+
+
+def test_parse_summary_response_rejects_key_moments_length_not_3():
+    payload = _valid_payload()
+    payload["key_moments"] = payload["key_moments"][:2]
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), _VALID_IDS)
+
+
+def test_parse_summary_response_rejects_hallucinated_moment_id():
+    payload = _valid_payload()
+    payload["key_moments"][0]["moment_id"] = "not-a-real-id"
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), _VALID_IDS)
+
+
+def test_parse_summary_response_rejects_duplicate_moment_ids():
+    payload = _valid_payload()
+    payload["key_moments"][1]["moment_id"] = payload["key_moments"][0]["moment_id"]
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), _VALID_IDS)
+
+
+def test_parse_summary_response_rejects_top_improvements_length_not_3():
+    payload = _valid_payload()
+    payload["top_improvements"] = ["a", "b"]
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), _VALID_IDS)
+
+
+def test_parse_summary_response_requires_strengths_non_empty():
+    payload = _valid_payload()
+    payload["strengths"] = []
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), _VALID_IDS)
