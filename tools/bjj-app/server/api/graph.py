@@ -1,7 +1,10 @@
 """Graph API — taxonomy skeleton, per-roll path arrays, vault position markdown."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+
+from server.config import Settings, load_settings
+from server.db import connect, get_analyses, get_moments, get_roll
 
 router = APIRouter(prefix="/api", tags=["graph"])
 
@@ -24,3 +27,40 @@ def get_vault_position(position_id: str, request: Request) -> dict:
             detail="No vault note for this position",
         )
     return dict(entry)
+
+
+@router.get("/graph/paths/{roll_id}")
+def get_graph_paths(
+    roll_id: str,
+    settings: Settings = Depends(load_settings),
+) -> dict:
+    """Return per-roll sparse paths for both players."""
+    conn = connect(settings.db_path)
+    try:
+        row = get_roll(conn, roll_id)
+        if row is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found"
+            )
+
+        moment_rows = get_moments(conn, roll_id)
+        greig: list[dict] = []
+        anthony: list[dict] = []
+        for m in moment_rows:
+            for a in get_analyses(conn, m["id"]):
+                entry = {
+                    "timestamp_s": m["timestamp_s"],
+                    "position_id": a["position_id"],
+                    "moment_id": m["id"],
+                }
+                if a["player"] == "greig":
+                    greig.append(entry)
+                elif a["player"] == "anthony":
+                    anthony.append(entry)
+
+        return {
+            "duration_s": row["duration_s"],
+            "paths": {"greig": greig, "anthony": anthony},
+        }
+    finally:
+        conn.close()
