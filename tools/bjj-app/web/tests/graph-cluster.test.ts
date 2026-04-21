@@ -58,12 +58,14 @@ const taxonomy: GraphTaxonomy = {
 
 const paths: GraphPaths = {
   duration_s: 60,
+  player_a_name: 'Greig',
+  player_b_name: 'Anthony',
   paths: {
-    greig: [
+    a: [
       { timestamp_s: 0, position_id: 'standing_neutral', moment_id: 'm1' },
       { timestamp_s: 30, position_id: 'closed_guard_bottom', moment_id: 'm2' }
     ],
-    anthony: []
+    b: []
   }
 };
 

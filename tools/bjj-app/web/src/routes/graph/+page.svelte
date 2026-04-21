@@ -120,6 +120,8 @@
       <FilterChips
         categories={taxonomy.categories}
         activeFilter={filter}
+        playerAName={paths?.player_a_name ?? 'Greig'}
+        playerBName={paths?.player_b_name ?? 'Anthony'}
         onfilterchange={onFilterChange}
       />
     {/if}
@@ -136,7 +138,7 @@
       <GraphCluster
         variant="full"
         taxonomy={taxonomy}
-        paths={paths ?? { duration_s: null, paths: { greig: [], anthony: [] } }}
+        paths={paths ?? { duration_s: null, player_a_name: 'Greig', player_b_name: 'Anthony', paths: { a: [], b: [] } }}
         scrubTimeS={scrubTimeS}
         filter={filter}
         onnodeclick={onNodeClick}

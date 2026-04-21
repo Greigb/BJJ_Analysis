@@ -44,23 +44,25 @@ def get_graph_paths(
             )
 
         moment_rows = get_moments(conn, roll_id)
-        greig: list[dict] = []
-        anthony: list[dict] = []
+        a: list[dict] = []
+        b: list[dict] = []
         for m in moment_rows:
-            for a in get_analyses(conn, m["id"]):
+            for an in get_analyses(conn, m["id"]):
                 entry = {
                     "timestamp_s": m["timestamp_s"],
-                    "position_id": a["position_id"],
+                    "position_id": an["position_id"],
                     "moment_id": m["id"],
                 }
-                if a["player"] == "greig":
-                    greig.append(entry)
-                elif a["player"] == "anthony":
-                    anthony.append(entry)
+                if an["player"] == "a":
+                    a.append(entry)
+                elif an["player"] == "b":
+                    b.append(entry)
 
         return {
             "duration_s": row["duration_s"],
-            "paths": {"greig": greig, "anthony": anthony},
+            "player_a_name": row["player_a_name"] or "Greig",
+            "player_b_name": row["player_b_name"] or "Anthony",
+            "paths": {"a": a, "b": b},
         }
     finally:
         conn.close()

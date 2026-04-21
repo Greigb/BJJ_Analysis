@@ -108,10 +108,10 @@ def _settings_with(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, taxonomy: Pa
 
 _ASSISTANT_OK = {
     "timestamp": 17.0,
-    "greig": {"position": "closed_guard_bottom", "confidence": 0.82},
-    "anthony": {"position": "closed_guard_top", "confidence": 0.78},
-    "description": "Greig is working from closed guard.",
-    "coach_tip": "Break Anthony's posture before attacking.",
+    "player_a": {"position": "closed_guard_bottom", "confidence": 0.82},
+    "player_b": {"position": "closed_guard_top", "confidence": 0.78},
+    "description": "Player A is working from closed guard.",
+    "coach_tip": "Break Player B's posture before attacking.",
 }
 
 
@@ -151,8 +151,8 @@ async def test_analyse_frame_happy_path_streams_and_returns_parsed_result(
         cache_conn=cache_conn,
     )
 
-    assert result["greig"]["position"] == "closed_guard_bottom"
-    assert result["anthony"]["position"] == "closed_guard_top"
+    assert result["player_a"]["position"] == "closed_guard_bottom"
+    assert result["player_b"]["position"] == "closed_guard_top"
     # At least one streaming event was surfaced.
     assert any(e.get("stage") == "streaming" for e in received)
     # The CLI was spawned exactly once with the Claude binary.

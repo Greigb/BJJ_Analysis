@@ -77,10 +77,10 @@ async def test_live_claude_returns_parseable_analysis(
     )
 
     print(f"\n--- Live Claude result ---\n{json.dumps(result, indent=2)}\n")
-    assert "greig" in result
-    assert "anthony" in result
-    assert result["greig"]["position"]
-    assert result["anthony"]["position"]
+    assert "player_a" in result
+    assert "player_b" in result
+    assert result["player_a"]["position"]
+    assert result["player_b"]["position"]
     assert any(e.get("stage") == "streaming" for e in streamed) or any(
         e.get("stage") == "cache" for e in streamed
     )

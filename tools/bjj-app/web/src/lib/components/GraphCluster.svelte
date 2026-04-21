@@ -34,7 +34,7 @@
   let cy: any = null;          // Cytoscape instance
 
   const effectivePaths: GraphPaths = $derived(
-    paths ?? { duration_s: null, paths: { greig: [], anthony: [] } }
+    paths ?? { duration_s: null, player_a_name: 'Greig', player_b_name: 'Anthony', paths: { a: [], b: [] } }
   );
 
   // ---------- Cytoscape lifecycle ----------
@@ -86,7 +86,7 @@
         }
       },
       {
-        selector: 'edge.path-greig',
+        selector: 'edge.path-a',
         style: {
           width: 3,
           'line-color': 'rgba(255,255,255,0.85)',
@@ -96,7 +96,7 @@
         }
       },
       {
-        selector: 'edge.path-anthony',
+        selector: 'edge.path-b',
         style: {
           width: 3,
           'line-color': 'rgba(244,63,94,0.85)',
@@ -110,7 +110,7 @@
         style: { opacity: 0.2 }
       },
       {
-        selector: '#head-greig',
+        selector: '#head-a',
         style: {
           'background-color': '#ffffff',
           width: 14,
@@ -121,7 +121,7 @@
         }
       },
       {
-        selector: '#head-anthony',
+        selector: '#head-b',
         style: {
           'background-color': '#f43f5e',
           width: 14,
@@ -144,7 +144,7 @@
         style: { opacity: 0.35 }
       },
       {
-        selector: '.mini-bg edge.path-greig, .mini-bg edge.path-anthony',
+        selector: '.mini-bg edge.path-a, .mini-bg edge.path-b',
         style: { 'line-style': 'dashed' }
       },
       {
@@ -201,8 +201,8 @@
 
     // Add player head markers (invisible initially; updated via effect).
     cy.add([
-      { data: { id: 'head-greig' }, position: { x: 0, y: 0 }, classes: 'head' },
-      { data: { id: 'head-anthony' }, position: { x: 0, y: 0 }, classes: 'head' }
+      { data: { id: 'head-a' }, position: { x: 0, y: 0 }, classes: 'head' },
+      { data: { id: 'head-b' }, position: { x: 0, y: 0 }, classes: 'head' }
     ]);
 
     // Layout the taxonomy nodes. Must run AFTER cy.add(), because the
@@ -229,14 +229,14 @@
   function rebuildElements() {
     if (!cy) return;
     // Remove only path overlay edges + head markers; keep taxonomy intact.
-    cy.remove('edge.path-greig, edge.path-anthony');
+    cy.remove('edge.path-a, edge.path-b');
     const { edges: newEdges } = buildCytoscapeElements(
       taxonomy,
       effectivePaths,
       variant === 'mini' ? scrubTimeS : undefined
     );
     const overlayEdges = newEdges.filter(
-      (e) => e.classes === 'path-greig' || e.classes === 'path-anthony'
+      (e) => e.classes === 'path-a' || e.classes === 'path-b'
     );
     const miniClass = variant === 'mini' ? ' mini-bg' : '';
     const taggedOverlays = overlayEdges.map((e) => ({
@@ -256,8 +256,8 @@
     });
 
     for (const [who, path] of [
-      ['greig', effectivePaths.paths.greig],
-      ['anthony', effectivePaths.paths.anthony]
+      ['a', effectivePaths.paths.a],
+      ['b', effectivePaths.paths.b]
     ] as const) {
       const head = cy.getElementById(`head-${who}`);
       if (!head || head.length === 0) continue;
@@ -287,7 +287,7 @@
       cy.edges('.taxonomy').addClass('dim');
       cy.edges('.path-greig, .path-anthony').addClass('dim');
     } else if (filter.kind === 'player') {
-      const other = filter.who === 'greig' ? 'anthony' : 'greig';
+      const other = filter.who === 'a' ? 'b' : 'a';
       cy.edges(`.path-${other}`).addClass('dim');
       const otherHead = cy.getElementById(`head-${other}`);
       if (otherHead && otherHead.length > 0) otherHead.addClass('dim');
@@ -298,12 +298,12 @@
     if (!cy || variant !== 'mini') return;
     cy.nodes('.current-moment').removeClass('current-moment');
     const ids = currentPositionIds(effectivePaths, scrubTimeS);
-    if (ids.greig) {
-      const n = cy.getElementById(ids.greig);
+    if (ids.a) {
+      const n = cy.getElementById(ids.a);
       if (n && n.length > 0) n.addClass('current-moment');
     }
-    if (ids.anthony) {
-      const n = cy.getElementById(ids.anthony);
+    if (ids.b) {
+      const n = cy.getElementById(ids.b);
       if (n && n.length > 0) n.addClass('current-moment');
     }
   }

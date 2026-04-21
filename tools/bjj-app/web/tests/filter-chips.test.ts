@@ -49,7 +49,7 @@ describe('FilterChips', () => {
       onfilterchange
     });
     await user.click(screen.getByRole('button', { name: /^greig$/i }));
-    expect(onfilterchange).toHaveBeenCalledWith({ kind: 'player', who: 'greig' });
+    expect(onfilterchange).toHaveBeenCalledWith({ kind: 'player', who: 'a' });
   });
 
   it('calls onfilterchange with {kind:"all"} when "All" is clicked', async () => {

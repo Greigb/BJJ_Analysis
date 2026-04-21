@@ -91,23 +91,25 @@ async def analyse_moment(
                 settings=settings,
                 limiter=limiter,
                 cache_conn=cache_conn,
+                player_a_name=roll_row["player_a_name"] or "Greig",
+                player_b_name=roll_row["player_b_name"] or "Anthony",
             )
-            # Persist analyses (per-player rows; description+coach_tip on greig only).
+            # Persist analyses (per-player rows; description+coach_tip on player_a only).
             insert_analyses(
                 cache_conn,
                 moment_id=moment["id"],
                 players=[
                     {
-                        "player": "greig",
-                        "position_id": result["greig"]["position"],
-                        "confidence": result["greig"].get("confidence"),
+                        "player": "a",
+                        "position_id": result["player_a"]["position"],
+                        "confidence": result["player_a"].get("confidence"),
                         "description": result.get("description"),
                         "coach_tip": result.get("coach_tip"),
                     },
                     {
-                        "player": "anthony",
-                        "position_id": result["anthony"]["position"],
-                        "confidence": result["anthony"].get("confidence"),
+                        "player": "b",
+                        "position_id": result["player_b"]["position"],
+                        "confidence": result["player_b"].get("confidence"),
                         "description": None,
                         "coach_tip": None,
                     },

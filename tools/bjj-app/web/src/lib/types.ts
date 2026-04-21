@@ -10,7 +10,7 @@ export type RollSummary = {
 
 export type Analysis = {
   id: string;
-  player: 'greig' | 'anthony';
+  player: 'a' | 'b';
   position_id: string;
   confidence: number | null;
   description: string | null;
@@ -42,6 +42,8 @@ export type RollDetail = {
   video_url: string;
   vault_path: string | null;
   vault_published_at: number | null;
+  player_a_name: string;
+  player_b_name: string;
   moments: Moment[];
 };
 
@@ -49,6 +51,8 @@ export type CreateRollInput = {
   title: string;
   date: string;
   partner?: string;
+  player_a_name?: string;
+  player_b_name?: string;
   video: File;
 };
 
@@ -69,8 +73,8 @@ export type AnalyseMomentEvent =
       cached: boolean;
       analysis: {
         timestamp: number;
-        greig: { position: string; confidence: number };
-        anthony: { position: string; confidence: number };
+        player_a: { position: string; confidence: number };
+        player_b: { position: string; confidence: number };
         description: string;
         coach_tip: string;
       };
@@ -128,9 +132,11 @@ export type PathPoint = {
 
 export type GraphPaths = {
   duration_s: number | null;
+  player_a_name: string;
+  player_b_name: string;
   paths: {
-    greig: PathPoint[];
-    anthony: PathPoint[];
+    a: PathPoint[];
+    b: PathPoint[];
   };
 };
 
@@ -144,4 +150,4 @@ export type PositionNote = {
 export type GraphFilter =
   | { kind: 'all' }
   | { kind: 'category'; id: string }
-  | { kind: 'player'; who: 'greig' | 'anthony' };
+  | { kind: 'player'; who: 'a' | 'b' };

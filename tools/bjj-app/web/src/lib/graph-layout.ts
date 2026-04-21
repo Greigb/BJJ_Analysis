@@ -32,7 +32,7 @@ export function lerp(a: number, b: number, t: number): number {
  *   - One compound parent node per category, id `cat:<category_id>`, data.isCategory=true, data.tint=<hex>.
  *   - One position node per taxonomy position, parented by `cat:<category>`, data.label=<name>.
  *   - One edge per taxonomy transition, class `taxonomy`.
- *   - For each non-empty player path: one overlay edge per consecutive pair, class `path-greig` or `path-anthony`.
+ *   - For each non-empty player path: one overlay edge per consecutive pair, class `path-a` or `path-b`.
  */
 export function buildCytoscapeElements(
   taxonomy: GraphTaxonomy,
@@ -75,8 +75,8 @@ export function buildCytoscapeElements(
   }
 
   for (const [who, allPoints] of [
-    ['greig', paths.paths.greig],
-    ['anthony', paths.paths.anthony]
+    ['a', paths.paths.a],
+    ['b', paths.paths.b]
   ] as const) {
     const points =
       maxTimeS === undefined
@@ -157,7 +157,7 @@ export function headPositionAt(
 export function currentPositionIds(
   paths: GraphPaths,
   scrubTimeS: number
-): { greig: string | null; anthony: string | null } {
+): { a: string | null; b: string | null } {
   function last(pts: Array<{ timestamp_s: number; position_id: string }>): string | null {
     let id: string | null = null;
     for (const p of pts) {
@@ -167,7 +167,7 @@ export function currentPositionIds(
     return id;
   }
   return {
-    greig: last(paths.paths.greig),
-    anthony: last(paths.paths.anthony)
+    a: last(paths.paths.a),
+    b: last(paths.paths.b)
   };
 }

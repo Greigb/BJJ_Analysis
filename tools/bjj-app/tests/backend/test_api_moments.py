@@ -43,8 +43,8 @@ async def _upload_and_analyse(
 
 _FAKE_RESULT = {
     "timestamp": 1.0,
-    "greig": {"position": "closed_guard_bottom", "confidence": 0.9},
-    "anthony": {"position": "closed_guard_top", "confidence": 0.85},
+    "player_a": {"position": "closed_guard_bottom", "confidence": 0.9},
+    "player_b": {"position": "closed_guard_top", "confidence": 0.85},
     "description": "Closed guard.",
     "coach_tip": "Break posture.",
 }
@@ -63,7 +63,7 @@ async def test_moment_analyse_streams_and_persists(
     # Patch claude_cli.analyse_frame where api.moments imports it from.
     async def fake_analyse_frame(frame_path, timestamp_s, stream_callback, **kw):
         await stream_callback({"stage": "cache", "hit": False})
-        await stream_callback({"stage": "streaming", "text": '{"greig":'})
+        await stream_callback({"stage": "streaming", "text": '{"player_a":'})
         return _FAKE_RESULT
 
     import server.api.moments as moments_mod
@@ -90,7 +90,7 @@ async def test_moment_analyse_streams_and_persists(
     stages = [e["stage"] for e in events]
     assert stages[0] == "cache"
     assert stages[-1] == "done"
-    assert events[-1]["analysis"]["greig"]["position"] == "closed_guard_bottom"
+    assert events[-1]["analysis"]["player_a"]["position"] == "closed_guard_bottom"
 
     # After the stream, the moment's analyses are persisted in the DB.
     async with AsyncClient(
@@ -100,7 +100,7 @@ async def test_moment_analyse_streams_and_persists(
     body = detail.json()
     target = next(m for m in body["moments"] if m["frame_idx"] == first_frame_idx)
     players = sorted(a["player"] for a in target["analyses"])
-    assert players == ["anthony", "greig"]
+    assert players == ["a", "b"]
 
 
 @pytest.mark.asyncio

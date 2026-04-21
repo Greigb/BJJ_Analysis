@@ -54,6 +54,8 @@ async def analyse_frame(
     settings: Settings,
     limiter: SlidingWindowLimiter,
     cache_conn: sqlite3.Connection,
+    player_a_name: str = "Greig",
+    player_b_name: str = "Anthony",
 ) -> AnalysisResult:
     """Classify one frame with Claude Opus 4.7. See module docstring."""
     # --- Security invariant: frame must live inside the project root ---
@@ -73,6 +75,8 @@ async def analyse_frame(
         frame_path=frame_resolved,
         taxonomy_path=settings.taxonomy_path,
         timestamp_s=timestamp_s,
+        player_a_name=player_a_name,
+        player_b_name=player_b_name,
     )
     prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
     frame_hash = _hash_file(frame_resolved)
@@ -203,10 +207,10 @@ def _hash_file(path: Path, chunk_size: int = 1 << 16) -> str:
 
 def _validate_shape(parsed: dict) -> None:
     """Raise ClaudeResponseError if the JSON doesn't match the expected schema."""
-    for key in ("greig", "anthony", "description", "coach_tip"):
+    for key in ("player_a", "player_b", "description", "coach_tip"):
         if key not in parsed:
             raise ClaudeResponseError(f"missing key: {key}")
-    for player in ("greig", "anthony"):
+    for player in ("player_a", "player_b"):
         sub = parsed[player]
         if not isinstance(sub, dict) or "position" not in sub or "confidence" not in sub:
             raise ClaudeResponseError(f"malformed player subobject: {player}")

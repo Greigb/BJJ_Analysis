@@ -264,6 +264,8 @@
         <MomentDetail
           rollId={roll.id}
           moment={selectedMoment}
+          playerAName={roll.player_a_name}
+          playerBName={roll.player_b_name}
           onanalysed={onMomentAnalysed}
           onannotated={onMomentAnnotated}
         />

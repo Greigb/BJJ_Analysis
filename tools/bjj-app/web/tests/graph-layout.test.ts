@@ -23,7 +23,9 @@ const tinyTaxonomy: GraphTaxonomy = {
 
 const emptyPaths: GraphPaths = {
   duration_s: 60,
-  paths: { greig: [], anthony: [] }
+  player_a_name: 'Greig',
+  player_b_name: 'Anthony',
+  paths: { a: [], b: [] }
 };
 
 function path(points: Array<[number, string]>): PathPoint[] {
@@ -76,17 +78,19 @@ describe('buildCytoscapeElements', () => {
   it('emits path overlay edges for each consecutive pair of analysed moments', () => {
     const paths: GraphPaths = {
       duration_s: 60,
+      player_a_name: 'Greig',
+      player_b_name: 'Anthony',
       paths: {
-        greig: path([
+        a: path([
           [3, 'standing_neutral'],
           [10, 'closed_guard_bottom'],
           [30, 'half_guard_bottom']
         ]),
-        anthony: []
+        b: []
       }
     };
     const { edges } = buildCytoscapeElements(tinyTaxonomy, paths);
-    const overlay = edges.filter((e) => e.classes === 'path-greig');
+    const overlay = edges.filter((e) => e.classes === 'path-a');
     expect(overlay.length).toBe(2);
     expect(overlay[0].data.source).toBe('standing_neutral');
     expect(overlay[0].data.target).toBe('closed_guard_bottom');
@@ -97,14 +101,16 @@ describe('buildCytoscapeElements', () => {
   it('does not emit overlay edges for a path with fewer than 2 points', () => {
     const paths: GraphPaths = {
       duration_s: 60,
+      player_a_name: 'Greig',
+      player_b_name: 'Anthony',
       paths: {
-        greig: path([[3, 'standing_neutral']]),
-        anthony: []
+        a: path([[3, 'standing_neutral']]),
+        b: []
       }
     };
     const { edges } = buildCytoscapeElements(tinyTaxonomy, paths);
     const overlay = edges.filter(
-      (e) => e.classes === 'path-greig' || e.classes === 'path-anthony'
+      (e) => e.classes === 'path-a' || e.classes === 'path-b'
     );
     expect(overlay.length).toBe(0);
   });
@@ -164,12 +170,14 @@ describe('headPositionAt', () => {
 describe('currentPositionIds', () => {
   const paths: GraphPaths = {
     duration_s: 60,
+    player_a_name: 'Greig',
+    player_b_name: 'Anthony',
     paths: {
-      greig: [
+      a: [
         { timestamp_s: 5, position_id: 'standing_neutral', moment_id: 'g1' },
         { timestamp_s: 20, position_id: 'closed_guard_bottom', moment_id: 'g2' }
       ],
-      anthony: [
+      b: [
         { timestamp_s: 5, position_id: 'standing_neutral', moment_id: 'a1' }
       ]
     }
@@ -177,22 +185,22 @@ describe('currentPositionIds', () => {
 
   it('returns null for players with no points before scrubTimeS', () => {
     const ids = currentPositionIds(paths, 2);
-    expect(ids).toEqual({ greig: null, anthony: null });
+    expect(ids).toEqual({ a: null, b: null });
   });
 
   it('returns the last position each player was at as of scrubTimeS', () => {
     const ids = currentPositionIds(paths, 10);
     expect(ids).toEqual({
-      greig: 'standing_neutral',
-      anthony: 'standing_neutral'
+      a: 'standing_neutral',
+      b: 'standing_neutral'
     });
   });
 
-  it('advances greig to closed_guard_bottom after his second point', () => {
+  it('advances player a to closed_guard_bottom after their second point', () => {
     const ids = currentPositionIds(paths, 25);
     expect(ids).toEqual({
-      greig: 'closed_guard_bottom',
-      anthony: 'standing_neutral'
+      a: 'closed_guard_bottom',
+      b: 'standing_neutral'
     });
   });
 });

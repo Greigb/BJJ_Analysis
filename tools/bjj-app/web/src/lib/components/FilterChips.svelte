@@ -4,10 +4,14 @@
   let {
     categories,
     activeFilter,
+    playerAName = 'Greig',
+    playerBName = 'Anthony',
     onfilterchange
   }: {
     categories: GraphCategory[];
     activeFilter: GraphFilter;
+    playerAName?: string;
+    playerBName?: string;
     onfilterchange: (filter: GraphFilter) => void;
   } = $props();
 
@@ -51,24 +55,24 @@
 
   <button
     type="button"
-    aria-pressed={isActive('player', 'greig')}
-    onclick={() => onfilterchange({ kind: 'player', who: 'greig' })}
+    aria-pressed={isActive('player', 'a')}
+    onclick={() => onfilterchange({ kind: 'player', who: 'a' })}
     class="rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-wider transition-colors
-           {isActive('player', 'greig')
+           {isActive('player', 'a')
              ? 'bg-white/20 border-white/40 text-white'
              : 'border-white/15 text-white/55 hover:bg-white/5'}"
   >
-    Greig
+    {playerAName}
   </button>
   <button
     type="button"
-    aria-pressed={isActive('player', 'anthony')}
-    onclick={() => onfilterchange({ kind: 'player', who: 'anthony' })}
+    aria-pressed={isActive('player', 'b')}
+    onclick={() => onfilterchange({ kind: 'player', who: 'b' })}
     class="rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-wider transition-colors
-           {isActive('player', 'anthony')
+           {isActive('player', 'b')
              ? 'bg-rose-500/30 border-rose-400/50 text-rose-100'
              : 'border-white/15 text-white/55 hover:bg-white/5'}"
   >
-    Anthony
+    {playerBName}
   </button>
 </div>

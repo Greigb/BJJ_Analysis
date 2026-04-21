@@ -98,7 +98,9 @@ describe('/graph page', () => {
       status: 200,
       json: async () => ({
         duration_s: 60,
-        paths: { greig: [], anthony: [] }
+        player_a_name: 'Greig',
+        player_b_name: 'Anthony',
+        paths: { a: [], b: [] }
       })
     });
     vi.stubGlobal('fetch', fetchMock);

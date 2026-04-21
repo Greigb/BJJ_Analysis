@@ -69,7 +69,7 @@ def test_build_prompt_references_the_frame_path(tiny_taxonomy: Path, tmp_path: P
     prompt = build_prompt(frame_path=frame, taxonomy_path=tiny_taxonomy, timestamp_s=17.0)
     assert str(frame) in prompt
     # Output schema keys must be spelled in the prompt so the model learns them.
-    for key in ("timestamp", "greig", "anthony", "position", "confidence",
+    for key in ("timestamp", "player_a", "player_b", "position", "confidence",
                 "description", "coach_tip"):
         assert key in prompt
 

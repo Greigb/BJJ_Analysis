@@ -57,9 +57,9 @@ def _seed_roll_with_analyses(db_path: Path) -> tuple[str, str, str]:
     insert_analyses(
         conn, moment_id=moments[0]["id"],
         players=[
-            {"player": "greig", "position_id": "closed_guard_bottom", "confidence": 0.9,
+            {"player": "a", "position_id": "closed_guard_bottom", "confidence": 0.9,
              "description": "d", "coach_tip": "t"},
-            {"player": "anthony", "position_id": "closed_guard_top", "confidence": 0.88,
+            {"player": "b", "position_id": "closed_guard_top", "confidence": 0.88,
              "description": None, "coach_tip": None},
         ],
         claude_version="test",
@@ -67,9 +67,9 @@ def _seed_roll_with_analyses(db_path: Path) -> tuple[str, str, str]:
     insert_analyses(
         conn, moment_id=moments[1]["id"],
         players=[
-            {"player": "greig", "position_id": "half_guard_bottom", "confidence": 0.82,
+            {"player": "a", "position_id": "half_guard_bottom", "confidence": 0.82,
              "description": "d", "coach_tip": "t"},
-            {"player": "anthony", "position_id": "half_guard_top", "confidence": 0.8,
+            {"player": "b", "position_id": "half_guard_top", "confidence": 0.8,
              "description": None, "coach_tip": None},
         ],
         claude_version="test",
@@ -100,13 +100,13 @@ async def test_get_graph_paths_returns_sorted_sequences(
     assert response.status_code == 200
     body = response.json()
     assert body["duration_s"] == 45.0
-    greig = body["paths"]["greig"]
-    anthony = body["paths"]["anthony"]
-    assert [p["position_id"] for p in greig] == ["closed_guard_bottom", "half_guard_bottom"]
-    assert [p["position_id"] for p in anthony] == ["closed_guard_top", "half_guard_top"]
+    a = body["paths"]["a"]
+    b = body["paths"]["b"]
+    assert [p["position_id"] for p in a] == ["closed_guard_bottom", "half_guard_bottom"]
+    assert [p["position_id"] for p in b] == ["closed_guard_top", "half_guard_top"]
     # Must be sorted by timestamp_s
-    assert greig[0]["timestamp_s"] == 3.0
-    assert greig[1]["timestamp_s"] == 12.0
+    assert a[0]["timestamp_s"] == 3.0
+    assert a[1]["timestamp_s"] == 12.0
 
 
 @pytest.mark.asyncio
@@ -141,8 +141,8 @@ async def test_get_graph_paths_returns_empty_when_no_analyses(
 
     assert response.status_code == 200
     body = response.json()
-    assert body["paths"]["greig"] == []
-    assert body["paths"]["anthony"] == []
+    assert body["paths"]["a"] == []
+    assert body["paths"]["b"] == []
 
 
 @pytest.mark.asyncio
