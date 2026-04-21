@@ -143,3 +143,16 @@ def render_report_pdf(context: dict) -> bytes:
     html = env.get_template("report.html.j2").render(**context)
     css = CSS(filename=str(_TEMPLATE_DIR / "report.css"))
     return HTML(string=html, base_url=str(_TEMPLATE_DIR)).write_pdf(stylesheets=[css])
+
+
+def render_report_section_body(*, roll_id: str, generated_at: datetime) -> str:
+    """Return the markdown body for the `## Report` section.
+
+    Shape: Obsidian wikilink to the PDF, blank line, italic timestamp.
+    """
+    stamp = generated_at.strftime("%Y-%m-%d %H:%M UTC")
+    return (
+        f"[[assets/{roll_id}/report.pdf|Match report PDF]]\n"
+        f"\n"
+        f"*Generated {stamp}*"
+    )

@@ -273,3 +273,22 @@ class TestRenderReportPdf:
         pdf_bytes = render_report_pdf(_render_fixture_context())
         # Text-only Page 1 PDFs are typically 8-50KB; give a wide bound.
         assert 3_000 < len(pdf_bytes) < 500_000
+
+
+from server.export.pdf import render_report_section_body
+
+
+class TestRenderReportSectionBody:
+    def test_contains_obsidian_link(self):
+        body = render_report_section_body(
+            roll_id="abcdef1234567890abcdef1234567890",
+            generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
+        )
+        assert "[[assets/abcdef1234567890abcdef1234567890/report.pdf|Match report PDF]]" in body
+
+    def test_contains_generated_at(self):
+        body = render_report_section_body(
+            roll_id="abcdef1234567890abcdef1234567890",
+            generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
+        )
+        assert "*Generated 2026-04-21 14:32 UTC*" in body
