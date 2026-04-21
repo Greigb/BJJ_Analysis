@@ -130,3 +130,39 @@ def test_init_db_migrates_analyses_player_enum(tmp_path: Path):
     finally:
         conn.close()
     assert [(r["id"], r["player"]) for r in rows] == [("a1", "a"), ("a2", "b")]
+
+
+def test_init_db_renames_hardcoded_player_names_to_generic(tmp_path: Path):
+    """Rows with the old hardcoded Greig/Anthony defaults get rewritten to
+    Player A/Player B so nothing in the UI depends on specific names."""
+    db_path = tmp_path / "rename.db"
+    init_db(db_path)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "INSERT INTO rolls (id, title, date, video_path, created_at, "
+            "player_a_name, player_b_name) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            ("r-old", "legacy", "2026-01-01", "v.mp4", 1, "Greig", "Anthony"),
+        )
+        conn.execute(
+            "INSERT INTO rolls (id, title, date, video_path, created_at, "
+            "player_a_name, player_b_name) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            ("r-custom", "custom", "2026-01-02", "v.mp4", 2, "Alice", "Bob"),
+        )
+        conn.commit()
+
+    # Re-run init_db — backfill should rename defaults but leave custom names alone.
+    init_db(db_path)
+
+    conn = connect(db_path)
+    try:
+        rows = {
+            r["id"]: (r["player_a_name"], r["player_b_name"])
+            for r in conn.execute(
+                "SELECT id, player_a_name, player_b_name FROM rolls"
+            ).fetchall()
+        }
+    finally:
+        conn.close()
+
+    assert rows["r-old"] == ("Player A", "Player B")
+    assert rows["r-custom"] == ("Alice", "Bob")  # user-typed names preserved

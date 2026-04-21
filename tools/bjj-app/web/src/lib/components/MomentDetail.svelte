@@ -5,8 +5,8 @@
   let {
     rollId,
     moment,
-    playerAName = 'Greig',
-    playerBName = 'Anthony',
+    playerAName = 'Player A',
+    playerBName = 'Player B',
     onanalysed,
     onannotated
   }: {

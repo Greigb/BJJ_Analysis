@@ -54,8 +54,8 @@ async def analyse_frame(
     settings: Settings,
     limiter: SlidingWindowLimiter,
     cache_conn: sqlite3.Connection,
-    player_a_name: str = "Greig",
-    player_b_name: str = "Anthony",
+    player_a_name: str = "Player A",
+    player_b_name: str = "Player B",
 ) -> AnalysisResult:
     """Classify one frame with Claude Opus 4.7. See module docstring."""
     # --- Security invariant: frame must live inside the project root ---

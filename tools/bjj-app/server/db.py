@@ -102,12 +102,19 @@ def _migrate_analyses_player_enum(conn: sqlite3.Connection) -> None:
 
 
 def _backfill_default_player_names(conn: sqlite3.Connection) -> None:
-    """Default any pre-migration roll to Greig/Anthony for the display labels."""
+    """Default any pre-migration roll to Player A/Player B for the display labels.
+
+    Also rewrites the old hardcoded "Greig"/"Anthony" defaults (seeded by an
+    earlier migration) so no user-visible text depends on specific names.
+    Idempotent.
+    """
     conn.execute(
-        "UPDATE rolls SET player_a_name = 'Greig' WHERE player_a_name IS NULL"
+        "UPDATE rolls SET player_a_name = 'Player A' "
+        "WHERE player_a_name IS NULL OR player_a_name = 'Greig'"
     )
     conn.execute(
-        "UPDATE rolls SET player_b_name = 'Anthony' WHERE player_b_name IS NULL"
+        "UPDATE rolls SET player_b_name = 'Player B' "
+        "WHERE player_b_name IS NULL OR player_b_name = 'Anthony'"
     )
 
 
@@ -141,8 +148,8 @@ def create_roll(
     partner: str | None,
     result: str,
     created_at: int,
-    player_a_name: str = "Greig",
-    player_b_name: str = "Anthony",
+    player_a_name: str = "Player A",
+    player_b_name: str = "Player B",
 ) -> sqlite3.Row:
     """Insert a roll row and return it. Callers pass an open connection."""
     conn.execute(

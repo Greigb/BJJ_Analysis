@@ -23,8 +23,8 @@ const tinyTaxonomy: GraphTaxonomy = {
 
 const emptyPaths: GraphPaths = {
   duration_s: 60,
-  player_a_name: 'Greig',
-  player_b_name: 'Anthony',
+  player_a_name: 'Player A',
+  player_b_name: 'Player B',
   paths: { a: [], b: [] }
 };
 

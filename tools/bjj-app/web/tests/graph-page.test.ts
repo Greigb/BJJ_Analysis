@@ -98,8 +98,8 @@ describe('/graph page', () => {
       status: 200,
       json: async () => ({
         duration_s: 60,
-        player_a_name: 'Greig',
-        player_b_name: 'Anthony',
+        player_a_name: 'Player A',
+        player_b_name: 'Player B',
         paths: { a: [], b: [] }
       })
     });

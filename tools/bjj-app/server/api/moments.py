@@ -91,8 +91,8 @@ async def analyse_moment(
                 settings=settings,
                 limiter=limiter,
                 cache_conn=cache_conn,
-                player_a_name=roll_row["player_a_name"] or "Greig",
-                player_b_name=roll_row["player_b_name"] or "Anthony",
+                player_a_name=roll_row["player_a_name"] or "Player A",
+                player_b_name=roll_row["player_b_name"] or "Player B",
             )
             # Persist analyses (per-player rows; description+coach_tip on player_a only).
             insert_analyses(

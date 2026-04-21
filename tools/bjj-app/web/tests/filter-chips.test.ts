@@ -24,8 +24,8 @@ describe('FilterChips', () => {
     expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^standing$/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /guard \(bottom\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^greig$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^anthony$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^player a$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^player b$/i })).toBeInTheDocument();
   });
 
   it('calls onfilterchange with category filter when a category chip is clicked', async () => {
@@ -48,7 +48,7 @@ describe('FilterChips', () => {
       activeFilter: { kind: 'all' },
       onfilterchange
     });
-    await user.click(screen.getByRole('button', { name: /^greig$/i }));
+    await user.click(screen.getByRole('button', { name: /^player a$/i }));
     expect(onfilterchange).toHaveBeenCalledWith({ kind: 'player', who: 'a' });
   });
 

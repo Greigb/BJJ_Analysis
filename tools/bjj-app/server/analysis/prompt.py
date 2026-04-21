@@ -59,8 +59,8 @@ def build_prompt(
     frame_path: Path,
     taxonomy_path: Path,
     timestamp_s: float,
-    player_a_name: str = "Greig",
-    player_b_name: str = "Anthony",
+    player_a_name: str = "Player A",
+    player_b_name: str = "Player B",
 ) -> str:
     """Construct the single-frame classification prompt. Deterministic."""
     if not frame_path.exists():

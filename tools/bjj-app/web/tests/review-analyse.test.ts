@@ -49,8 +49,8 @@ function detailWithoutMoments() {
     video_url: '/assets/abc123/source.mp4',
     vault_path: null,
     vault_published_at: null,
-    player_a_name: 'Greig',
-    player_b_name: 'Anthony',
+    player_a_name: 'Player A',
+    player_b_name: 'Player B',
     moments: []
   };
 }
@@ -317,8 +317,8 @@ describe('Review page — analyse flow', () => {
       status: 200,
       json: async () => ({
         duration_s: 10,
-        player_a_name: 'Greig',
-        player_b_name: 'Anthony',
+        player_a_name: 'Player A',
+        player_b_name: 'Player B',
         paths: {
           a: [{ timestamp_s: 2, position_id: 'standing_neutral', moment_id: 'm1' }],
           b: [{ timestamp_s: 2, position_id: 'standing_neutral', moment_id: 'm1' }]

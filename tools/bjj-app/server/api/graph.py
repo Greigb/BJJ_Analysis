@@ -60,8 +60,8 @@ def get_graph_paths(
 
         return {
             "duration_s": row["duration_s"],
-            "player_a_name": row["player_a_name"] or "Greig",
-            "player_b_name": row["player_b_name"] or "Anthony",
+            "player_a_name": row["player_a_name"] or "Player A",
+            "player_b_name": row["player_b_name"] or "Player B",
             "paths": {"a": a, "b": b},
         }
     finally:

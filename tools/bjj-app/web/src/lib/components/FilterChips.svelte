@@ -4,8 +4,8 @@
   let {
     categories,
     activeFilter,
-    playerAName = 'Greig',
-    playerBName = 'Anthony',
+    playerAName = 'Player A',
+    playerBName = 'Player B',
     onfilterchange
   }: {
     categories: GraphCategory[];
