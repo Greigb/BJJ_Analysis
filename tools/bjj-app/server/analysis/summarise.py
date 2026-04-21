@@ -142,6 +142,71 @@ def build_summary_prompt(
     return "\n\n".join(parts)
 
 
+_REQUIRED_SCORES = ("guard_retention", "positional_awareness", "transition_quality")
+
+
+def _clamp_score(value) -> int:
+    if not isinstance(value, (int, float)):
+        raise SummaryResponseError(f"score is not a number: {value!r}")
+    return max(0, min(10, int(round(value))))
+
+
 def parse_summary_response(raw: str, valid_moment_ids: set[str]) -> dict:
-    """Parse + validate Claude's summary JSON output. (stub — full impl in next step)"""
-    raise NotImplementedError
+    """Parse + validate Claude's summary JSON output. Raises SummaryResponseError."""
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise SummaryResponseError(f"not valid JSON: {raw[:200]!r}") from exc
+
+    if not isinstance(data, dict):
+        raise SummaryResponseError(f"expected an object, got {type(data).__name__}")
+
+    for key in ("summary", "scores", "top_improvements", "strengths", "key_moments"):
+        if key not in data:
+            raise SummaryResponseError(f"missing required key: {key}")
+
+    if not isinstance(data["summary"], str) or not data["summary"].strip():
+        raise SummaryResponseError("summary must be a non-empty string")
+
+    scores = data["scores"]
+    if not isinstance(scores, dict):
+        raise SummaryResponseError("scores must be an object")
+    for metric in _REQUIRED_SCORES:
+        if metric not in scores:
+            raise SummaryResponseError(f"missing score metric: {metric}")
+    data["scores"] = {m: _clamp_score(scores[m]) for m in _REQUIRED_SCORES}
+
+    ti = data["top_improvements"]
+    if not isinstance(ti, list) or len(ti) != 3:
+        raise SummaryResponseError("top_improvements must be a list of exactly 3 items")
+    for item in ti:
+        if not isinstance(item, str) or not item.strip():
+            raise SummaryResponseError("each top_improvements item must be a non-empty string")
+
+    st = data["strengths"]
+    if not isinstance(st, list) or len(st) == 0:
+        raise SummaryResponseError("strengths must be a non-empty list")
+    for item in st:
+        if not isinstance(item, str) or not item.strip():
+            raise SummaryResponseError("each strengths item must be a non-empty string")
+
+    km = data["key_moments"]
+    if not isinstance(km, list) or len(km) != 3:
+        raise SummaryResponseError("key_moments must be a list of exactly 3 items")
+    seen: set[str] = set()
+    for entry in km:
+        if not isinstance(entry, dict):
+            raise SummaryResponseError("each key_moments entry must be an object")
+        mid = entry.get("moment_id")
+        note = entry.get("note")
+        if not isinstance(mid, str) or not mid:
+            raise SummaryResponseError("key_moments[*].moment_id must be a non-empty string")
+        if mid in seen:
+            raise SummaryResponseError(f"duplicate key_moments moment_id: {mid}")
+        if mid not in valid_moment_ids:
+            raise SummaryResponseError(f"key_moments references unknown moment_id: {mid}")
+        if not isinstance(note, str) or not note.strip():
+            raise SummaryResponseError("key_moments[*].note must be a non-empty string")
+        seen.add(mid)
+
+    return data
