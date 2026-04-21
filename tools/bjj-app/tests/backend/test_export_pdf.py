@@ -88,9 +88,9 @@ def _fixture_scores():
     return {
         "summary": "Solid guard retention but limited offence from the bottom.",
         "scores": {
-            "position_control": 7,
-            "submission_threat": 3,
-            "defensive_resilience": 8,
+            "guard_retention": 7,
+            "positional_awareness": 3,
+            "transition_quality": 8,
         },
         "top_improvements": [
             "Chain sweeps from closed guard.",
@@ -101,9 +101,9 @@ def _fixture_scores():
             "Calm under pressure.",
         ],
         "key_moments": [
-            {"moment_id": "m1", "why": "First sweep attempt."},
-            {"moment_id": "m2", "why": "Passed half guard."},
-            {"moment_id": "m3", "why": "Back take attempt."},
+            {"moment_id": "m1", "note": "First sweep attempt."},
+            {"moment_id": "m2", "note": "Passed half guard."},
+            {"moment_id": "m3", "note": "Back take attempt."},
         ],
     }
 
@@ -154,9 +154,9 @@ class TestBuildReportContext:
             generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
         )
         assert ctx["scores"] == [
-            {"id": "position_control", "label": "Position Control", "value": 7, "bar_pct": 70, "color_bucket": "high"},
-            {"id": "submission_threat", "label": "Submission Threat", "value": 3, "bar_pct": 30, "color_bucket": "low"},
-            {"id": "defensive_resilience", "label": "Defensive Resilience", "value": 8, "bar_pct": 80, "color_bucket": "high"},
+            {"id": "guard_retention", "label": "Guard Retention", "value": 7, "bar_pct": 70, "color_bucket": "high"},
+            {"id": "positional_awareness", "label": "Positional Awareness", "value": 3, "bar_pct": 30, "color_bucket": "low"},
+            {"id": "transition_quality", "label": "Transition Quality", "value": 8, "bar_pct": 80, "color_bucket": "high"},
         ]
 
     def test_distribution_bar_uses_human_labels(self):
@@ -209,7 +209,7 @@ class TestBuildReportContext:
 
     def test_missing_key_moment_id_is_skipped(self):
         scores = _fixture_scores()
-        scores["key_moments"].append({"moment_id": "does-not-exist", "why": "should be dropped"})
+        scores["key_moments"].append({"moment_id": "does-not-exist", "note": "should be dropped"})
         ctx = build_report_context(
             roll=_fixture_roll(),
             scores=scores,
@@ -246,9 +246,9 @@ def _render_fixture_context():
         "moments_analysed_count": 3,
         "summary_sentence": "Solid guard retention but limited offence.",
         "scores": [
-            {"id": "position_control", "label": "Position Control", "value": 7, "bar_pct": 70, "color_bucket": "high"},
-            {"id": "submission_threat", "label": "Submission Threat", "value": 3, "bar_pct": 30, "color_bucket": "low"},
-            {"id": "defensive_resilience", "label": "Defensive Resilience", "value": 8, "bar_pct": 80, "color_bucket": "high"},
+            {"id": "guard_retention", "label": "Guard Retention", "value": 7, "bar_pct": 70, "color_bucket": "high"},
+            {"id": "positional_awareness", "label": "Positional Awareness", "value": 3, "bar_pct": 30, "color_bucket": "low"},
+            {"id": "transition_quality", "label": "Transition Quality", "value": 8, "bar_pct": 80, "color_bucket": "high"},
         ],
         "distribution_bar": [
             {"category_id": "guard_bottom", "label": "Guard bottom", "width_pct": 50, "color_class": "cat-guard-bottom"},

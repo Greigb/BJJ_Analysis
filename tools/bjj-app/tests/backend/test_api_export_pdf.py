@@ -86,13 +86,13 @@ def _setup_finalised_roll(db_path: Path, roll_id: str, project_root: Path) -> li
             scores_payload={
                 "summary": "Solid guard retention.",
                 "scores": {
-                    "position_control": 7,
-                    "submission_threat": 3,
-                    "defensive_resilience": 8,
+                    "guard_retention": 7,
+                    "positional_awareness": 3,
+                    "transition_quality": 8,
                 },
                 "top_improvements": ["Chain sweeps from closed guard."],
                 "strengths": ["Strong retention."],
-                "key_moments": [{"moment_id": m_id, "why": "First sweep attempt."}],
+                "key_moments": [{"moment_id": m_id, "note": "First sweep attempt."}],
             },
             finalised_at=1713700100,
         )

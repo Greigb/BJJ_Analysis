@@ -580,23 +580,15 @@ def render_summary_sections(
     # Summary
     summary = scores_payload["summary"].strip()
 
-    # Scores — render whichever metrics are present (M6a or M6b key format).
+    # Scores
     scores = scores_payload["scores"]
     score_rows = [
         "| Metric                 | Score |",
-        "|------------------------|-------|",
+        "| ---------------------- | ----- |",
     ] + [
         f"| {label:<22} | {scores[metric]}/10  |"
         for metric, label in _SCORE_METRIC_LABELS
-        if metric in scores
     ]
-    # Fall back to rendering all present keys if none of the known labels matched.
-    if len(score_rows) == 2:
-        _label_by_key = {k: v for k, v in _SCORE_METRIC_LABELS}
-        score_rows += [
-            f"| {_label_by_key.get(metric, metric.replace('_', ' ').title()):<22} | {value}/10  |"
-            for metric, value in scores.items()
-        ]
     scores_body = "\n".join(score_rows)
 
     # Position Distribution
@@ -626,7 +618,7 @@ def render_summary_sections(
     for km in scores_payload["key_moments"]:
         m = moments_by_id.get(km["moment_id"])
         mm_ss = _format_mm_ss(m["timestamp_s"]) if m is not None else "?:??"
-        km_lines.append(f"- **{mm_ss}** — {km.get('note') or km.get('why', '')}")
+        km_lines.append(f"- **{mm_ss}** — {km['note']}")
     key_moments_body = "\n".join(km_lines)
 
     # Top Improvements

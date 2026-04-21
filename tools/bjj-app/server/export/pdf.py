@@ -37,9 +37,9 @@ def slugify_report_filename(title: str, date: str) -> str:
 
 
 _SCORE_LABEL_BY_ID = {
-    "position_control": "Position Control",
-    "submission_threat": "Submission Threat",
-    "defensive_resilience": "Defensive Resilience",
+    "guard_retention": "Guard Retention",
+    "positional_awareness": "Positional Awareness",
+    "transition_quality": "Transition Quality",
 }
 
 
@@ -106,7 +106,7 @@ def build_report_context(
                 m.get("category") or "scramble",
                 (m.get("category") or "scramble").replace("_", " ").capitalize(),
             ),
-            "blurb": km.get("why", ""),
+            "blurb": km.get("note", ""),
         })
 
     return {

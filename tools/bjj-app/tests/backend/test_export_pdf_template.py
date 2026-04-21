@@ -32,9 +32,9 @@ def _fixture_context():
         "moments_analysed_count": 3,
         "summary_sentence": "Solid guard retention but limited offence.",
         "scores": [
-            {"id": "position_control", "label": "Position Control", "value": 7, "bar_pct": 70, "color_bucket": "high"},
-            {"id": "submission_threat", "label": "Submission Threat", "value": 3, "bar_pct": 30, "color_bucket": "low"},
-            {"id": "defensive_resilience", "label": "Defensive Resilience", "value": 8, "bar_pct": 80, "color_bucket": "high"},
+            {"id": "guard_retention", "label": "Guard Retention", "value": 7, "bar_pct": 70, "color_bucket": "high"},
+            {"id": "positional_awareness", "label": "Positional Awareness", "value": 3, "bar_pct": 30, "color_bucket": "low"},
+            {"id": "transition_quality", "label": "Transition Quality", "value": 8, "bar_pct": 80, "color_bucket": "high"},
         ],
         "distribution_bar": [
             {"category_id": "guard_bottom", "label": "Guard bottom", "width_pct": 33, "color_class": "cat-guard-bottom"},
@@ -70,10 +70,8 @@ def test_template_renders_three_score_boxes_with_buckets():
     html = _render(_fixture_context())
     assert 'class="score-box bucket-high"' in html  # first score
     assert 'class="score-box bucket-low"' in html   # second score
-    # Values and labels both appear.
     assert ">7<" in html
-    assert "Position Control" in html
-    # Bar width is present as inline style.
+    assert "Guard Retention" in html
     assert "width: 70%" in html
 
 
