@@ -9,7 +9,8 @@ import type {
   PublishConflict,
   PublishSuccess,
   RollDetail,
-  RollSummary
+  RollSummary,
+  SummariseResponse
 } from './types';
 
 export class ApiError extends Error {
@@ -230,4 +231,47 @@ export async function getPositionNote(positionId: string): Promise<PositionNote 
     throw new ApiError(response.status, `${response.status} ${response.statusText}`);
   }
   return (await response.json()) as PositionNote;
+}
+
+/**
+ * Finalise a roll — one Claude call across all analysed moments + annotations.
+ * Returns the parsed summary payload + locally-computed distribution.
+ */
+export class SummariseRateLimitedError extends Error {
+  constructor(
+    public readonly retryAfterS: number,
+    message: string
+  ) {
+    super(message);
+  }
+}
+
+export async function summariseRoll(rollId: string): Promise<SummariseResponse> {
+  const response = await fetch(
+    `/api/rolls/${encodeURIComponent(rollId)}/summarise`,
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    }
+  );
+  if (response.status === 429) {
+    const body = await response.json().catch(() => ({}));
+    const retryAfter = Number(response.headers.get('Retry-After') ?? body.retry_after_s ?? 60);
+    throw new SummariseRateLimitedError(retryAfter, body.detail ?? 'Rate limited');
+  }
+  if (!response.ok) {
+    let detail = `${response.status} ${response.statusText}`;
+    try {
+      const body = await response.json();
+      if (body?.detail) detail = body.detail;
+    } catch {
+      /* ignore */
+    }
+    throw new ApiError(response.status, detail);
+  }
+  return (await response.json()) as SummariseResponse;
 }
