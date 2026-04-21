@@ -93,3 +93,55 @@ export type PublishConflict = {
   current_hash: string;
   stored_hash: string;
 };
+
+// ---------- M5: Graph page types ----------
+
+export type GraphCategory = {
+  id: string;
+  label: string;
+  dominance: number;
+  tint: string;
+};
+
+export type GraphNode = {
+  id: string;
+  name: string;
+  category: string;
+};
+
+export type GraphEdge = {
+  from: string;
+  to: string;
+};
+
+export type GraphTaxonomy = {
+  categories: GraphCategory[];
+  positions: GraphNode[];
+  transitions: GraphEdge[];
+};
+
+export type PathPoint = {
+  timestamp_s: number;
+  position_id: string;
+  moment_id: string;
+};
+
+export type GraphPaths = {
+  duration_s: number | null;
+  paths: {
+    greig: PathPoint[];
+    anthony: PathPoint[];
+  };
+};
+
+export type PositionNote = {
+  position_id: string;
+  name: string;
+  markdown: string;
+  vault_path: string;
+};
+
+export type GraphFilter =
+  | { kind: 'all' }
+  | { kind: 'category'; id: string }
+  | { kind: 'player'; who: 'greig' | 'anthony' };

@@ -3,6 +3,9 @@ import type {
   AnalyseMomentEvent,
   Annotation,
   CreateRollInput,
+  GraphPaths,
+  GraphTaxonomy,
+  PositionNote,
   PublishConflict,
   PublishSuccess,
   RollDetail,
@@ -203,4 +206,26 @@ export async function publishRoll(
     throw new ApiError(response.status, `${response.status} ${response.statusText}`);
   }
   return (await response.json()) as PublishSuccess;
+}
+
+export function getGraph(): Promise<GraphTaxonomy> {
+  return request<GraphTaxonomy>('/api/graph');
+}
+
+export function getGraphPaths(rollId: string): Promise<GraphPaths> {
+  return request<GraphPaths>(`/api/graph/paths/${encodeURIComponent(rollId)}`);
+}
+
+export async function getPositionNote(positionId: string): Promise<PositionNote | null> {
+  const response = await fetch(
+    `/api/vault/position/${encodeURIComponent(positionId)}`,
+    { headers: { Accept: 'application/json' } }
+  );
+  if (response.status === 404) {
+    return null;
+  }
+  if (!response.ok) {
+    throw new ApiError(response.status, `${response.status} ${response.statusText}`);
+  }
+  return (await response.json()) as PositionNote;
 }
