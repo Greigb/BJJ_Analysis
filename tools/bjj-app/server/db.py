@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS rolls (
     vault_your_notes_hash TEXT,
     vault_published_at INTEGER,
     player_a_name TEXT,
-    player_b_name TEXT
+    player_b_name TEXT,
+    vault_summary_hashes TEXT
 );
 
 CREATE TABLE IF NOT EXISTS moments (
@@ -76,6 +77,7 @@ _ROLLS_M4_COLUMNS: tuple[tuple[str, str], ...] = (
     ("vault_published_at", "INTEGER"),
     ("player_a_name", "TEXT"),
     ("player_b_name", "TEXT"),
+    ("vault_summary_hashes", "TEXT"),
 )
 
 
