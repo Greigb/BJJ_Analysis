@@ -97,7 +97,7 @@
     if (event.stage === 'done') {
       if (!roll) return;
       roll.moments = event.moments.map((m) => ({
-        id: `pending-${m.frame_idx}`,
+        id: m.id,
         frame_idx: m.frame_idx,
         timestamp_s: m.timestamp_s,
         pose_delta: m.pose_delta,

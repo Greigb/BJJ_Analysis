@@ -65,7 +65,12 @@ export type AnalyseEvent =
   | {
       stage: 'done';
       total?: number;
-      moments: Array<{ frame_idx: number; timestamp_s: number; pose_delta: number | null }>;
+      moments: Array<{
+        id: string;
+        frame_idx: number;
+        timestamp_s: number;
+        pose_delta: number | null;
+      }>;
     };
 
 export type AnalyseMomentEvent =

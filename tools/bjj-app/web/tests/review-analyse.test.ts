@@ -147,8 +147,8 @@ describe('Review page — analyse flow', () => {
         {
           stage: 'done',
           moments: [
-            { frame_idx: 3, timestamp_s: 3.0, pose_delta: 0.8 },
-            { frame_idx: 7, timestamp_s: 7.0, pose_delta: 1.4 }
+            { id: 'm-3', frame_idx: 3, timestamp_s: 3.0, pose_delta: 0.8 },
+            { id: 'm-7', frame_idx: 7, timestamp_s: 7.0, pose_delta: 1.4 }
           ]
         }
       ])
