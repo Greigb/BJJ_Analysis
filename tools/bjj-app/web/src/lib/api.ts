@@ -3,6 +3,7 @@ import type {
   AnalyseMomentEvent,
   Annotation,
   CreateRollInput,
+  ExportPdfResult,
   GraphPaths,
   GraphTaxonomy,
   PositionNote,
@@ -274,4 +275,27 @@ export async function summariseRoll(rollId: string): Promise<SummariseResponse> 
     throw new ApiError(response.status, detail);
   }
   return (await response.json()) as SummariseResponse;
+}
+
+/** POST /api/rolls/:id/export-pdf — returns PDF blob + conflict flag. */
+export async function exportRollPdf(rollId: string, overwrite = false): Promise<ExportPdfResult> {
+  const url = `/api/rolls/${encodeURIComponent(rollId)}/export-pdf${overwrite ? '?overwrite=1' : ''}`;
+  const response = await fetch(url, { method: 'POST' });
+
+  if (response.status === 200 || response.status === 409) {
+    const blob = await response.blob();
+    const filename = parseFilenameFromContentDisposition(response.headers.get('content-disposition'));
+    const kind = response.status === 409 ? 'conflict' : 'ok';
+    return { kind, blob, filename };
+  }
+
+  // Error paths return JSON.
+  const error = await response.json().catch(() => ({ detail: `HTTP ${response.status}` }));
+  throw new ApiError(response.status, error.detail ?? `Export failed (${response.status})`);
+}
+
+function parseFilenameFromContentDisposition(header: string | null): string {
+  if (!header) return 'match-report.pdf';
+  const m = header.match(/filename="([^"]+)"/);
+  return m?.[1] ?? 'match-report.pdf';
 }
