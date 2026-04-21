@@ -11,7 +11,14 @@ from pydantic import BaseModel
 from server.analysis.vault import RollSummary, list_rolls
 from server.analysis.video import read_duration
 from server.config import Settings, load_settings
-from server.db import connect, create_roll, get_analyses, get_moments, get_roll
+from server.db import (
+    connect,
+    create_roll,
+    get_analyses,
+    get_annotations_by_moment,
+    get_moments,
+    get_roll,
+)
 
 
 class RollSummaryOut(BaseModel):
@@ -23,6 +30,7 @@ class RollSummaryOut(BaseModel):
     partner: str | None
     duration: str | None
     result: str | None
+    roll_id: str | None = None
 
     @classmethod
     def from_vault(cls, r: RollSummary) -> "RollSummaryOut":
@@ -33,6 +41,7 @@ class RollSummaryOut(BaseModel):
             partner=r.partner,
             duration=r.duration,
             result=r.result,
+            roll_id=r.roll_id,
         )
 
 
@@ -45,12 +54,19 @@ class AnalysisOut(BaseModel):
     coach_tip: str | None
 
 
+class AnnotationOut(BaseModel):
+    id: str
+    body: str
+    created_at: int
+
+
 class MomentOut(BaseModel):
     id: str
     frame_idx: int
     timestamp_s: float
     pose_delta: float | None
     analyses: list[AnalysisOut] = []
+    annotations: list[AnnotationOut] = []
 
 
 class RollDetailOut(BaseModel):
@@ -63,6 +79,8 @@ class RollDetailOut(BaseModel):
     duration_s: float | None
     result: str
     video_url: str
+    vault_path: str | None = None
+    vault_published_at: int | None = None
     moments: list[MomentOut] = []
 
 
@@ -136,6 +154,8 @@ async def upload_roll(
         duration_s=duration_s,
         result="unknown",
         video_url=f"/assets/{roll_id}/source.mp4",
+        vault_path=None,
+        vault_published_at=None,
         moments=[],
     )
 
@@ -155,6 +175,9 @@ def get_roll_detail(
         moment_rows = get_moments(conn, roll_id)
         analyses_by_moment: dict[str, list] = {
             m["id"]: get_analyses(conn, m["id"]) for m in moment_rows
+        }
+        annotations_by_moment: dict[str, list] = {
+            m["id"]: get_annotations_by_moment(conn, m["id"]) for m in moment_rows
         }
     finally:
         conn.close()
@@ -176,6 +199,10 @@ def get_roll_detail(
                 )
                 for a in analyses_by_moment[m["id"]]
             ],
+            annotations=[
+                AnnotationOut(id=an["id"], body=an["body"], created_at=an["created_at"])
+                for an in annotations_by_moment[m["id"]]
+            ],
         )
         for m in moment_rows
     ]
@@ -188,5 +215,7 @@ def get_roll_detail(
         duration_s=row["duration_s"],
         result=row["result"],
         video_url=f"/{row['video_path']}",
+        vault_path=row["vault_path"],
+        vault_published_at=row["vault_published_at"],
         moments=moments_out,
     )
