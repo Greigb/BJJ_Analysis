@@ -6,7 +6,9 @@ Later milestones populate them.
 """
 from __future__ import annotations
 
+import json
 import sqlite3
+import time
 import uuid
 from pathlib import Path
 
@@ -162,5 +164,101 @@ def get_moments(conn, roll_id: str) -> list[sqlite3.Row]:
     cur = conn.execute(
         "SELECT * FROM moments WHERE roll_id = ? ORDER BY timestamp_s",
         (roll_id,),
+    )
+    return list(cur.fetchall())
+
+
+def cache_get(conn, *, prompt_hash: str, frame_hash: str) -> dict | None:
+    """Return the cached Claude response for this (prompt, frame) pair, or None."""
+    cur = conn.execute(
+        "SELECT response_json FROM claude_cache WHERE prompt_hash = ? AND frame_hash = ?",
+        (prompt_hash, frame_hash),
+    )
+    row = cur.fetchone()
+    if row is None:
+        return None
+    return json.loads(row["response_json"])
+
+
+def cache_put(
+    conn,
+    *,
+    prompt_hash: str,
+    frame_hash: str,
+    response: dict,
+) -> None:
+    """Upsert a cached response. Re-putting on the same key replaces the value."""
+    conn.execute(
+        """
+        INSERT INTO claude_cache (prompt_hash, frame_hash, response_json, created_at)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(prompt_hash, frame_hash) DO UPDATE SET
+            response_json = excluded.response_json,
+            created_at    = excluded.created_at
+        """,
+        (prompt_hash, frame_hash, json.dumps(response), int(time.time())),
+    )
+    conn.commit()
+
+
+def insert_analyses(
+    conn,
+    *,
+    moment_id: str,
+    players: list[dict],
+    claude_version: str,
+) -> list[sqlite3.Row]:
+    """Replace all analyses for `moment_id` with one row per entry in `players`.
+
+    Each player dict must contain: player ('greig'|'anthony'), position_id (str),
+    confidence (float | None), description (str | None), coach_tip (str | None).
+    """
+    conn.execute("DELETE FROM analyses WHERE moment_id = ?", (moment_id,))
+    inserted_ids: list[str] = []
+    now = int(time.time())
+    for p in players:
+        analysis_id = uuid.uuid4().hex
+        conn.execute(
+            """
+            INSERT INTO analyses (
+                id, moment_id, player, position_id, confidence,
+                description, coach_tip, claude_version, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                analysis_id,
+                moment_id,
+                p["player"],
+                p["position_id"],
+                None if p.get("confidence") is None else float(p["confidence"]),
+                p.get("description"),
+                p.get("coach_tip"),
+                claude_version,
+                now,
+            ),
+        )
+        inserted_ids.append(analysis_id)
+    conn.commit()
+
+    if not inserted_ids:
+        return []
+    cur = conn.execute(
+        f"SELECT * FROM analyses WHERE id IN ({','.join('?' * len(inserted_ids))})",
+        inserted_ids,
+    )
+    rows_by_id = {r["id"]: r for r in cur.fetchall()}
+    return [rows_by_id[i] for i in inserted_ids]
+
+
+def get_analyses(conn, moment_id: str) -> list[sqlite3.Row]:
+    """Return all analyses for a moment. Order is stable: greig first, then anthony."""
+    cur = conn.execute(
+        """
+        SELECT * FROM analyses
+        WHERE moment_id = ?
+        ORDER BY CASE player WHEN 'greig' THEN 0 ELSE 1 END, created_at
+        """,
+        (moment_id,),
     )
     return list(cur.fetchall())

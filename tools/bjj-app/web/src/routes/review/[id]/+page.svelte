@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { analyseRoll, ApiError, getRoll } from '$lib/api';
+  import MomentDetail from '$lib/components/MomentDetail.svelte';
   import type { AnalyseEvent, Moment, RollDetail } from '$lib/types';
 
   let roll = $state<RollDetail | null>(null);
@@ -9,9 +10,13 @@
   let error = $state<string | null>(null);
   let analysing = $state(false);
   let progress = $state<{ stage: string; pct: number } | null>(null);
+  let selectedMomentId = $state<string | null>(null);
 
-  // Refs for video seeking from chip clicks.
   let videoEl: HTMLVideoElement | undefined = $state();
+
+  const selectedMoment = $derived(
+    roll?.moments.find((m) => m.id === selectedMomentId) ?? null
+  );
 
   onMount(async () => {
     const id = $page.params.id;
@@ -43,13 +48,12 @@
   function handleAnalyseEvent(event: AnalyseEvent) {
     if (event.stage === 'done') {
       if (!roll) return;
-      // Server assigns ids on persistence; for immediate UI we fabricate
-      // stable keys from frame_idx — they'll be replaced on the next refresh.
       roll.moments = event.moments.map((m) => ({
         id: `pending-${m.frame_idx}`,
         frame_idx: m.frame_idx,
         timestamp_s: m.timestamp_s,
-        pose_delta: m.pose_delta
+        pose_delta: m.pose_delta,
+        analyses: []
       })) as Moment[];
       progress = { stage: 'done', pct: 100 };
     } else {
@@ -80,13 +84,33 @@
     return `${p.stage}… ${p.pct}%`;
   }
 
-  function seekTo(seconds: number) {
+  function onChipClick(moment: Moment) {
+    selectedMomentId = moment.id;
     if (videoEl) {
-      videoEl.currentTime = seconds;
+      videoEl.currentTime = moment.timestamp_s;
       videoEl.play().catch(() => {
-        /* autoplay may be blocked; it's fine */
+        /* autoplay may be blocked; that's fine */
       });
     }
+  }
+
+  function onMomentAnalysed(updated: Moment) {
+    if (!roll) return;
+    roll.moments = roll.moments.map((m) => (m.id === updated.id ? updated : m));
+  }
+
+  function chipStateClass(m: Moment, isSelected: boolean): string {
+    const base = 'rounded-md px-2.5 py-1 text-xs font-mono tabular-nums transition-colors';
+    if (m.analyses.length > 0) {
+      // Analysed — solid chip.
+      return `${base} border bg-emerald-500/15 border-emerald-400/40 text-emerald-100 hover:bg-emerald-500/25${
+        isSelected ? ' ring-1 ring-emerald-300' : ''
+      }`;
+    }
+    // Unanalysed — dashed chip.
+    return `${base} border border-dashed bg-white/[0.02] border-white/20 text-white/75 hover:bg-white/[0.05] hover:border-white/40${
+      isSelected ? ' ring-1 ring-white/40' : ''
+    }`;
   }
 </script>
 
@@ -151,18 +175,26 @@
           {#each roll.moments as moment (moment.id)}
             <button
               type="button"
-              onclick={() => seekTo(moment.timestamp_s)}
-              class="rounded-md border border-dashed border-white/20 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/40 px-2.5 py-1 text-xs font-mono tabular-nums text-white/75 transition-colors"
+              onclick={() => onChipClick(moment)}
+              class={chipStateClass(moment, moment.id === selectedMomentId)}
             >
               {formatMomentTime(moment.timestamp_s)}
             </button>
           {/each}
         </div>
-        <p class="text-[11px] text-white/35">
-          Click a chip to jump the video there. Position classification via Claude Opus 4.7
-          arrives in M3.
-        </p>
       </div>
+
+      {#if selectedMoment}
+        <MomentDetail
+          rollId={roll.id}
+          moment={selectedMoment}
+          onanalysed={onMomentAnalysed}
+        />
+      {:else}
+        <p class="text-[11px] text-white/35">
+          Click a chip to see the moment and analyse it with Claude.
+        </p>
+      {/if}
     {:else if !analysing}
       <div class="rounded-lg border border-white/10 bg-white/[0.02] p-6 text-center">
         <p class="text-sm text-white/60">No moments yet.</p>

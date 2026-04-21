@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from server.analysis.vault import RollSummary, list_rolls
 from server.analysis.video import read_duration
 from server.config import Settings, load_settings
-from server.db import connect, create_roll, get_moments, get_roll
+from server.db import connect, create_roll, get_analyses, get_moments, get_roll
 
 
 class RollSummaryOut(BaseModel):
@@ -36,11 +36,21 @@ class RollSummaryOut(BaseModel):
         )
 
 
+class AnalysisOut(BaseModel):
+    id: str
+    player: str
+    position_id: str
+    confidence: float | None
+    description: str | None
+    coach_tip: str | None
+
+
 class MomentOut(BaseModel):
     id: str
     frame_idx: int
     timestamp_s: float
     pose_delta: float | None
+    analyses: list[AnalysisOut] = []
 
 
 class RollDetailOut(BaseModel):
@@ -143,8 +153,32 @@ def get_roll_detail(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found"
             )
         moment_rows = get_moments(conn, roll_id)
+        analyses_by_moment: dict[str, list] = {
+            m["id"]: get_analyses(conn, m["id"]) for m in moment_rows
+        }
     finally:
         conn.close()
+
+    moments_out = [
+        MomentOut(
+            id=m["id"],
+            frame_idx=m["frame_idx"],
+            timestamp_s=m["timestamp_s"],
+            pose_delta=m["pose_delta"],
+            analyses=[
+                AnalysisOut(
+                    id=a["id"],
+                    player=a["player"],
+                    position_id=a["position_id"],
+                    confidence=a["confidence"],
+                    description=a["description"],
+                    coach_tip=a["coach_tip"],
+                )
+                for a in analyses_by_moment[m["id"]]
+            ],
+        )
+        for m in moment_rows
+    ]
 
     return RollDetailOut(
         id=row["id"],
@@ -154,13 +188,5 @@ def get_roll_detail(
         duration_s=row["duration_s"],
         result=row["result"],
         video_url=f"/{row['video_path']}",
-        moments=[
-            MomentOut(
-                id=m["id"],
-                frame_idx=m["frame_idx"],
-                timestamp_s=m["timestamp_s"],
-                pose_delta=m["pose_delta"],
-            )
-            for m in moment_rows
-        ],
+        moments=moments_out,
     )

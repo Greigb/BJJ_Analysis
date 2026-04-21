@@ -7,7 +7,6 @@ from pathlib import Path
 
 
 def _project_root() -> Path:
-    # tools/bjj-app/server/config.py → project root is three parents up
     return Path(__file__).resolve().parent.parent.parent.parent
 
 
@@ -19,6 +18,12 @@ class Settings:
     host: str
     port: int
     frontend_build_dir: Path
+    # Claude CLI adapter
+    claude_bin: Path
+    claude_model: str
+    claude_max_calls: int
+    claude_window_seconds: float
+    taxonomy_path: Path
 
 
 def load_settings() -> Settings:
@@ -30,6 +35,9 @@ def load_settings() -> Settings:
         if db_override
         else project_root / "tools" / "bjj-app" / "bjj-app.db"
     )
+    claude_bin = Path(
+        os.getenv("BJJ_CLAUDE_BIN", "/Users/greigbradley/.local/bin/claude")
+    )
     return Settings(
         project_root=project_root,
         vault_root=vault_root,
@@ -37,4 +45,9 @@ def load_settings() -> Settings:
         host=os.getenv("BJJ_HOST", "0.0.0.0"),
         port=int(os.getenv("BJJ_PORT", "8000")),
         frontend_build_dir=project_root / "tools" / "bjj-app" / "web" / "build",
+        claude_bin=claude_bin,
+        claude_model=os.getenv("BJJ_CLAUDE_MODEL", "claude-opus-4-7"),
+        claude_max_calls=int(os.getenv("BJJ_CLAUDE_MAX_CALLS", "10")),
+        claude_window_seconds=float(os.getenv("BJJ_CLAUDE_WINDOW_SECONDS", "300")),
+        taxonomy_path=project_root / "tools" / "taxonomy.json",
     )

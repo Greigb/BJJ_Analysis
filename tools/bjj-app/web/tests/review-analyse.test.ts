@@ -34,8 +34,8 @@ function detailWithMoments() {
   return {
     ...detailWithoutMoments(),
     moments: [
-      { id: 'm1', frame_idx: 2, timestamp_s: 2.0, pose_delta: 0.5 },
-      { id: 'm2', frame_idx: 5, timestamp_s: 5.0, pose_delta: 1.2 }
+      { id: 'm1', frame_idx: 2, timestamp_s: 2.0, pose_delta: 0.5, analyses: [] },
+      { id: 'm2', frame_idx: 5, timestamp_s: 5.0, pose_delta: 1.2, analyses: [] }
     ]
   };
 }

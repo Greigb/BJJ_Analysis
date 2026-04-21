@@ -34,3 +34,7 @@ include = ["server*"]
 testpaths = ["tests/backend"]
 asyncio_mode = "auto"
 pythonpath = ["."]
+markers = [
+    "integration: slow live-CLI tests that spend Claude budget (run manually with -m integration)",
+]
+addopts = "-m 'not integration'"

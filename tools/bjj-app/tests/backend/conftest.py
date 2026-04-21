@@ -21,3 +21,14 @@ def tmp_project_root(tmp_path: Path) -> Path:
     (tmp_path / "assets").mkdir()
     (tmp_path / "Roll Log").mkdir()
     return tmp_path
+
+
+@pytest.fixture(autouse=True)
+def _reset_claude_limiter():
+    """Reset the module-level limiter between tests so they don't leak state."""
+    yield
+    try:
+        import server.api.moments as moments_mod
+        moments_mod._LIMITER = None
+    except Exception:
+        pass
