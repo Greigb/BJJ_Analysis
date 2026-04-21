@@ -22,7 +22,8 @@ function momentWithoutAnalyses() {
     frame_idx: 3,
     timestamp_s: 3.0,
     pose_delta: 0.5,
-    analyses: []
+    analyses: [],
+    annotations: []
   };
 }
 
@@ -49,7 +50,8 @@ function momentWithAnalyses() {
         description: null,
         coach_tip: null
       }
-    ]
+    ],
+    annotations: []
   };
 }
 
@@ -132,5 +134,65 @@ describe('MomentDetail', () => {
     await waitFor(() => {
       expect(screen.getByText(/cooldown/i)).toBeInTheDocument();
     });
+  });
+
+  it('renders an empty notes thread with a textarea + Add button', () => {
+    render(MomentDetail, { rollId: 'r1', moment: momentWithoutAnalyses() });
+    expect(screen.getByPlaceholderText(/type a new note/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /add note/i })).toBeInTheDocument();
+  });
+
+  it('renders prior annotations in the thread in chronological order', () => {
+    const moment = {
+      ...momentWithoutAnalyses(),
+      annotations: [
+        { id: 'a1', body: 'earlier thought', created_at: 100 },
+        { id: 'a2', body: 'later thought', created_at: 200 }
+      ]
+    };
+    render(MomentDetail, { rollId: 'r1', moment });
+    const earlier = screen.getByText('earlier thought');
+    const later = screen.getByText('later thought');
+    expect(earlier.compareDocumentPosition(later) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('submitting a new note via Add button calls PATCH and appends to the thread', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        json: async () => ({ id: 'a-new', body: 'fresh note', created_at: 999 })
+      })
+    );
+
+    const user = userEvent.setup();
+    render(MomentDetail, { rollId: 'r1', moment: momentWithoutAnalyses() });
+
+    await user.type(screen.getByPlaceholderText(/type a new note/i), 'fresh note');
+    await user.click(screen.getByRole('button', { name: /add note/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('fresh note')).toBeInTheDocument();
+    });
+    // Textarea clears after submit.
+    expect((screen.getByPlaceholderText(/type a new note/i) as HTMLTextAreaElement).value).toBe(
+      ''
+    );
+  });
+
+  it('does not submit when the textarea is empty or whitespace', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const user = userEvent.setup();
+    render(MomentDetail, { rollId: 'r1', moment: momentWithoutAnalyses() });
+
+    await user.click(screen.getByRole('button', { name: /add note/i }));
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    await user.type(screen.getByPlaceholderText(/type a new note/i), '   ');
+    await user.click(screen.getByRole('button', { name: /add note/i }));
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
