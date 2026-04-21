@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from server.analysis.positions_vault import load_positions_index
+from server.analysis.taxonomy import load_taxonomy
 from server.api import analyse as analyse_api
 from server.api import annotations as annotations_api
 from server.api import moments as moments_api
@@ -18,7 +20,18 @@ def create_app() -> FastAPI:
     settings = load_settings()
     init_db(settings.db_path)
 
+    taxonomy_path = settings.project_root / "tools" / "taxonomy.json"
+    taxonomy = (
+        load_taxonomy(taxonomy_path)
+        if taxonomy_path.exists()
+        else {"categories": [], "positions": [], "transitions": []}
+    )
+    positions_index = load_positions_index(settings.vault_root)
+
     app = FastAPI(title="BJJ Review App", version="0.1.0")
+
+    app.state.taxonomy = taxonomy
+    app.state.positions_index = positions_index
 
     app.add_middleware(
         CORSMiddleware,
