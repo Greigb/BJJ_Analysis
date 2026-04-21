@@ -118,6 +118,7 @@ import os
 import re as _re  # re is already imported at top, alias to avoid shadowing any later additions
 import time
 
+from server.analysis.summarise import CATEGORY_EMOJI
 from server.db import get_annotations_by_roll, get_roll, get_vault_state, set_vault_state
 
 
@@ -363,3 +364,87 @@ def _atomic_write(target: Path, text: str) -> None:
     tmp = target.with_suffix(target.suffix + ".tmp")
     tmp.write_text(text, encoding="utf-8")
     os.replace(tmp, target)
+
+
+# ---------- M6a: summary section rendering ----------
+
+
+_SCORE_METRIC_LABELS: list[tuple[str, str]] = [
+    ("guard_retention", "Guard Retention"),
+    ("positional_awareness", "Positional Awareness"),
+    ("transition_quality", "Transition Quality"),
+]
+
+
+def render_summary_sections(
+    scores_payload: dict,
+    distribution: dict,
+    categories: list[dict],
+    moments: list[dict],
+) -> dict[str, str]:
+    """Render the six summary-owned section bodies.
+
+    Returns `{section_id: body_markdown}` — bodies do NOT include the `## <heading>` line.
+    """
+    moments_by_id = {m["id"]: m for m in moments}
+    category_label_by_id = {c["id"]: c["label"] for c in categories}
+
+    # Summary
+    summary = scores_payload["summary"].strip()
+
+    # Scores
+    scores = scores_payload["scores"]
+    score_rows = [
+        "| Metric                 | Score |",
+        "|------------------------|-------|",
+    ] + [
+        f"| {label:<22} | {scores[metric]}/10  |"
+        for metric, label in _SCORE_METRIC_LABELS
+    ]
+    scores_body = "\n".join(score_rows)
+
+    # Position Distribution
+    dist_rows = ["| Category        | Count | %   |", "|-----------------|-------|-----|"]
+    for cat_id in sorted(distribution["counts"].keys()):
+        label = category_label_by_id.get(cat_id, cat_id)
+        count = distribution["counts"][cat_id]
+        pct = distribution["percentages"][cat_id]
+        dist_rows.append(f"| {label:<15} | {count:<5} | {pct}% |")
+    timeline_bar = "".join(
+        CATEGORY_EMOJI.get(cat, "⬛") for cat in distribution["timeline"]
+    )
+    legend = "Legend: " + " ".join(
+        f"{CATEGORY_EMOJI[cat]}{cat}" for cat in CATEGORY_EMOJI.keys()
+    )
+    position_distribution_body = (
+        "\n".join(dist_rows)
+        + "\n\n### Position Timeline Bar\n\n"
+        + (timeline_bar if timeline_bar else "(no analyses)")
+        + "\n\n"
+        + legend
+    )
+
+    # Key Moments
+    km_lines: list[str] = []
+    for km in scores_payload["key_moments"]:
+        m = moments_by_id.get(km["moment_id"])
+        mm_ss = _format_mm_ss(m["timestamp_s"]) if m is not None else "?:??"
+        km_lines.append(f"- **{mm_ss}** — {km['note']}")
+    key_moments_body = "\n".join(km_lines)
+
+    # Top Improvements
+    ti_lines = [f"{i + 1}. {item}" for i, item in enumerate(scores_payload["top_improvements"])]
+    top_improvements_body = "\n".join(ti_lines)
+
+    # Strengths
+    st_lines = [f"- {item}" for item in scores_payload["strengths"]]
+    strengths_body = "\n".join(st_lines)
+
+    return {
+        "summary": summary,
+        "scores": scores_body,
+        "position_distribution": position_distribution_body,
+        "key_moments": key_moments_body,
+        "top_improvements": top_improvements_body,
+        "strengths": strengths_body,
+    }
