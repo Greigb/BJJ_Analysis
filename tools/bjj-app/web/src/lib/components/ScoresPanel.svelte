@@ -93,7 +93,7 @@
       Key moments
     </div>
     <ul class="space-y-1 text-sm text-white/80">
-      {#each scores.key_moments as km (km.moment_id)}
+      {#each scores.key_moments as km, i (i)}
         {@const moment = momentsById.get(km.moment_id)}
         <li class="flex items-start justify-between gap-3">
           <div class="flex-1">
