@@ -8,6 +8,7 @@ Enforced inside `publish` by Path.resolve().relative_to().
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -72,3 +73,38 @@ def _format_created_stamp(unix_seconds: int) -> str:
     # UTC — deterministic across machines. Obsidian renders this verbatim.
     dt = datetime.fromtimestamp(int(unix_seconds), tz=timezone.utc)
     return dt.strftime("%Y-%m-%d %H:%M")
+
+
+_UNSAFE_CHARS = re.compile(r'[\\/:*?"<>|]')
+
+
+def slugify_filename(title: str, date: str, vault_root: Path) -> Path:
+    """Return a collision-safe path under `<vault_root>/Roll Log/`.
+
+    Filename template: `YYYY-MM-DD - <sanitised title>.md`.
+    Sanitisation: collapses runs of whitespace, strips filesystem-unsafe
+    characters (/\\:*?"<>|), drops leading dots so ".." or "./" can't escape.
+
+    On collision, appends ` (2)`, ` (3)` etc. until unique.
+    """
+    roll_log = vault_root / "Roll Log"
+    roll_log.mkdir(parents=True, exist_ok=True)
+
+    clean_title = _UNSAFE_CHARS.sub("", title).strip()
+    clean_title = re.sub(r"\s+", " ", clean_title)
+    # Prevent leading dot (hidden file, or ".." remnants).
+    clean_title = clean_title.lstrip(". ")
+    if not clean_title:
+        clean_title = "Roll"
+
+    base = f"{date} - {clean_title}"
+    candidate = roll_log / f"{base}.md"
+    if not candidate.exists():
+        return candidate
+
+    n = 2
+    while True:
+        candidate = roll_log / f"{base} ({n}).md"
+        if not candidate.exists():
+            return candidate
+        n += 1
