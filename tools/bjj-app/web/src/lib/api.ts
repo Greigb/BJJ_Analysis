@@ -1,7 +1,10 @@
 import type {
   AnalyseEvent,
   AnalyseMomentEvent,
+  Annotation,
   CreateRollInput,
+  PublishConflict,
+  PublishSuccess,
   RollDetail,
   RollSummary
 } from './types';
@@ -153,4 +156,51 @@ export async function* analyseMoment(
   } finally {
     reader.releaseLock();
   }
+}
+
+export function addAnnotation(
+  rollId: string,
+  momentId: string,
+  body: string
+): Promise<Annotation> {
+  return request<Annotation>(
+    `/api/rolls/${encodeURIComponent(rollId)}/moments/${encodeURIComponent(momentId)}/annotations`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body })
+    }
+  );
+}
+
+/**
+ * Publish a roll to the vault. Returns PublishSuccess on 200.
+ * On 409, throws a ConflictError carrying the current/stored hashes.
+ */
+export class PublishConflictError extends Error {
+  constructor(public readonly payload: PublishConflict) {
+    super(payload.detail);
+  }
+}
+
+export async function publishRoll(
+  rollId: string,
+  options: { force?: boolean } = {}
+): Promise<PublishSuccess> {
+  const response = await fetch(`/api/rolls/${encodeURIComponent(rollId)}/publish`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ force: options.force ?? false })
+  });
+  if (response.status === 409) {
+    const payload = (await response.json()) as PublishConflict;
+    throw new PublishConflictError(payload);
+  }
+  if (!response.ok) {
+    throw new ApiError(response.status, `${response.status} ${response.statusText}`);
+  }
+  return (await response.json()) as PublishSuccess;
 }
