@@ -13,6 +13,7 @@ from server.api import graph as graph_api
 from server.api import moments as moments_api
 from server.api import publish as publish_api
 from server.api import rolls as rolls_api
+from server.api import summarise as summarise_api
 from server.config import load_settings
 from server.db import init_db
 
@@ -48,6 +49,7 @@ def create_app() -> FastAPI:
     app.include_router(annotations_api.router)
     app.include_router(publish_api.router)
     app.include_router(graph_api.router)
+    app.include_router(summarise_api.router)
 
     @app.get("/api/health")
     def health() -> dict[str, str]:
