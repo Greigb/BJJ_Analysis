@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS rolls (
     vault_your_notes_hash TEXT,
     vault_published_at INTEGER,
     player_a_name TEXT,
-    player_b_name TEXT
+    player_b_name TEXT,
+    vault_summary_hashes TEXT
 );
 
 CREATE TABLE IF NOT EXISTS moments (
@@ -76,6 +77,7 @@ _ROLLS_M4_COLUMNS: tuple[tuple[str, str], ...] = (
     ("vault_published_at", "INTEGER"),
     ("player_a_name", "TEXT"),
     ("player_b_name", "TEXT"),
+    ("vault_summary_hashes", "TEXT"),
 )
 
 
@@ -411,3 +413,37 @@ def get_annotations_by_roll(conn, roll_id: str) -> list[sqlite3.Row]:
         (roll_id,),
     )
     return list(cur.fetchall())
+
+
+def set_summary_state(
+    conn,
+    *,
+    roll_id: str,
+    scores_payload: dict,
+    finalised_at: int,
+) -> None:
+    """Write the parsed summary payload + finalised_at to the rolls row."""
+    conn.execute(
+        "UPDATE rolls SET scores_json = ?, finalised_at = ? WHERE id = ?",
+        (json.dumps(scores_payload), finalised_at, roll_id),
+    )
+    conn.commit()
+
+
+def set_vault_summary_hashes(
+    conn,
+    *,
+    roll_id: str,
+    hashes: dict | None,
+) -> None:
+    """Record per-section hash dict for the summary-owned vault sections.
+
+    Pass None to clear (e.g. for a roll that's been un-finalised — currently no
+    code path does this, but the helper accepts it for completeness).
+    """
+    value = json.dumps(hashes) if hashes is not None else None
+    conn.execute(
+        "UPDATE rolls SET vault_summary_hashes = ? WHERE id = ?",
+        (value, roll_id),
+    )
+    conn.commit()

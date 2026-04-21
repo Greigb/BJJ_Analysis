@@ -42,20 +42,42 @@ def analyse_roll(
         last_moments: list[dict] = []
         for event in run_analysis(video_path, frames_dir):
             if event["stage"] == "done":
+                # Hold the done event — we'll re-emit it with real moment IDs
+                # after persistence.
                 last_moments = event.get("moments", [])
+                continue
             yield f"data: {json.dumps(event)}\n\n".encode("utf-8")
 
-        # Persist after streaming completes. Done inline so the client sees the
-        # moments event *before* the connection closes. A failure here would
-        # otherwise be silent to the client (already sent "done") — log it so
-        # an operator can notice the mismatch when they refresh and see no chips.
+        # Persist, then emit a done event that carries the real IDs.
         conn = connect(settings.db_path)
         try:
-            insert_moments(conn, roll_id=roll_id, moments=last_moments)
+            inserted_rows = insert_moments(
+                conn, roll_id=roll_id, moments=last_moments
+            )
         except Exception:
             logger.exception("Failed to persist moments for %s", roll_id)
+            # Still emit a done event so the client doesn't hang.
+            yield (
+                b'data: {"stage":"done","total":0,"moments":[]}\n\n'
+            )
+            return
         finally:
             conn.close()
+
+        done_event = {
+            "stage": "done",
+            "total": len(inserted_rows),
+            "moments": [
+                {
+                    "id": r["id"],
+                    "frame_idx": r["frame_idx"],
+                    "timestamp_s": r["timestamp_s"],
+                    "pose_delta": r["pose_delta"],
+                }
+                for r in inserted_rows
+            ],
+        }
+        yield f"data: {json.dumps(done_event)}\n\n".encode("utf-8")
 
     return StreamingResponse(
         event_stream(),

@@ -56,6 +56,11 @@ async def test_analyse_streams_progress_and_final_done(
 
     done = events[-1]
     assert isinstance(done["moments"], list)
+    for m in done["moments"]:
+        assert "id" in m
+        assert "frame_idx" in m
+        assert "timestamp_s" in m
+        assert "pose_delta" in m
 
 
 @pytest.mark.asyncio

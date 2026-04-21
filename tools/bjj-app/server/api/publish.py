@@ -1,7 +1,7 @@
 """POST /api/rolls/:id/publish — publish annotations to the vault markdown."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -29,8 +29,10 @@ class _PublishOut(BaseModel):
 def publish_roll(
     roll_id: str,
     payload: _PublishIn,
+    request: Request,
     settings: Settings = Depends(load_settings),
 ):
+    taxonomy = getattr(request.app.state, "taxonomy", None)
     conn = connect(settings.db_path)
     try:
         try:
@@ -39,6 +41,7 @@ def publish_roll(
                 roll_id=roll_id,
                 vault_root=settings.vault_root,
                 force=payload.force,
+                taxonomy=taxonomy,
             )
         except LookupError:
             raise HTTPException(
@@ -48,7 +51,7 @@ def publish_roll(
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,
                 content={
-                    "detail": "Your Notes was edited in Obsidian since last publish",
+                    "detail": "Your Notes or a summary section was edited in Obsidian since last publish",
                     "current_hash": exc.current_hash,
                     "stored_hash": exc.stored_hash,
                 },

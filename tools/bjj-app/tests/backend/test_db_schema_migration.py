@@ -166,3 +166,42 @@ def test_init_db_renames_hardcoded_player_names_to_generic(tmp_path: Path):
 
     assert rows["r-old"] == ("Player A", "Player B")
     assert rows["r-custom"] == ("Alice", "Bob")  # user-typed names preserved
+
+
+def test_init_db_fresh_includes_vault_summary_hashes_column(tmp_path: Path):
+    db_path = tmp_path / "fresh.db"
+    init_db(db_path)
+    cols = _rolls_columns(db_path)
+    assert "vault_summary_hashes" in cols
+
+
+def test_init_db_migrates_vault_summary_hashes_on_existing_db(tmp_path: Path):
+    """A pre-M6a DB (with all prior M1–M5 columns but no vault_summary_hashes)
+    gets the new column added on next init_db."""
+    db_path = tmp_path / "premigrate.db"
+    with sqlite3.connect(db_path) as conn:
+        conn.executescript(
+            """
+            CREATE TABLE rolls (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                date TEXT NOT NULL,
+                video_path TEXT NOT NULL,
+                duration_s REAL,
+                partner TEXT,
+                result TEXT,
+                scores_json TEXT,
+                finalised_at INTEGER,
+                created_at INTEGER NOT NULL,
+                vault_path TEXT,
+                vault_your_notes_hash TEXT,
+                vault_published_at INTEGER,
+                player_a_name TEXT,
+                player_b_name TEXT
+            );
+            """
+        )
+        conn.commit()
+    init_db(db_path)
+    cols = _rolls_columns(db_path)
+    assert "vault_summary_hashes" in cols

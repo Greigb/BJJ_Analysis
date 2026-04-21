@@ -44,6 +44,9 @@ export type RollDetail = {
   vault_published_at: number | null;
   player_a_name: string;
   player_b_name: string;
+  finalised_at: number | null;
+  scores: SummaryPayload | null;
+  distribution: Distribution | null;
   moments: Moment[];
 };
 
@@ -62,7 +65,12 @@ export type AnalyseEvent =
   | {
       stage: 'done';
       total?: number;
-      moments: Array<{ frame_idx: number; timestamp_s: number; pose_delta: number | null }>;
+      moments: Array<{
+        id: string;
+        frame_idx: number;
+        timestamp_s: number;
+        pose_delta: number | null;
+      }>;
     };
 
 export type AnalyseMomentEvent =
@@ -151,3 +159,36 @@ export type GraphFilter =
   | { kind: 'all' }
   | { kind: 'category'; id: string }
   | { kind: 'player'; who: 'a' | 'b' };
+
+// ---------- M6a: Summary types ----------
+
+export type Scores = {
+  guard_retention: number;
+  positional_awareness: number;
+  transition_quality: number;
+};
+
+export type KeyMoment = {
+  moment_id: string;
+  note: string;
+};
+
+export type SummaryPayload = {
+  summary: string;
+  scores: Scores;
+  top_improvements: string[];
+  strengths: string[];
+  key_moments: KeyMoment[];
+};
+
+export type Distribution = {
+  timeline: string[];
+  counts: Record<string, number>;
+  percentages: Record<string, number>;
+};
+
+export type SummariseResponse = {
+  finalised_at: number;
+  scores: SummaryPayload;
+  distribution: Distribution;
+};

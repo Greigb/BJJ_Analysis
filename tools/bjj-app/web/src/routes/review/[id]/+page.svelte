@@ -8,11 +8,14 @@
     getGraphPaths,
     getRoll,
     publishRoll,
-    PublishConflictError
+    PublishConflictError,
+    summariseRoll,
+    SummariseRateLimitedError
   } from '$lib/api';
   import GraphCluster from '$lib/components/GraphCluster.svelte';
   import MomentDetail from '$lib/components/MomentDetail.svelte';
   import PublishConflictDialog from '$lib/components/PublishConflictDialog.svelte';
+  import ScoresPanel from '$lib/components/ScoresPanel.svelte';
   import type { AnalyseEvent, GraphPaths, GraphTaxonomy, Moment, RollDetail } from '$lib/types';
 
   let roll = $state<RollDetail | null>(null);
@@ -25,6 +28,8 @@
   let publishError = $state<string | null>(null);
   let publishToast = $state<string | null>(null);
   let conflictOpen = $state(false);
+  let finalising = $state(false);
+  let finaliseError = $state<string | null>(null);
 
   let videoEl: HTMLVideoElement | undefined = $state();
   let graphTaxonomy = $state<GraphTaxonomy | null>(null);
@@ -32,6 +37,10 @@
 
   const selectedMoment = $derived(
     roll?.moments.find((m) => m.id === selectedMomentId) ?? null
+  );
+
+  const hasAnyAnalyses = $derived(
+    roll?.moments?.some((m) => m.analyses.length > 0) ?? false
   );
 
   onMount(async () => {
@@ -88,7 +97,7 @@
     if (event.stage === 'done') {
       if (!roll) return;
       roll.moments = event.moments.map((m) => ({
-        id: `pending-${m.frame_idx}`,
+        id: m.id,
         frame_idx: m.frame_idx,
         timestamp_s: m.timestamp_s,
         pose_delta: m.pose_delta,
@@ -188,6 +197,34 @@
   function onCancelConflict() {
     conflictOpen = false;
   }
+
+  async function onFinaliseClick() {
+    if (!roll || finalising) return;
+    if (!hasAnyAnalyses) return;
+    finalising = true;
+    finaliseError = null;
+    try {
+      const result = await summariseRoll(roll.id);
+      roll.finalised_at = result.finalised_at;
+      roll.scores = result.scores;
+      roll.distribution = result.distribution;
+    } catch (err) {
+      if (err instanceof SummariseRateLimitedError) {
+        finaliseError = `Claude cooldown — ${err.retryAfterS}s until next call`;
+      } else if (err instanceof ApiError) {
+        finaliseError = err.message;
+      } else {
+        finaliseError = String(err);
+      }
+    } finally {
+      finalising = false;
+    }
+  }
+
+  function onKeyMomentGoTo(momentId: string) {
+    const moment = roll?.moments.find((m) => m.id === momentId);
+    if (moment) onChipClick(moment);
+  }
 </script>
 
 {#if loading}
@@ -260,6 +297,15 @@
         </div>
       </div>
 
+      {#if roll.scores && roll.finalised_at}
+        <ScoresPanel
+          scores={roll.scores}
+          moments={roll.moments}
+          finalisedAt={roll.finalised_at}
+          ongoto={onKeyMomentGoTo}
+        />
+      {/if}
+
       {#if selectedMoment}
         <MomentDetail
           rollId={roll.id}
@@ -303,6 +349,32 @@
         <p class="mt-1 text-xs text-white/35">
           Click <strong>Analyse</strong> to run the pose pre-pass and flag interesting moments.
         </p>
+      </div>
+    {/if}
+
+    <div class="flex items-center justify-between gap-3 border-t border-white/8 pt-4">
+      <div class="text-[11px] text-white/40">
+        {#if !hasAnyAnalyses}
+          Analyse at least one moment first.
+        {:else if roll.finalised_at}
+          Finalised. Click to recompute with the latest analyses + notes.
+        {:else}
+          Not yet finalised.
+        {/if}
+      </div>
+      <button
+        type="button"
+        onclick={onFinaliseClick}
+        disabled={finalising || !hasAnyAnalyses}
+        class="rounded-md border border-blue-400/40 bg-blue-500/15 px-3 py-1.5 text-xs font-medium text-blue-100 hover:bg-blue-500/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {finalising ? 'Finalising…' : roll.finalised_at ? 'Re-finalise' : 'Finalise'}
+      </button>
+    </div>
+
+    {#if finaliseError}
+      <div class="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+        {finaliseError}
       </div>
     {/if}
 

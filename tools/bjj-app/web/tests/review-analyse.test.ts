@@ -51,6 +51,9 @@ function detailWithoutMoments() {
     vault_published_at: null,
     player_a_name: 'Player A',
     player_b_name: 'Player B',
+    finalised_at: null,
+    scores: null,
+    distribution: null,
     moments: []
   };
 }
@@ -144,8 +147,8 @@ describe('Review page — analyse flow', () => {
         {
           stage: 'done',
           moments: [
-            { frame_idx: 3, timestamp_s: 3.0, pose_delta: 0.8 },
-            { frame_idx: 7, timestamp_s: 7.0, pose_delta: 1.4 }
+            { id: 'm-3', frame_idx: 3, timestamp_s: 3.0, pose_delta: 0.8 },
+            { id: 'm-7', frame_idx: 7, timestamp_s: 7.0, pose_delta: 1.4 }
           ]
         }
       ])
@@ -342,6 +345,155 @@ describe('Review page — analyse flow', () => {
       // Mini graph data-testid should appear.
       const miniHost = container.querySelector('[data-graphcluster][data-variant="mini"]');
       expect(miniHost).not.toBeNull();
+    });
+  });
+
+  it('renders a disabled Finalise button when the roll has no analyses', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => detailWithMoments()
+        })
+        .mockRejectedValueOnce(new Error('ignored'))
+    );
+
+    const { default: Page } = await import('../src/routes/review/[id]/+page.svelte');
+    render(Page);
+
+    await waitFor(() => {
+      expect(screen.getByText('Review analyse test')).toBeInTheDocument();
+    });
+    const button = screen.getByRole('button', { name: /^finalise$/i });
+    expect(button).toBeDisabled();
+  });
+
+  it('clicking Finalise on a roll with analyses calls POST /summarise and shows the scores panel', async () => {
+    const fetchMock = vi.fn();
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...detailWithoutMoments(),
+        moments: [
+          {
+            id: 'm1',
+            frame_idx: 2,
+            timestamp_s: 2.0,
+            pose_delta: 0.5,
+            analyses: [
+              {
+                id: 'a1', player: 'a', position_id: 'closed_guard_bottom', confidence: 0.9,
+                description: 'd', coach_tip: 't'
+              },
+              {
+                id: 'a2', player: 'b', position_id: 'closed_guard_top', confidence: 0.85,
+                description: null, coach_tip: null
+              }
+            ],
+            annotations: []
+          }
+        ]
+      })
+    });
+    fetchMock.mockRejectedValueOnce(new Error('no-graph'));
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        finalised_at: 1714579500,
+        scores: {
+          summary: 'A solid closed-guard roll.',
+          scores: { guard_retention: 8, positional_awareness: 6, transition_quality: 7 },
+          top_improvements: ['one', 'two', 'three'],
+          strengths: ['strong'],
+          key_moments: [
+            { moment_id: 'm1', note: 'Perfect entry' },
+            { moment_id: 'm1', note: 'Sweep here' },
+            { moment_id: 'm1', note: 'Recovery' }
+          ]
+        },
+        distribution: {
+          timeline: ['guard_bottom'],
+          counts: { guard_bottom: 1 },
+          percentages: { guard_bottom: 100 }
+        }
+      })
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const user = userEvent.setup();
+    const { default: Page } = await import('../src/routes/review/[id]/+page.svelte');
+    render(Page);
+
+    await waitFor(() => {
+      expect(screen.getByText('Review analyse test')).toBeInTheDocument();
+    });
+    const button = screen.getByRole('button', { name: /^finalise$/i });
+    expect(button).not.toBeDisabled();
+    await user.click(button);
+
+    await waitFor(() => {
+      expect(screen.getByText(/a solid closed-guard roll/i)).toBeInTheDocument();
+    });
+    expect(screen.getByText('8/10')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /re-finalise/i })).toBeInTheDocument();
+  });
+
+  it('shows a cooldown toast on 429 from summarise', async () => {
+    const fetchMock = vi.fn();
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...detailWithoutMoments(),
+        moments: [
+          {
+            id: 'm1',
+            frame_idx: 2,
+            timestamp_s: 2.0,
+            pose_delta: 0.5,
+            analyses: [
+              {
+                id: 'a1', player: 'a', position_id: 'x', confidence: 0.9,
+                description: null, coach_tip: null
+              },
+              {
+                id: 'a2', player: 'b', position_id: 'y', confidence: 0.85,
+                description: null, coach_tip: null
+              }
+            ],
+            annotations: []
+          }
+        ]
+      })
+    });
+    fetchMock.mockRejectedValueOnce(new Error('no-graph'));
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      status: 429,
+      statusText: 'Too Many Requests',
+      headers: new Headers({ 'Retry-After': '42' }),
+      json: async () => ({
+        detail: 'Claude cooldown — 42s until next call',
+        retry_after_s: 42
+      })
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const user = userEvent.setup();
+    const { default: Page } = await import('../src/routes/review/[id]/+page.svelte');
+    render(Page);
+
+    await waitFor(() => {
+      expect(screen.getByText('Review analyse test')).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole('button', { name: /^finalise$/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/cooldown/i)).toBeInTheDocument();
     });
   });
 });
