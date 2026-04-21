@@ -9,6 +9,7 @@ from server.analysis.positions_vault import load_positions_index
 from server.analysis.taxonomy import load_taxonomy
 from server.api import analyse as analyse_api
 from server.api import annotations as annotations_api
+from server.api import graph as graph_api
 from server.api import moments as moments_api
 from server.api import publish as publish_api
 from server.api import rolls as rolls_api
@@ -46,6 +47,7 @@ def create_app() -> FastAPI:
     app.include_router(moments_api.router)
     app.include_router(annotations_api.router)
     app.include_router(publish_api.router)
+    app.include_router(graph_api.router)
 
     @app.get("/api/health")
     def health() -> dict[str, str]:
