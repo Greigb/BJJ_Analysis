@@ -84,3 +84,59 @@ def test_render_your_notes_is_deterministic_for_identical_input():
     a = render_your_notes(rows)
     b = render_your_notes(rows)
     assert a == b
+
+
+# ---------- slugify_filename tests ----------
+
+
+from server.analysis.vault_writer import slugify_filename  # noqa: E402
+
+
+def test_slugify_filename_basic(tmp_path: Path):
+    path = slugify_filename(title="Greig vs Anthony", date="2026-04-21", vault_root=tmp_path)
+    assert path == tmp_path / "Roll Log" / "2026-04-21 - Greig vs Anthony.md"
+
+
+def test_slugify_filename_strips_unsafe_characters(tmp_path: Path):
+    # Slashes, colons, and quotes would be problematic in a filename.
+    path = slugify_filename(
+        title='Roll: "A vs B" / final',
+        date="2026-04-21",
+        vault_root=tmp_path,
+    )
+    name = path.name
+    # No slashes, colons, or double-quotes in the name.
+    for ch in ("/", ":", '"'):
+        assert ch not in name
+    # Still matches the template shape.
+    assert name.startswith("2026-04-21 - ")
+    assert name.endswith(".md")
+
+
+def test_slugify_filename_appends_suffix_on_collision(tmp_path: Path):
+    roll_log = tmp_path / "Roll Log"
+    roll_log.mkdir()
+    (roll_log / "2026-04-21 - Sparring.md").write_text("# existing")
+
+    path = slugify_filename(title="Sparring", date="2026-04-21", vault_root=tmp_path)
+    assert path.name == "2026-04-21 - Sparring (2).md"
+
+
+def test_slugify_filename_appends_higher_suffix_when_2_is_also_taken(tmp_path: Path):
+    roll_log = tmp_path / "Roll Log"
+    roll_log.mkdir()
+    (roll_log / "2026-04-21 - Sparring.md").write_text("x")
+    (roll_log / "2026-04-21 - Sparring (2).md").write_text("x")
+
+    path = slugify_filename(title="Sparring", date="2026-04-21", vault_root=tmp_path)
+    assert path.name == "2026-04-21 - Sparring (3).md"
+
+
+def test_slugify_filename_result_stays_under_roll_log(tmp_path: Path):
+    # Security invariant: even if the title contains ../, the result must live under Roll Log/.
+    path = slugify_filename(title="../evil", date="2026-04-21", vault_root=tmp_path)
+    # Resolve to detect any traversal shenanigans.
+    resolved = path.resolve()
+    roll_log = (tmp_path / "Roll Log").resolve()
+    # resolved must be under roll_log
+    assert resolved.is_relative_to(roll_log)
