@@ -52,7 +52,8 @@ cd web && npm test
 ## Milestones
 
 - **M1 (shipped):** Scaffolding. Home page lists vault's `Roll Log/` via `GET /api/rolls`.
-- **M2a (shipped):** Video upload (`POST /api/rolls`), review page skeleton (`/review/[id]` with video player + empty timeline), `/assets/` static mount.
-- **M2b (this milestone):** MediaPipe pose pre-pass, `POST /api/rolls/:id/analyse` SSE endpoint, timeline chips render in `/review/[id]` and seek the video on click. No Claude calls yet — chips are unlabeled.
-- **M3 (next):** Claude CLI adapter. Click a chip → call `claude -p --model claude-opus-4-7` on that frame → label the moment with the detected BJJ position + coaching tip.
-- **M4–M8:** Annotations + vault write-back, graph page, summary + PDF, PWA, cleanup.
+- **M2a (shipped):** Video upload (`POST /api/rolls`), review page skeleton, `/assets/` static mount.
+- **M2b (shipped):** MediaPipe pose pre-pass, `POST /api/rolls/:id/analyse` SSE endpoint, timeline chips seek the video on click.
+- **M3 (this milestone):** Claude CLI adapter (`server/analysis/claude_cli.py` — sole caller of `claude -p`). `POST /api/rolls/:id/moments/:frame_idx/analyse` streams a Claude Opus 4.7 classification for one frame, with SQLite cache (`claude_cache`) and a 10/5-min sliding-window rate limiter. Selected-moment panel shows live streaming and the saved result. Security audit at `docs/superpowers/audits/2026-04-21-claude-cli-subprocess-audit.md`.
+- **M4 (next):** Annotations + vault write-back. Edit a note, save to SQLite AND vault markdown with hash-based conflict detection.
+- **M5–M8:** Graph page, summary + PDF, PWA, cleanup.
