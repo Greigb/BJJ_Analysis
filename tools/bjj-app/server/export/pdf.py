@@ -7,6 +7,10 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
+from pathlib import Path
+
+import jinja2
+from weasyprint import CSS, HTML
 
 
 _SLUG_STRIP_RE = re.compile(r"[^a-z0-9]+")
@@ -121,3 +125,21 @@ def build_report_context(
         "generated_at_human": generated_at.strftime("%Y-%m-%d %H:%M UTC"),
         "roll_id_short": roll["id"][:8],
     }
+
+
+_TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
+
+
+def _jinja_env() -> jinja2.Environment:
+    return jinja2.Environment(
+        loader=jinja2.FileSystemLoader(str(_TEMPLATE_DIR)),
+        autoescape=True,
+    )
+
+
+def render_report_pdf(context: dict) -> bytes:
+    """Render the Jinja template to HTML, then to a PDF byte string."""
+    env = _jinja_env()
+    html = env.get_template("report.html.j2").render(**context)
+    css = CSS(filename=str(_TEMPLATE_DIR / "report.css"))
+    return HTML(string=html, base_url=str(_TEMPLATE_DIR)).write_pdf(stylesheets=[css])

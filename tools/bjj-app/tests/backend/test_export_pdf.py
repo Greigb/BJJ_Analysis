@@ -231,3 +231,45 @@ class TestBuildReportContext:
                 taxonomy=_fixture_taxonomy(),
                 generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
             )
+
+
+from server.export.pdf import render_report_pdf
+
+
+def _render_fixture_context():
+    return {
+        "title": "Tuesday Roll",
+        "date_human": "21 April 2026",
+        "player_a_name": "Greig",
+        "player_b_name": "Partner",
+        "duration_human": "04:05",
+        "moments_analysed_count": 3,
+        "summary_sentence": "Solid guard retention but limited offence.",
+        "scores": [
+            {"id": "position_control", "label": "Position Control", "value": 7, "bar_pct": 70, "color_bucket": "high"},
+            {"id": "submission_threat", "label": "Submission Threat", "value": 3, "bar_pct": 30, "color_bucket": "low"},
+            {"id": "defensive_resilience", "label": "Defensive Resilience", "value": 8, "bar_pct": 80, "color_bucket": "high"},
+        ],
+        "distribution_bar": [
+            {"category_id": "guard_bottom", "label": "Guard bottom", "width_pct": 50, "color_class": "cat-guard-bottom"},
+            {"category_id": "guard_top", "label": "Guard top", "width_pct": 50, "color_class": "cat-guard-top"},
+        ],
+        "improvements": ["Chain sweeps."],
+        "strengths": ["Strong retention."],
+        "key_moments": [
+            {"timestamp_human": "00:12", "category_label": "Guard bottom", "blurb": "First sweep attempt."},
+        ],
+        "generated_at_human": "2026-04-21 14:32 UTC",
+        "roll_id_short": "abcdef12",
+    }
+
+
+class TestRenderReportPdf:
+    def test_produces_pdf_magic_number(self):
+        pdf_bytes = render_report_pdf(_render_fixture_context())
+        assert pdf_bytes.startswith(b"%PDF-")
+
+    def test_size_is_reasonable(self):
+        pdf_bytes = render_report_pdf(_render_fixture_context())
+        # Text-only Page 1 PDFs are typically 8-50KB; give a wide bound.
+        assert 3_000 < len(pdf_bytes) < 500_000
