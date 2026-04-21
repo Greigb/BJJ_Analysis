@@ -7,11 +7,21 @@ export type RollSummary = {
   result: string | null;
 };
 
+export type Analysis = {
+  id: string;
+  player: 'greig' | 'anthony';
+  position_id: string;
+  confidence: number | null;
+  description: string | null;
+  coach_tip: string | null;
+};
+
 export type Moment = {
   id: string;
   frame_idx: number;
   timestamp_s: number;
   pose_delta: number | null;
+  analyses: Analysis[];
 };
 
 export type RollDetail = {
@@ -39,4 +49,25 @@ export type AnalyseEvent =
       stage: 'done';
       total?: number;
       moments: Array<{ frame_idx: number; timestamp_s: number; pose_delta: number | null }>;
+    };
+
+export type AnalyseMomentEvent =
+  | { stage: 'cache'; hit: boolean }
+  | { stage: 'streaming'; text: string }
+  | {
+      stage: 'done';
+      cached: boolean;
+      analysis: {
+        timestamp: number;
+        greig: { position: string; confidence: number };
+        anthony: { position: string; confidence: number };
+        description: string;
+        coach_tip: string;
+      };
+    }
+  | {
+      stage: 'error';
+      kind: string;
+      detail?: string;
+      retry_after_s?: number;
     };

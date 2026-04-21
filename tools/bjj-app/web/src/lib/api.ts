@@ -1,4 +1,10 @@
-import type { AnalyseEvent, CreateRollInput, RollDetail, RollSummary } from './types';
+import type {
+  AnalyseEvent,
+  AnalyseMomentEvent,
+  CreateRollInput,
+  RollDetail,
+  RollSummary
+} from './types';
 
 export class ApiError extends Error {
   constructor(
@@ -92,6 +98,59 @@ export async function* analyseRoll(id: string): AsyncIterator<AnalyseEvent> {
     } catch {
       /* already cancelled or errored — safe to ignore */
     }
+    reader.releaseLock();
+  }
+}
+
+/**
+ * Analyse a single moment with Claude — async iterator over SSE events.
+ *
+ * Usage:
+ *   for await (const event of analyseMoment(rollId, frameIdx)) { ... }
+ *
+ * Throws ApiError on non-streaming error statuses (e.g. 404, 429).
+ */
+export async function* analyseMoment(
+  rollId: string,
+  frameIdx: number
+): AsyncIterator<AnalyseMomentEvent> {
+  const response = await fetch(
+    `/api/rolls/${encodeURIComponent(rollId)}/moments/${frameIdx}/analyse`,
+    { method: 'POST' }
+  );
+  if (!response.ok) {
+    // Try to surface the server's detail payload for 429 / 404.
+    let detail = `${response.status} ${response.statusText}`;
+    try {
+      const body = await response.json();
+      if (body?.detail) detail = body.detail;
+    } catch {
+      /* ignore */
+    }
+    throw new ApiError(response.status, detail);
+  }
+  if (!response.body) {
+    throw new Error('Analyse response has no body');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const frames = buffer.split('\n\n');
+      buffer = frames.pop() ?? '';
+      for (const frame of frames) {
+        const dataLine = frame.split('\n').find((line) => line.startsWith('data: '));
+        if (!dataLine) continue;
+        yield JSON.parse(dataLine.slice(6)) as AnalyseMomentEvent;
+      }
+    }
+  } finally {
     reader.releaseLock();
   }
 }
