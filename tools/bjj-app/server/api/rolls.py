@@ -5,9 +5,10 @@ import shutil
 import time
 import uuid
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 from pydantic import BaseModel
 
+from server.analysis.summarise import compute_distribution
 from server.analysis.vault import RollSummary, list_rolls
 from server.analysis.video import read_duration
 from server.config import Settings, load_settings
@@ -83,6 +84,9 @@ class RollDetailOut(BaseModel):
     vault_published_at: int | None = None
     player_a_name: str = "Player A"
     player_b_name: str = "Player B"
+    finalised_at: int | None = None
+    scores: dict | None = None
+    distribution: dict | None = None
     moments: list[MomentOut] = []
 
 
@@ -164,6 +168,9 @@ async def upload_roll(
         vault_published_at=None,
         player_a_name=player_a_name,
         player_b_name=player_b_name,
+        finalised_at=None,
+        scores=None,
+        distribution=None,
         moments=[],
     )
 
@@ -171,8 +178,11 @@ async def upload_roll(
 @router.get("/rolls/{roll_id}", response_model=RollDetailOut)
 def get_roll_detail(
     roll_id: str,
+    request: Request,
     settings: Settings = Depends(load_settings),
 ) -> RollDetailOut:
+    import json as _json
+
     conn = connect(settings.db_path)
     try:
         row = get_roll(conn, roll_id)
@@ -215,6 +225,28 @@ def get_roll_detail(
         for m in moment_rows
     ]
 
+    scores = None
+    if row["scores_json"]:
+        try:
+            scores = _json.loads(row["scores_json"])
+        except Exception:
+            scores = None
+
+    distribution = None
+    taxonomy = getattr(request.app.state, "taxonomy", None)
+    if taxonomy is not None and any(analyses_by_moment[m["id"]] for m in moment_rows):
+        position_to_category = {p["id"]: p["category"] for p in taxonomy.get("positions", [])}
+        flat_analyses: list[dict] = []
+        for m in moment_rows:
+            for a in analyses_by_moment[m["id"]]:
+                flat_analyses.append({
+                    "position_id": a["position_id"],
+                    "player": a["player"],
+                    "timestamp_s": m["timestamp_s"],
+                    "category": position_to_category.get(a["position_id"], "scramble"),
+                })
+        distribution = compute_distribution(flat_analyses, taxonomy.get("categories", []))
+
     return RollDetailOut(
         id=row["id"],
         title=row["title"],
@@ -227,5 +259,8 @@ def get_roll_detail(
         vault_published_at=row["vault_published_at"],
         player_a_name=row["player_a_name"] or "Player A",
         player_b_name=row["player_b_name"] or "Player B",
+        finalised_at=row["finalised_at"],
+        scores=scores,
+        distribution=distribution,
         moments=moments_out,
     )
