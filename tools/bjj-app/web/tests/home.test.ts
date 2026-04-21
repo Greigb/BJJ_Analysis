@@ -10,7 +10,8 @@ const sampleRolls = [
     date: '2026-04-14',
     partner: 'Anthony',
     duration: '2:23',
-    result: 'win_submission'
+    result: 'win_submission',
+    roll_id: 'roll-uuid-1'
   },
   {
     id: '2026-04-01 - other',
@@ -18,7 +19,8 @@ const sampleRolls = [
     date: '2026-04-01',
     partner: 'Bob',
     duration: '1:45',
-    result: 'continuation'
+    result: 'continuation',
+    roll_id: 'roll-uuid-2'
   }
 ];
 
@@ -68,6 +70,67 @@ describe('Home page', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/No rolls analysed yet/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders a clickable anchor for rolls with a roll_id', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [
+          {
+            id: '2026-04-21 - sample',
+            title: 'Sample roll',
+            date: '2026-04-21',
+            partner: 'Anthony',
+            duration: '3:45',
+            result: 'unknown',
+            roll_id: 'abc123'
+          }
+        ]
+      })
+    );
+
+    const { default: Page } = await import('../src/routes/+page.svelte');
+    render(Page);
+
+    await waitFor(() => {
+      const link = screen.getByRole('link', { name: /sample roll/i });
+      expect(link).toHaveAttribute('href', '/review/abc123');
+    });
+  });
+
+  it('renders a non-link tile for rolls without a roll_id', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [
+          {
+            id: '2026-04-14 - legacy',
+            title: 'Legacy roll',
+            date: '2026-04-14',
+            partner: null,
+            duration: null,
+            result: null,
+            roll_id: null
+          }
+        ]
+      })
+    );
+
+    const { default: Page } = await import('../src/routes/+page.svelte');
+    render(Page);
+
+    await waitFor(() => {
+      expect(screen.getByText(/legacy roll/i)).toBeInTheDocument();
+      // No link with that text exists.
+      expect(screen.queryByRole('link', { name: /legacy roll/i })).toBeNull();
+      // An ".md only" badge is rendered.
+      expect(screen.getByText(/md only/i)).toBeInTheDocument();
     });
   });
 });

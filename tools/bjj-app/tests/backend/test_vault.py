@@ -41,3 +41,28 @@ def test_list_rolls_skips_files_without_frontmatter(tmp_path: Path):
     rolls = list_rolls(tmp_path)
     assert len(rolls) == 1
     assert rolls[0].title == "Has frontmatter"
+
+
+def test_list_rolls_exposes_roll_id_from_frontmatter(tmp_path: Path):
+    roll_log = tmp_path / "Roll Log"
+    roll_log.mkdir()
+    (roll_log / "2026-04-21 - with-id.md").write_text(
+        "---\n"
+        "date: 2026-04-21\n"
+        "roll_id: abc123def\n"
+        "tags: [roll]\n"
+        "---\n"
+        "# With ID\n"
+    )
+    (roll_log / "2026-04-20 - without-id.md").write_text(
+        "---\n"
+        "date: 2026-04-20\n"
+        "tags: [roll]\n"
+        "---\n"
+        "# No ID\n"
+    )
+
+    rolls = list_rolls(tmp_path)
+    by_id = {r.id: r for r in rolls}
+    assert by_id["2026-04-21 - with-id"].roll_id == "abc123def"
+    assert by_id["2026-04-20 - without-id"].roll_id is None

@@ -17,6 +17,8 @@ class RollSummary:
     `id` is the markdown filename stem — a stable, vault-relative identifier
     safe to send over HTTP and use in URLs. `path` is the full filesystem
     Path for internal use by later-milestone code that reads/writes the file.
+    `roll_id` is the SQLite uuid from frontmatter (present on files the app
+    has published, absent on legacy markdown).
     """
 
     id: str
@@ -26,6 +28,7 @@ class RollSummary:
     partner: str | None
     duration: str | None
     result: str | None
+    roll_id: str | None
 
 
 def list_rolls(vault_root: Path) -> list[RollSummary]:
@@ -54,6 +57,7 @@ def list_rolls(vault_root: Path) -> list[RollSummary]:
                 partner=_str_or_none(post.metadata.get("partner")),
                 duration=_str_or_none(post.metadata.get("duration")),
                 result=_str_or_none(post.metadata.get("result")),
+                roll_id=_str_or_none(post.metadata.get("roll_id")),
             )
         )
 

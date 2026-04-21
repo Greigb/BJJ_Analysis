@@ -5,6 +5,7 @@ export type RollSummary = {
   partner: string | null;
   duration: string | null;
   result: string | null;
+  roll_id: string | null;
 };
 
 export type Analysis = {
@@ -16,12 +17,19 @@ export type Analysis = {
   coach_tip: string | null;
 };
 
+export type Annotation = {
+  id: string;
+  body: string;
+  created_at: number;
+};
+
 export type Moment = {
   id: string;
   frame_idx: number;
   timestamp_s: number;
   pose_delta: number | null;
   analyses: Analysis[];
+  annotations: Annotation[];
 };
 
 export type RollDetail = {
@@ -32,6 +40,8 @@ export type RollDetail = {
   duration_s: number | null;
   result: string;
   video_url: string;
+  vault_path: string | null;
+  vault_published_at: number | null;
   moments: Moment[];
 };
 
@@ -71,3 +81,15 @@ export type AnalyseMomentEvent =
       detail?: string;
       retry_after_s?: number;
     };
+
+export type PublishSuccess = {
+  vault_path: string;
+  your_notes_hash: string;
+  vault_published_at: number;
+};
+
+export type PublishConflict = {
+  detail: string;
+  current_hash: string;
+  stored_hash: string;
+};

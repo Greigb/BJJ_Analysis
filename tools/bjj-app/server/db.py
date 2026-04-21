@@ -23,7 +23,10 @@ CREATE TABLE IF NOT EXISTS rolls (
     result TEXT,
     scores_json TEXT,
     finalised_at INTEGER,
-    created_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL,
+    vault_path TEXT,
+    vault_your_notes_hash TEXT,
+    vault_published_at INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS moments (
@@ -65,11 +68,32 @@ CREATE TABLE IF NOT EXISTS claude_cache (
 """
 
 
+_ROLLS_M4_COLUMNS: tuple[tuple[str, str], ...] = (
+    ("vault_path", "TEXT"),
+    ("vault_your_notes_hash", "TEXT"),
+    ("vault_published_at", "INTEGER"),
+)
+
+
+def _migrate_rolls_m4(conn: sqlite3.Connection) -> None:
+    """Idempotently add M4 columns to an existing rolls table.
+
+    Only needed for databases created before M4 — CREATE TABLE IF NOT EXISTS
+    above handles fresh installs. SQLite has no ADD COLUMN IF NOT EXISTS,
+    so we inspect PRAGMA table_info and ALTER only when missing.
+    """
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(rolls)").fetchall()}
+    for name, sql_type in _ROLLS_M4_COLUMNS:
+        if name not in existing:
+            conn.execute(f"ALTER TABLE rolls ADD COLUMN {name} {sql_type}")
+
+
 def init_db(db_path: Path) -> None:
     """Create the schema if it doesn't already exist. Safe to call every startup."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(db_path) as conn:
         conn.executescript(SCHEMA_SQL)
+        _migrate_rolls_m4(conn)
         conn.commit()
 
 
@@ -260,5 +284,94 @@ def get_analyses(conn, moment_id: str) -> list[sqlite3.Row]:
         ORDER BY CASE player WHEN 'greig' THEN 0 ELSE 1 END, created_at
         """,
         (moment_id,),
+    )
+    return list(cur.fetchall())
+
+
+def set_vault_state(
+    conn,
+    *,
+    roll_id: str,
+    vault_path: str,
+    vault_your_notes_hash: str,
+    vault_published_at: int,
+) -> None:
+    """Record the outcome of a successful publish on the roll row."""
+    conn.execute(
+        """
+        UPDATE rolls
+           SET vault_path = ?,
+               vault_your_notes_hash = ?,
+               vault_published_at = ?
+         WHERE id = ?
+        """,
+        (vault_path, vault_your_notes_hash, vault_published_at, roll_id),
+    )
+    conn.commit()
+
+
+def get_vault_state(conn, roll_id: str) -> dict | None:
+    """Return the roll's vault_path/hash/published_at, or None if the roll doesn't exist."""
+    cur = conn.execute(
+        "SELECT vault_path, vault_your_notes_hash, vault_published_at FROM rolls WHERE id = ?",
+        (roll_id,),
+    )
+    row = cur.fetchone()
+    if row is None:
+        return None
+    return {
+        "vault_path": row["vault_path"],
+        "vault_your_notes_hash": row["vault_your_notes_hash"],
+        "vault_published_at": row["vault_published_at"],
+    }
+
+
+def insert_annotation(
+    conn,
+    *,
+    moment_id: str,
+    body: str,
+    created_at: int,
+) -> sqlite3.Row:
+    """Append a new annotation to a moment. Returns the inserted row."""
+    annotation_id = uuid.uuid4().hex
+    conn.execute(
+        """
+        INSERT INTO annotations (id, moment_id, body, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (annotation_id, moment_id, body, created_at, created_at),
+    )
+    conn.commit()
+    cur = conn.execute("SELECT * FROM annotations WHERE id = ?", (annotation_id,))
+    return cur.fetchone()
+
+
+def get_annotations_by_moment(conn, moment_id: str) -> list[sqlite3.Row]:
+    """Return all annotations for a moment ordered by created_at ascending."""
+    cur = conn.execute(
+        "SELECT * FROM annotations WHERE moment_id = ? ORDER BY created_at",
+        (moment_id,),
+    )
+    return list(cur.fetchall())
+
+
+def get_annotations_by_roll(conn, roll_id: str) -> list[sqlite3.Row]:
+    """Return all annotations for a roll, joined with moment timestamps.
+
+    Ordered for vault rendering: by moment timestamp_s ascending, then by
+    created_at ascending within each moment.
+    Each row carries: id, moment_id, body, created_at, updated_at, timestamp_s, frame_idx.
+    """
+    cur = conn.execute(
+        """
+        SELECT a.id, a.moment_id, a.body, a.created_at, a.updated_at,
+               m.timestamp_s, m.frame_idx
+          FROM annotations a
+          JOIN moments m ON m.id = a.moment_id
+         WHERE m.roll_id = ?
+         ORDER BY m.timestamp_s ASC, a.created_at ASC
+        """,
+        (roll_id,),
     )
     return list(cur.fetchall())
