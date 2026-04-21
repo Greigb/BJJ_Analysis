@@ -26,7 +26,9 @@ CREATE TABLE IF NOT EXISTS rolls (
     created_at INTEGER NOT NULL,
     vault_path TEXT,
     vault_your_notes_hash TEXT,
-    vault_published_at INTEGER
+    vault_published_at INTEGER,
+    player_a_name TEXT,
+    player_b_name TEXT
 );
 
 CREATE TABLE IF NOT EXISTS moments (
@@ -72,6 +74,8 @@ _ROLLS_M4_COLUMNS: tuple[tuple[str, str], ...] = (
     ("vault_path", "TEXT"),
     ("vault_your_notes_hash", "TEXT"),
     ("vault_published_at", "INTEGER"),
+    ("player_a_name", "TEXT"),
+    ("player_b_name", "TEXT"),
 )
 
 
@@ -88,12 +92,40 @@ def _migrate_rolls_m4(conn: sqlite3.Connection) -> None:
             conn.execute(f"ALTER TABLE rolls ADD COLUMN {name} {sql_type}")
 
 
+def _migrate_analyses_player_enum(conn: sqlite3.Connection) -> None:
+    """One-time value migration: rename analyses.player 'greig'→'a', 'anthony'→'b'.
+
+    Idempotent: subsequent calls are no-ops because no rows match the old values.
+    """
+    conn.execute("UPDATE analyses SET player = 'a' WHERE player = 'greig'")
+    conn.execute("UPDATE analyses SET player = 'b' WHERE player = 'anthony'")
+
+
+def _backfill_default_player_names(conn: sqlite3.Connection) -> None:
+    """Default any pre-migration roll to Player A/Player B for the display labels.
+
+    Also rewrites the old hardcoded "Greig"/"Anthony" defaults (seeded by an
+    earlier migration) so no user-visible text depends on specific names.
+    Idempotent.
+    """
+    conn.execute(
+        "UPDATE rolls SET player_a_name = 'Player A' "
+        "WHERE player_a_name IS NULL OR player_a_name = 'Greig'"
+    )
+    conn.execute(
+        "UPDATE rolls SET player_b_name = 'Player B' "
+        "WHERE player_b_name IS NULL OR player_b_name = 'Anthony'"
+    )
+
+
 def init_db(db_path: Path) -> None:
     """Create the schema if it doesn't already exist. Safe to call every startup."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(db_path) as conn:
         conn.executescript(SCHEMA_SQL)
         _migrate_rolls_m4(conn)
+        _backfill_default_player_names(conn)
+        _migrate_analyses_player_enum(conn)
         conn.commit()
 
 
@@ -116,17 +148,21 @@ def create_roll(
     partner: str | None,
     result: str,
     created_at: int,
+    player_a_name: str = "Player A",
+    player_b_name: str = "Player B",
 ) -> sqlite3.Row:
     """Insert a roll row and return it. Callers pass an open connection."""
     conn.execute(
         """
         INSERT INTO rolls (
             id, title, date, video_path, duration_s, partner,
-            result, scores_json, finalised_at, created_at
+            result, scores_json, finalised_at, created_at,
+            player_a_name, player_b_name
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?)
         """,
-        (id, title, date, video_path, duration_s, partner, result, created_at),
+        (id, title, date, video_path, duration_s, partner, result, created_at,
+         player_a_name, player_b_name),
     )
     conn.commit()
     return get_roll(conn, id)  # type: ignore[return-value]
@@ -234,7 +270,7 @@ def insert_analyses(
 ) -> list[sqlite3.Row]:
     """Replace all analyses for `moment_id` with one row per entry in `players`.
 
-    Each player dict must contain: player ('greig'|'anthony'), position_id (str),
+    Each player dict must contain: player ('a'|'b'), position_id (str),
     confidence (float | None), description (str | None), coach_tip (str | None).
     """
     conn.execute("DELETE FROM analyses WHERE moment_id = ?", (moment_id,))
@@ -276,12 +312,12 @@ def insert_analyses(
 
 
 def get_analyses(conn, moment_id: str) -> list[sqlite3.Row]:
-    """Return all analyses for a moment. Order is stable: greig first, then anthony."""
+    """Return all analyses for a moment. Order is stable: player_a first, then player_b."""
     cur = conn.execute(
         """
         SELECT * FROM analyses
         WHERE moment_id = ?
-        ORDER BY CASE player WHEN 'greig' THEN 0 ELSE 1 END, created_at
+        ORDER BY CASE player WHEN 'a' THEN 0 ELSE 1 END, created_at
         """,
         (moment_id,),
     )

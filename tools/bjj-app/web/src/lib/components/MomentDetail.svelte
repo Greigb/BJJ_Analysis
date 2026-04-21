@@ -5,11 +5,15 @@
   let {
     rollId,
     moment,
+    playerAName = 'Player A',
+    playerBName = 'Player B',
     onanalysed,
     onannotated
   }: {
     rollId: string;
     moment: Moment;
+    playerAName?: string;
+    playerBName?: string;
     onanalysed?: (m: Moment) => void;
     onannotated?: (m: Moment) => void;
   } = $props();
@@ -32,8 +36,8 @@
     annotateError = null;
   });
 
-  const greig = $derived(localAnalyses.find((a) => a.player === 'greig'));
-  const anthony = $derived(localAnalyses.find((a) => a.player === 'anthony'));
+  const playerA = $derived(localAnalyses.find((a) => a.player === 'a'));
+  const playerB = $derived(localAnalyses.find((a) => a.player === 'b'));
 
   function formatMomentTime(seconds: number): string {
     const total = Math.round(seconds);
@@ -74,18 +78,18 @@
       const a = event.analysis;
       const fabricated: Analysis[] = [
         {
-          id: `pending-${moment.id}-greig`,
-          player: 'greig',
-          position_id: a.greig.position,
-          confidence: a.greig.confidence,
+          id: `pending-${moment.id}-a`,
+          player: 'a',
+          position_id: a.player_a.position,
+          confidence: a.player_a.confidence,
           description: a.description,
           coach_tip: a.coach_tip
         },
         {
-          id: `pending-${moment.id}-anthony`,
-          player: 'anthony',
-          position_id: a.anthony.position,
-          confidence: a.anthony.confidence,
+          id: `pending-${moment.id}-b`,
+          player: 'b',
+          position_id: a.player_b.position,
+          confidence: a.player_b.confidence,
           description: null,
           coach_tip: null
         }
@@ -143,36 +147,36 @@
 
   {#if localAnalyses.length > 0}
     <div class="grid gap-2 sm:grid-cols-2">
-      {#if greig}
+      {#if playerA}
         <div class="rounded-md border border-white/10 bg-white/[0.03] p-3">
-          <div class="text-[10px] uppercase tracking-wider text-white/40">Greig</div>
-          <div class="mt-0.5 font-mono text-xs text-white/85">{greig.position_id}</div>
-          {#if greig.confidence != null}
+          <div class="text-[10px] uppercase tracking-wider text-white/40">{playerAName}</div>
+          <div class="mt-0.5 font-mono text-xs text-white/85">{playerA.position_id}</div>
+          {#if playerA.confidence != null}
             <div class="text-[11px] text-white/40">
-              confidence {(greig.confidence * 100).toFixed(0)}%
+              confidence {(playerA.confidence * 100).toFixed(0)}%
             </div>
           {/if}
         </div>
       {/if}
-      {#if anthony}
+      {#if playerB}
         <div class="rounded-md border border-white/10 bg-white/[0.03] p-3">
-          <div class="text-[10px] uppercase tracking-wider text-white/40">Anthony</div>
-          <div class="mt-0.5 font-mono text-xs text-white/85">{anthony.position_id}</div>
-          {#if anthony.confidence != null}
+          <div class="text-[10px] uppercase tracking-wider text-white/40">{playerBName}</div>
+          <div class="mt-0.5 font-mono text-xs text-white/85">{playerB.position_id}</div>
+          {#if playerB.confidence != null}
             <div class="text-[11px] text-white/40">
-              confidence {(anthony.confidence * 100).toFixed(0)}%
+              confidence {(playerB.confidence * 100).toFixed(0)}%
             </div>
           {/if}
         </div>
       {/if}
     </div>
 
-    {#if greig?.description}
-      <p class="text-sm leading-relaxed text-white/80">{greig.description}</p>
+    {#if playerA?.description}
+      <p class="text-sm leading-relaxed text-white/80">{playerA.description}</p>
     {/if}
-    {#if greig?.coach_tip}
+    {#if playerA?.coach_tip}
       <div class="border-l-2 border-amber-400/60 pl-3 text-sm text-amber-100/90">
-        {greig.coach_tip}
+        {playerA.coach_tip}
       </div>
     {/if}
   {:else if analysing}

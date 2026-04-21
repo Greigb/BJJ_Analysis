@@ -42,7 +42,8 @@ describe('New Roll page', () => {
     render(Page);
     expect(screen.getByLabelText(/title/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/date/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/partner/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/player a/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/player b/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/video file/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /upload/i })).toBeInTheDocument();
   });
@@ -53,7 +54,6 @@ describe('New Roll page', () => {
 
     await user.type(screen.getByLabelText(/title/i), 'My roll');
     // Date input has a default today-value; the test just asserts it gets sent.
-    await user.type(screen.getByLabelText(/partner/i), 'Anthony');
 
     const file = new File(['fake video bytes'], 'roll.mp4', { type: 'video/mp4' });
     const fileInput = screen.getByLabelText(/video file/i) as HTMLInputElement;

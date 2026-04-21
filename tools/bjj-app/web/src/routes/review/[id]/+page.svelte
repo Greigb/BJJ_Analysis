@@ -4,13 +4,16 @@
   import {
     analyseRoll,
     ApiError,
+    getGraph,
+    getGraphPaths,
     getRoll,
     publishRoll,
     PublishConflictError
   } from '$lib/api';
+  import GraphCluster from '$lib/components/GraphCluster.svelte';
   import MomentDetail from '$lib/components/MomentDetail.svelte';
   import PublishConflictDialog from '$lib/components/PublishConflictDialog.svelte';
-  import type { AnalyseEvent, Moment, RollDetail } from '$lib/types';
+  import type { AnalyseEvent, GraphPaths, GraphTaxonomy, Moment, RollDetail } from '$lib/types';
 
   let roll = $state<RollDetail | null>(null);
   let loading = $state(true);
@@ -24,6 +27,8 @@
   let conflictOpen = $state(false);
 
   let videoEl: HTMLVideoElement | undefined = $state();
+  let graphTaxonomy = $state<GraphTaxonomy | null>(null);
+  let graphPaths = $state<GraphPaths | null>(null);
 
   const selectedMoment = $derived(
     roll?.moments.find((m) => m.id === selectedMomentId) ?? null
@@ -33,6 +38,29 @@
     const id = $page.params.id;
     try {
       roll = await getRoll(id);
+      try {
+        graphTaxonomy = await getGraph();
+        graphPaths = await getGraphPaths(id);
+      } catch {
+        // Mini graph is a nice-to-have; ignore failures so the review page still loads.
+      }
+
+      // Honor ?t=<seconds> by pre-seeking the video once it's loaded.
+      const queryT = $page.url.searchParams.get('t');
+      if (queryT !== null && videoEl) {
+        const t = Number(queryT);
+        if (!Number.isNaN(t)) {
+          // If the video metadata hasn't loaded yet, defer the seek.
+          const seek = () => {
+            if (videoEl) videoEl.currentTime = t;
+          };
+          if (videoEl.readyState >= 1) {
+            seek();
+          } else {
+            videoEl.addEventListener('loadedmetadata', seek, { once: true });
+          }
+        }
+      }
     } catch (err) {
       error = err instanceof ApiError ? err.message : String(err);
     } finally {
@@ -100,9 +128,12 @@
     selectedMomentId = moment.id;
     if (videoEl) {
       videoEl.currentTime = moment.timestamp_s;
-      videoEl.play().catch(() => {
-        /* autoplay may be blocked; that's fine */
-      });
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          /* autoplay may be blocked; that's fine */
+        });
+      }
     }
   }
 
@@ -233,9 +264,34 @@
         <MomentDetail
           rollId={roll.id}
           moment={selectedMoment}
+          playerAName={roll.player_a_name}
+          playerBName={roll.player_b_name}
           onanalysed={onMomentAnalysed}
           onannotated={onMomentAnnotated}
         />
+        {#if graphTaxonomy && graphPaths}
+          <section class="space-y-2 border-t border-white/8 pt-4">
+            <div class="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+              Graph at this moment
+            </div>
+            <div class="h-[220px] rounded-md overflow-hidden border border-white/8">
+              <GraphCluster
+                variant="mini"
+                taxonomy={graphTaxonomy}
+                paths={graphPaths}
+                scrubTimeS={selectedMoment.timestamp_s}
+              />
+            </div>
+            <div class="text-right">
+              <a
+                href={`/graph?roll=${encodeURIComponent(roll.id)}&t=${Math.floor(selectedMoment.timestamp_s)}`}
+                class="text-[11px] text-white/60 hover:text-white/85 underline"
+              >
+                Open full BJJ graph →
+              </a>
+            </div>
+          </section>
+        {/if}
       {:else}
         <p class="text-[11px] text-white/35">
           Click a chip to see the moment and analyse it with Claude.

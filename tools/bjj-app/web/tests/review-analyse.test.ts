@@ -2,6 +2,27 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('cytoscape', () => {
+  const cyInstance: any = {
+    on: vi.fn(),
+    add: vi.fn(),
+    remove: vi.fn(),
+    getElementById: vi.fn(() => ({ length: 0, style: vi.fn(), position: vi.fn(), addClass: vi.fn(), removeClass: vi.fn() })),
+    nodes: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn() })),
+    edges: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn(), length: 0, remove: vi.fn() })),
+    elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn(), remove: vi.fn() })),
+    layout: vi.fn(() => ({ run: vi.fn(), stop: vi.fn() })),
+    fit: vi.fn(),
+    resize: vi.fn(),
+    destroy: vi.fn()
+  };
+  const cytoscape = vi.fn(() => cyInstance);
+  (cytoscape as any).use = vi.fn();
+  return { default: cytoscape };
+});
+vi.mock('cytoscape-cose-bilkent', () => ({ default: () => {} }));
+vi.mock('marked', () => ({ marked: { parse: (s: string) => s } }));
+
 import Page from '../src/routes/review/[id]/+page.svelte';
 
 // See M2a new.test.ts — vi.mock factories are hoisted, so any referenced
@@ -10,8 +31,8 @@ const { mockId } = vi.hoisted(() => ({ mockId: { value: 'abc123' } }));
 
 vi.mock('$app/stores', () => ({
   page: {
-    subscribe: (run: (v: { params: { id: string } }) => void) => {
-      run({ params: { id: mockId.value } });
+    subscribe: (run: (v: { params: { id: string }; url: { searchParams: { get: () => null } } }) => void) => {
+      run({ params: { id: mockId.value }, url: { searchParams: { get: () => null } } });
       return () => {};
     }
   }
@@ -28,6 +49,8 @@ function detailWithoutMoments() {
     video_url: '/assets/abc123/source.mp4',
     vault_path: null,
     vault_published_at: null,
+    player_a_name: 'Player A',
+    player_b_name: 'Player B',
     moments: []
   };
 }
@@ -101,12 +124,15 @@ describe('Review page — analyse flow', () => {
 
   it('clicking Analyse streams progress and then renders new chips', async () => {
     const fetchMock = vi.fn();
-    // First call: GET roll detail. Second: POST analyse (SSE body).
+    // First call: GET roll detail. Second: graph taxonomy (fails; inner catch swallows it,
+    // getGraphPaths is never called). Third: POST analyse (SSE body).
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
       json: async () => detailWithoutMoments()
     });
+    // graph taxonomy fails; inner catch swallows, getGraphPaths skipped
+    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -144,11 +170,15 @@ describe('Review page — analyse flow', () => {
 
   it('clicking Save to Vault calls POST /publish and toasts on success', async () => {
     const fetchMock = vi.fn();
+    // 1. GET roll detail
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
       json: async () => detailWithMoments()
     });
+    // 2. graph taxonomy fails; inner catch swallows, getGraphPaths skipped
+    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
+    // 3. POST /publish
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -173,8 +203,8 @@ describe('Review page — analyse flow', () => {
     await waitFor(() => {
       expect(screen.getByText(/published to/i)).toBeInTheDocument();
     });
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    const publishCall = fetchMock.mock.calls[1];
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const publishCall = fetchMock.mock.calls[2];
     expect(publishCall[0]).toContain('/publish');
   });
 
@@ -186,7 +216,9 @@ describe('Review page — analyse flow', () => {
       status: 200,
       json: async () => detailWithMoments()
     });
-    // 2. first POST /publish → 409
+    // 2. graph taxonomy fails; inner catch swallows, getGraphPaths skipped
+    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
+    // 3. first POST /publish → 409
     fetchMock.mockResolvedValueOnce({
       ok: false,
       status: 409,
@@ -196,7 +228,7 @@ describe('Review page — analyse flow', () => {
         stored_hash: 'stored'
       })
     });
-    // 3. second POST /publish with force → 200
+    // 4. second POST /publish with force → 200
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -226,9 +258,90 @@ describe('Review page — analyse flow', () => {
     await waitFor(() => {
       expect(screen.getByText(/published to/i)).toBeInTheDocument();
     });
-    expect(fetchMock).toHaveBeenCalledTimes(3);
-    const forceCall = fetchMock.mock.calls[2];
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    const forceCall = fetchMock.mock.calls[3];
     const forceBody = JSON.parse(forceCall[1].body);
     expect(forceBody.force).toBe(true);
+  });
+
+  it('mounts a mini graph below MomentDetail when a moment is selected', async () => {
+    const fetchMock = vi.fn();
+    // 1. GET roll detail (with moments + one analysed)
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...detailWithoutMoments(),
+        moments: [
+          {
+            id: 'm1',
+            frame_idx: 2,
+            timestamp_s: 2.0,
+            pose_delta: 0.5,
+            analyses: [
+              {
+                id: 'a1',
+                player: 'a',
+                position_id: 'standing_neutral',
+                confidence: 0.9,
+                description: 'd',
+                coach_tip: 't'
+              },
+              {
+                id: 'a2',
+                player: 'b',
+                position_id: 'standing_neutral',
+                confidence: 0.9,
+                description: null,
+                coach_tip: null
+              }
+            ],
+            annotations: []
+          }
+        ]
+      })
+    });
+    // 2. GET /api/graph (taxonomy for mini graph)
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        categories: [{ id: 'standing', label: 'Standing', dominance: 0, tint: '#e6f2ff' }],
+        positions: [{ id: 'standing_neutral', name: 'Standing', category: 'standing' }],
+        transitions: []
+      })
+    });
+    // 3. GET /api/graph/paths/<id>
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        duration_s: 10,
+        player_a_name: 'Player A',
+        player_b_name: 'Player B',
+        paths: {
+          a: [{ timestamp_s: 2, position_id: 'standing_neutral', moment_id: 'm1' }],
+          b: [{ timestamp_s: 2, position_id: 'standing_neutral', moment_id: 'm1' }]
+        }
+      })
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const user = userEvent.setup();
+    const { default: Page } = await import('../src/routes/review/[id]/+page.svelte');
+    const { container } = render(Page);
+
+    await waitFor(() => {
+      expect(screen.getByText('Review analyse test')).toBeInTheDocument();
+    });
+
+    // Click the only chip.
+    await user.click(screen.getByRole('button', { name: /0:02/i }));
+
+    await waitFor(() => {
+      // Mini graph data-testid should appear.
+      const miniHost = container.querySelector('[data-graphcluster][data-variant="mini"]');
+      expect(miniHost).not.toBeNull();
+    });
   });
 });

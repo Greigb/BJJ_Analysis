@@ -36,15 +36,15 @@ function momentWithAnalyses() {
     analyses: [
       {
         id: 'a1',
-        player: 'greig',
+        player: 'a',
         position_id: 'closed_guard_bottom',
         confidence: 0.82,
-        description: 'Greig is working from closed guard.',
+        description: 'Player A is working from closed guard.',
         coach_tip: 'Break posture.'
       },
       {
         id: 'a2',
-        player: 'anthony',
+        player: 'b',
         position_id: 'closed_guard_top',
         confidence: 0.78,
         description: null,
@@ -81,15 +81,15 @@ describe('MomentDetail', () => {
         status: 200,
         body: sseBody([
           { stage: 'cache', hit: false },
-          { stage: 'streaming', text: '{"greig":' },
-          { stage: 'streaming', text: '{"greig":{"position":"standing_neutral"' },
+          { stage: 'streaming', text: '{"player_a":' },
+          { stage: 'streaming', text: '{"player_a":{"position":"standing_neutral"' },
           {
             stage: 'done',
             cached: false,
             analysis: {
               timestamp: 3.0,
-              greig: { position: 'standing_neutral', confidence: 0.9 },
-              anthony: { position: 'standing_neutral', confidence: 0.88 },
+              player_a: { position: 'standing_neutral', confidence: 0.9 },
+              player_b: { position: 'standing_neutral', confidence: 0.88 },
               description: 'Both standing neutral.',
               coach_tip: 'Engage first.'
             }

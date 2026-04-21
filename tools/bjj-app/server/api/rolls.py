@@ -81,6 +81,8 @@ class RollDetailOut(BaseModel):
     video_url: str
     vault_path: str | None = None
     vault_published_at: int | None = None
+    player_a_name: str = "Player A"
+    player_b_name: str = "Player B"
     moments: list[MomentOut] = []
 
 
@@ -102,6 +104,8 @@ async def upload_roll(
     title: str = Form(...),
     date: str = Form(...),
     partner: str | None = Form(default=None),
+    player_a_name: str = Form(default="Player A"),
+    player_b_name: str = Form(default="Player B"),
     settings: Settings = Depends(load_settings),
 ) -> RollDetailOut:
     # roll_id is a 32-char hex string (no hyphens). Server-generated, never user input.
@@ -137,6 +141,8 @@ async def upload_roll(
                 partner=partner,
                 result="unknown",
                 created_at=int(time.time()),
+                player_a_name=player_a_name,
+                player_b_name=player_b_name,
             )
         finally:
             conn.close()
@@ -156,6 +162,8 @@ async def upload_roll(
         video_url=f"/assets/{roll_id}/source.mp4",
         vault_path=None,
         vault_published_at=None,
+        player_a_name=player_a_name,
+        player_b_name=player_b_name,
         moments=[],
     )
 
@@ -217,5 +225,7 @@ def get_roll_detail(
         video_url=f"/{row['video_path']}",
         vault_path=row["vault_path"],
         vault_published_at=row["vault_published_at"],
+        player_a_name=row["player_a_name"] or "Player A",
+        player_b_name=row["player_b_name"] or "Player B",
         moments=moments_out,
     )

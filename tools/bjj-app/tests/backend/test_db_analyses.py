@@ -51,14 +51,14 @@ def test_insert_analyses_persists_one_row_per_player(db_with_moment):
         moment_id=moment_id,
         players=[
             {
-                "player": "greig",
+                "player": "a",
                 "position_id": "closed_guard_bottom",
                 "confidence": 0.8,
-                "description": "Greig is in closed guard.",
+                "description": "Player A is in closed guard.",
                 "coach_tip": "Break posture.",
             },
             {
-                "player": "anthony",
+                "player": "b",
                 "position_id": "closed_guard_top",
                 "confidence": 0.75,
                 "description": None,
@@ -69,7 +69,7 @@ def test_insert_analyses_persists_one_row_per_player(db_with_moment):
     )
     assert len(rows) == 2
     players = sorted(r["player"] for r in rows)
-    assert players == ["anthony", "greig"]
+    assert players == ["a", "b"]
 
 
 def test_get_analyses_returns_both_rows_for_a_moment(db_with_moment):
@@ -79,11 +79,11 @@ def test_get_analyses_returns_both_rows_for_a_moment(db_with_moment):
         moment_id=moment_id,
         players=[
             {
-                "player": "greig", "position_id": "p1", "confidence": 1.0,
+                "player": "a", "position_id": "p1", "confidence": 1.0,
                 "description": "x", "coach_tip": "y",
             },
             {
-                "player": "anthony", "position_id": "p2", "confidence": 0.5,
+                "player": "b", "position_id": "p2", "confidence": 0.5,
                 "description": None, "coach_tip": None,
             },
         ],
@@ -99,9 +99,9 @@ def test_insert_analyses_replaces_previous_analyses_for_the_same_moment(db_with_
         conn,
         moment_id=moment_id,
         players=[
-            {"player": "greig", "position_id": "old", "confidence": 0.3,
+            {"player": "a", "position_id": "old", "confidence": 0.3,
              "description": None, "coach_tip": None},
-            {"player": "anthony", "position_id": "old2", "confidence": 0.3,
+            {"player": "b", "position_id": "old2", "confidence": 0.3,
              "description": None, "coach_tip": None},
         ],
         claude_version="2.1.114",
@@ -110,9 +110,9 @@ def test_insert_analyses_replaces_previous_analyses_for_the_same_moment(db_with_
         conn,
         moment_id=moment_id,
         players=[
-            {"player": "greig", "position_id": "new", "confidence": 0.9,
+            {"player": "a", "position_id": "new", "confidence": 0.9,
              "description": "d", "coach_tip": "t"},
-            {"player": "anthony", "position_id": "new2", "confidence": 0.85,
+            {"player": "b", "position_id": "new2", "confidence": 0.85,
              "description": None, "coach_tip": None},
         ],
         claude_version="2.1.114",

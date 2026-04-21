@@ -6,7 +6,8 @@
 
   let title = $state('');
   let date = $state(today);
-  let partner = $state('');
+  let playerAName = $state('');
+  let playerBName = $state('');
   let file = $state<File | null>(null);
   let submitting = $state(false);
   let error = $state<string | null>(null);
@@ -25,7 +26,8 @@
       const roll = await createRoll({
         title: title || `Roll ${date}`,
         date,
-        partner: partner || undefined,
+        player_a_name: playerAName || undefined,
+        player_b_name: playerBName || undefined,
         video: file
       });
       await goto(`/review/${encodeURIComponent(roll.id)}`);
@@ -66,13 +68,23 @@
       />
     </label>
 
-    <label class="block space-y-1">
-      <span class="text-sm text-white/70">Partner</span>
+    <label class="flex flex-col gap-1 text-xs text-white/70">
+      Player A
       <input
         type="text"
-        placeholder="e.g. Anthony"
-        bind:value={partner}
-        class="w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-blue-400/50"
+        bind:value={playerAName}
+        placeholder="Player A"
+        class="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 text-sm text-white/90 placeholder:text-white/30"
+      />
+    </label>
+
+    <label class="flex flex-col gap-1 text-xs text-white/70">
+      Player B
+      <input
+        type="text"
+        bind:value={playerBName}
+        placeholder="Player B"
+        class="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 text-sm text-white/90 placeholder:text-white/30"
       />
     </label>
 

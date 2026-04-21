@@ -9,25 +9,29 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-_SYSTEM_PREAMBLE = (
-    "You are a BJJ (Brazilian Jiu-Jitsu) position classifier. "
-    "You will be shown one frame from a grappling roll between two practitioners: "
-    "Greig (the white belt we are coaching) and Anthony (his training partner). "
-    "Identify each player's current position using ONLY the position ids listed in "
-    "the taxonomy below. If you are unsure between two positions, pick the more "
-    "specific one. Confidence is a float in [0, 1] reflecting how confident you "
-    "are that the chosen position id is correct.\n\n"
-    "Output ONE JSON object and nothing else. No prose, no markdown fences."
-)
+
+def _system_preamble(player_a_name: str, player_b_name: str) -> str:
+    return (
+        "You are a BJJ (Brazilian Jiu-Jitsu) position classifier. "
+        "You will be shown one frame from a grappling roll between two practitioners: "
+        f"{player_a_name} (referred to as player_a in the output) and "
+        f"{player_b_name} (referred to as player_b in the output). "
+        "Identify each player's current position using ONLY the position ids listed in "
+        "the taxonomy below. If you are unsure between two positions, pick the more "
+        "specific one. Confidence is a float in [0, 1] reflecting how confident you "
+        "are that the chosen position id is correct.\n\n"
+        "Output ONE JSON object and nothing else. No prose, no markdown fences."
+    )
+
 
 _SCHEMA_HINT = (
     'Output JSON schema:\n'
     '{\n'
     '  "timestamp": <float, seconds>,\n'
-    '  "greig":   {"position": "<taxonomy position id>", "confidence": <0..1>},\n'
-    '  "anthony": {"position": "<taxonomy position id>", "confidence": <0..1>},\n'
+    '  "player_a": {"position": "<taxonomy position id>", "confidence": <0..1>},\n'
+    '  "player_b": {"position": "<taxonomy position id>", "confidence": <0..1>},\n'
     '  "description": "<one paragraph describing the moment>",\n'
-    '  "coach_tip":   "<one actionable sentence for Greig>"\n'
+    '  "coach_tip":   "<one actionable sentence for player_a>"\n'
     '}'
 )
 
@@ -55,6 +59,8 @@ def build_prompt(
     frame_path: Path,
     taxonomy_path: Path,
     timestamp_s: float,
+    player_a_name: str = "Player A",
+    player_b_name: str = "Player B",
 ) -> str:
     """Construct the single-frame classification prompt. Deterministic."""
     if not frame_path.exists():
@@ -62,7 +68,7 @@ def build_prompt(
 
     taxonomy = compress_taxonomy(taxonomy_path)
     return (
-        f"{_SYSTEM_PREAMBLE}\n\n"
+        f"{_system_preamble(player_a_name, player_b_name)}\n\n"
         f"{taxonomy}\n\n"
         f"Frame timestamp (seconds into the roll): {timestamp_s}\n"
         f"Image to analyse: @{frame_path}\n\n"

@@ -1,4 +1,4 @@
-"""Tests for the M4 schema migration (vault columns on rolls table)."""
+"""Tests for the M4/M5 schema migration (vault + player name columns on rolls table)."""
 from __future__ import annotations
 
 import sqlite3
@@ -81,3 +81,88 @@ def test_init_db_is_idempotent(tmp_path: Path):
     init_db(db_path)  # must not raise
     cols = _rolls_columns(db_path)
     assert "vault_path" in cols
+
+
+def test_init_db_fresh_includes_player_name_columns(tmp_path: Path):
+    db_path = tmp_path / "fresh.db"
+    init_db(db_path)
+    cols = _rolls_columns(db_path)
+    assert "player_a_name" in cols
+    assert "player_b_name" in cols
+
+
+def test_init_db_migrates_analyses_player_enum(tmp_path: Path):
+    """Rows with analyses.player in ('greig','anthony') get renamed to ('a','b')."""
+    db_path = tmp_path / "enum.db"
+    # Build a minimal pre-migration database and insert legacy rows.
+    init_db(db_path)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "INSERT INTO rolls (id, title, date, video_path, created_at, "
+            "player_a_name, player_b_name) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            ("r1", "t", "2026-01-01", "v.mp4", 1, "Greig", "Anthony"),
+        )
+        conn.execute(
+            "INSERT INTO moments (id, roll_id, frame_idx, timestamp_s) "
+            "VALUES (?, ?, ?, ?)",
+            ("m1", "r1", 0, 0.0),
+        )
+        conn.execute(
+            "INSERT INTO analyses (id, moment_id, player, position_id, created_at) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("a1", "m1", "greig", "pos1", 1),
+        )
+        conn.execute(
+            "INSERT INTO analyses (id, moment_id, player, position_id, created_at) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("a2", "m1", "anthony", "pos2", 1),
+        )
+        conn.commit()
+
+    # Re-run init_db — the migration should rename.
+    init_db(db_path)
+
+    conn = connect(db_path)
+    try:
+        rows = conn.execute(
+            "SELECT id, player FROM analyses ORDER BY id"
+        ).fetchall()
+    finally:
+        conn.close()
+    assert [(r["id"], r["player"]) for r in rows] == [("a1", "a"), ("a2", "b")]
+
+
+def test_init_db_renames_hardcoded_player_names_to_generic(tmp_path: Path):
+    """Rows with the old hardcoded Greig/Anthony defaults get rewritten to
+    Player A/Player B so nothing in the UI depends on specific names."""
+    db_path = tmp_path / "rename.db"
+    init_db(db_path)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "INSERT INTO rolls (id, title, date, video_path, created_at, "
+            "player_a_name, player_b_name) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            ("r-old", "legacy", "2026-01-01", "v.mp4", 1, "Greig", "Anthony"),
+        )
+        conn.execute(
+            "INSERT INTO rolls (id, title, date, video_path, created_at, "
+            "player_a_name, player_b_name) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            ("r-custom", "custom", "2026-01-02", "v.mp4", 2, "Alice", "Bob"),
+        )
+        conn.commit()
+
+    # Re-run init_db — backfill should rename defaults but leave custom names alone.
+    init_db(db_path)
+
+    conn = connect(db_path)
+    try:
+        rows = {
+            r["id"]: (r["player_a_name"], r["player_b_name"])
+            for r in conn.execute(
+                "SELECT id, player_a_name, player_b_name FROM rolls"
+            ).fetchall()
+        }
+    finally:
+        conn.close()
+
+    assert rows["r-old"] == ("Player A", "Player B")
+    assert rows["r-custom"] == ("Alice", "Bob")  # user-typed names preserved
