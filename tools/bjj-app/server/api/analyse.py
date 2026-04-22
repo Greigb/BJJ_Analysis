@@ -86,6 +86,17 @@ async def analyse_roll(
     ]
     player_a_name = row["player_a_name"] or "Player A"
     player_b_name = row["player_b_name"] or "Player B"
+    # These columns are nullable; sqlite3.Row.__getitem__ raises on missing
+    # columns for old DBs, so guard with a try/except rather than `or None`
+    # (an empty-string description should not become None).
+    try:
+        player_a_description = row["player_a_description"]
+    except (IndexError, KeyError):
+        player_a_description = None
+    try:
+        player_b_description = row["player_b_description"]
+    except (IndexError, KeyError):
+        player_b_description = None
     limiter = _get_limiter(settings)
 
     async def event_stream() -> AsyncIterator[bytes]:
@@ -100,6 +111,8 @@ async def analyse_roll(
                 duration_s=duration_s,
                 player_a_name=player_a_name,
                 player_b_name=player_b_name,
+                player_a_description=player_a_description,
+                player_b_description=player_b_description,
                 settings=settings,
                 limiter=limiter,
             ):

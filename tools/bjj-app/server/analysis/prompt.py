@@ -97,11 +97,17 @@ def build_section_prompt(
     timestamps: list[float],
     player_a_name: str,
     player_b_name: str,
+    player_a_description: str | None = None,
+    player_b_description: str | None = None,
 ) -> str:
     """Build the multi-image section narrative prompt.
 
     Caller must have already written the frames to disk. `frame_paths` and
     `timestamps` are parallel lists in chronological order.
+
+    `player_a_description` / `player_b_description`, when provided, are short
+    visual-identification hints (gi colour, hair, build) that help Claude
+    consistently tag the same person as player_a across frames.
     """
     if len(frame_paths) != len(timestamps):
         raise ValueError(
@@ -116,6 +122,20 @@ def build_section_prompt(
         f"You are analysing a Brazilian Jiu-Jitsu sequence between "
         f"{player_a_name} (player_a in output) and {player_b_name} (player_b in output)."
     )
+
+    ident_lines: list[str] = []
+    a_desc = (player_a_description or "").strip()
+    b_desc = (player_b_description or "").strip()
+    if a_desc or b_desc:
+        ident_lines.append(
+            "Use these appearance hints to keep player tagging consistent across frames:"
+        )
+        if a_desc:
+            ident_lines.append(f"- player_a ({player_a_name}): {a_desc}")
+        if b_desc:
+            ident_lines.append(f"- player_b ({player_b_name}): {b_desc}")
+    identification = "\n".join(ident_lines)
+
     intro = (
         f"Below are {len(frame_paths)} chronologically ordered frames spanning "
         f"{duration_s}s of footage. Review all frames as one continuous sequence "
@@ -131,13 +151,11 @@ def build_section_prompt(
         "\"passes half guard to side control\", \"triangle attempt\"). Follow with "
         "one actionable coach tip directed at player_a."
     )
-    return "\n\n".join([
-        preamble,
-        intro,
-        "\n".join(frame_lines),
-        guidance,
-        _SECTION_SCHEMA_HINT,
-    ])
+    parts = [preamble]
+    if identification:
+        parts.append(identification)
+    parts.extend([intro, "\n".join(frame_lines), guidance, _SECTION_SCHEMA_HINT])
+    return "\n\n".join(parts)
 
 
 def parse_section_response(raw: str) -> dict:

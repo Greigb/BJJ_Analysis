@@ -42,8 +42,10 @@ describe('New Roll page', () => {
     render(Page);
     expect(screen.getByLabelText(/title/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/date/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/player a/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/player b/i)).toBeInTheDocument();
+    // Two fieldsets (Player A / Player B), each with a Name + Appearance field.
+    expect(screen.getByRole('group', { name: /player a/i })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /player b/i })).toBeInTheDocument();
+    expect(screen.getAllByLabelText(/appearance/i)).toHaveLength(2);
     expect(screen.getByLabelText(/video file/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /upload/i })).toBeInTheDocument();
   });

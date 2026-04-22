@@ -122,6 +122,38 @@ def test_build_section_prompt_contains_frame_refs_and_names(tmp_path):
     assert '"coach_tip"' in prompt
 
 
+def test_build_section_prompt_includes_player_descriptions_when_provided(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+
+    frames = [tmp_path / "frame_000000.jpg"]
+    frames[0].write_bytes(b"x")
+
+    prompt = build_section_prompt(
+        start_s=0.0, end_s=1.0,
+        frame_paths=frames, timestamps=[0.0],
+        player_a_name="Greig", player_b_name="Sam",
+        player_a_description="navy gi, bald",
+        player_b_description="white gi, long hair",
+    )
+    assert "navy gi, bald" in prompt
+    assert "white gi, long hair" in prompt
+    assert "appearance hints" in prompt.lower()
+
+
+def test_build_section_prompt_omits_identification_when_no_descriptions(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+
+    frames = [tmp_path / "frame_000000.jpg"]
+    frames[0].write_bytes(b"x")
+
+    prompt = build_section_prompt(
+        start_s=0.0, end_s=1.0,
+        frame_paths=frames, timestamps=[0.0],
+        player_a_name="Greig", player_b_name="Sam",
+    )
+    assert "appearance hints" not in prompt.lower()
+
+
 def test_parse_section_response_happy_path():
     from server.analysis.prompt import parse_section_response
 

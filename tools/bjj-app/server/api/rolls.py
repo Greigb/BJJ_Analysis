@@ -97,6 +97,8 @@ class RollDetailOut(BaseModel):
     vault_published_at: int | None = None
     player_a_name: str = "Player A"
     player_b_name: str = "Player B"
+    player_a_description: str | None = None
+    player_b_description: str | None = None
     finalised_at: int | None = None
     scores: dict | None = None
     distribution: dict | None = None
@@ -124,6 +126,8 @@ async def upload_roll(
     partner: str | None = Form(default=None),
     player_a_name: str = Form(default="Player A"),
     player_b_name: str = Form(default="Player B"),
+    player_a_description: str | None = Form(default=None),
+    player_b_description: str | None = Form(default=None),
     settings: Settings = Depends(load_settings),
 ) -> RollDetailOut:
     # roll_id is a 32-char hex string (no hyphens). Server-generated, never user input.
@@ -161,6 +165,8 @@ async def upload_roll(
                 created_at=int(time.time()),
                 player_a_name=player_a_name,
                 player_b_name=player_b_name,
+                player_a_description=(player_a_description or None),
+                player_b_description=(player_b_description or None),
             )
         finally:
             conn.close()
@@ -182,6 +188,8 @@ async def upload_roll(
         vault_published_at=None,
         player_a_name=player_a_name,
         player_b_name=player_b_name,
+        player_a_description=(player_a_description or None),
+        player_b_description=(player_b_description or None),
         finalised_at=None,
         scores=None,
         distribution=None,
@@ -263,6 +271,16 @@ def get_roll_detail(
         for s in section_rows
     ]
 
+    # Older DBs may predate the player_*_description columns; guard access.
+    try:
+        player_a_description = row["player_a_description"]
+    except (IndexError, KeyError):
+        player_a_description = None
+    try:
+        player_b_description = row["player_b_description"]
+    except (IndexError, KeyError):
+        player_b_description = None
+
     return RollDetailOut(
         id=row["id"],
         title=row["title"],
@@ -275,6 +293,8 @@ def get_roll_detail(
         vault_published_at=row["vault_published_at"],
         player_a_name=row["player_a_name"] or "Player A",
         player_b_name=row["player_b_name"] or "Player B",
+        player_a_description=player_a_description,
+        player_b_description=player_b_description,
         finalised_at=row["finalised_at"],
         scores=scores,
         distribution=None,

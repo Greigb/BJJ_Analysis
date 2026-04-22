@@ -29,7 +29,9 @@ CREATE TABLE IF NOT EXISTS rolls (
     vault_published_at INTEGER,
     player_a_name TEXT,
     player_b_name TEXT,
-    vault_summary_hashes TEXT
+    vault_summary_hashes TEXT,
+    player_a_description TEXT,
+    player_b_description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS moments (
@@ -92,6 +94,11 @@ _ROLLS_M4_COLUMNS: tuple[tuple[str, str], ...] = (
     ("vault_summary_hashes", "TEXT"),
 )
 
+_ROLLS_M9B2_COLUMNS: tuple[tuple[str, str], ...] = (
+    ("player_a_description", "TEXT"),
+    ("player_b_description", "TEXT"),
+)
+
 
 def _migrate_rolls_m4(conn: sqlite3.Connection) -> None:
     """Idempotently add M4 columns to an existing rolls table.
@@ -102,6 +109,19 @@ def _migrate_rolls_m4(conn: sqlite3.Connection) -> None:
     """
     existing = {row[1] for row in conn.execute("PRAGMA table_info(rolls)").fetchall()}
     for name, sql_type in _ROLLS_M4_COLUMNS:
+        if name not in existing:
+            conn.execute(f"ALTER TABLE rolls ADD COLUMN {name} {sql_type}")
+
+
+def _migrate_rolls_player_descriptions(conn: sqlite3.Connection) -> None:
+    """Idempotently add player_a_description / player_b_description to rolls.
+
+    Freeform text; used to feed Claude a visual-identification hint so the same
+    player is consistently tagged player_a across frames (e.g. "navy gi, bald,
+    bottom at the start of this roll").
+    """
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(rolls)").fetchall()}
+    for name, sql_type in _ROLLS_M9B2_COLUMNS:
         if name not in existing:
             conn.execute(f"ALTER TABLE rolls ADD COLUMN {name} {sql_type}")
 
@@ -197,6 +217,7 @@ def init_db(db_path: Path) -> None:
         _migrate_moments_m9(conn)
         _migrate_sections_m9b(conn)
         _migrate_annotations_m9b(conn)
+        _migrate_rolls_player_descriptions(conn)
         conn.commit()
 
 
@@ -221,6 +242,8 @@ def create_roll(
     created_at: int,
     player_a_name: str = "Player A",
     player_b_name: str = "Player B",
+    player_a_description: str | None = None,
+    player_b_description: str | None = None,
 ) -> sqlite3.Row:
     """Insert a roll row and return it. Callers pass an open connection."""
     conn.execute(
@@ -228,12 +251,14 @@ def create_roll(
         INSERT INTO rolls (
             id, title, date, video_path, duration_s, partner,
             result, scores_json, finalised_at, created_at,
-            player_a_name, player_b_name
+            player_a_name, player_b_name,
+            player_a_description, player_b_description
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)
         """,
         (id, title, date, video_path, duration_s, partner, result, created_at,
-         player_a_name, player_b_name),
+         player_a_name, player_b_name,
+         player_a_description, player_b_description),
     )
     conn.commit()
     return get_roll(conn, id)  # type: ignore[return-value]

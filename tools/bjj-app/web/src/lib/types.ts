@@ -56,6 +56,8 @@ export type RollDetail = {
   vault_published_at: number | null;
   player_a_name: string;
   player_b_name: string;
+  player_a_description: string | null;
+  player_b_description: string | null;
   finalised_at: number | null;
   scores: SummaryPayload | null;
   distribution: Distribution | null;
@@ -69,6 +71,8 @@ export type CreateRollInput = {
   partner?: string;
   player_a_name?: string;
   player_b_name?: string;
+  player_a_description?: string;
+  player_b_description?: string;
   video: File;
 };
 

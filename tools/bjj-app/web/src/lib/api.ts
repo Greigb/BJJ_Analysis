@@ -50,6 +50,10 @@ export function createRoll(input: CreateRollInput): Promise<RollDetail> {
   if (input.partner) form.append('partner', input.partner);
   if (input.player_a_name) form.append('player_a_name', input.player_a_name);
   if (input.player_b_name) form.append('player_b_name', input.player_b_name);
+  if (input.player_a_description)
+    form.append('player_a_description', input.player_a_description);
+  if (input.player_b_description)
+    form.append('player_b_description', input.player_b_description);
   form.append('video', input.video);
 
   return request<RollDetail>('/api/rolls', {

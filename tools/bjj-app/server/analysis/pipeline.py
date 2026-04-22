@@ -66,6 +66,8 @@ async def run_section_analysis(
     player_b_name: str,
     settings: Settings,
     limiter: SlidingWindowLimiter,
+    player_a_description: str | None = None,
+    player_b_description: str | None = None,
 ) -> AsyncIterator[dict]:
     """Process each section sequentially. Yields SSE-shaped dicts.
 
@@ -130,6 +132,8 @@ async def run_section_analysis(
             timestamps=timestamps,
             player_a_name=player_a_name,
             player_b_name=player_b_name,
+            player_a_description=player_a_description,
+            player_b_description=player_b_description,
         )
 
         error_msg: str | None = None

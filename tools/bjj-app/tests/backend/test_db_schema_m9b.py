@@ -37,6 +37,43 @@ def test_annotations_uses_section_id_fk(tmp_path):
         conn.close()
 
 
+def test_rolls_has_player_a_b_description(tmp_path):
+    """Freeform text columns used to feed Claude a visual-id hint per roll."""
+    db = tmp_path / "db.sqlite"
+    init_db(db)
+    conn = connect(db)
+    try:
+        cols = {r[1]: r[2] for r in conn.execute("PRAGMA table_info(rolls)")}
+        assert "player_a_description" in cols
+        assert "player_b_description" in cols
+        assert cols["player_a_description"].upper() == "TEXT"
+        assert cols["player_b_description"].upper() == "TEXT"
+    finally:
+        conn.close()
+
+
+def test_create_roll_persists_player_descriptions(tmp_path):
+    from server.db import create_roll, get_roll
+
+    db = tmp_path / "db.sqlite"
+    init_db(db)
+    conn = connect(db)
+    try:
+        create_roll(
+            conn, id="r1", title="T", date="2026-04-22",
+            video_path="assets/r1/source.mp4", duration_s=10.0,
+            partner=None, result="unknown", created_at=1,
+            player_a_name="Greig", player_b_name="Sam",
+            player_a_description="navy gi, bald",
+            player_b_description="white gi, long hair",
+        )
+        row = get_roll(conn, "r1")
+        assert row["player_a_description"] == "navy gi, bald"
+        assert row["player_b_description"] == "white gi, long hair"
+    finally:
+        conn.close()
+
+
 def test_init_db_is_idempotent(tmp_path):
     """Running init_db twice must not raise or duplicate data."""
     db = tmp_path / "db.sqlite"
