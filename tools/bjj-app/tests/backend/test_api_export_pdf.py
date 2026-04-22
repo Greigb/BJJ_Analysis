@@ -32,15 +32,14 @@ def _minimal_taxonomy(root: Path) -> None:
 
 
 def _setup_finalised_roll(db_path: Path, roll_id: str, project_root: Path) -> list[str]:
-    """Create a roll in the DB with 1 moment, 1 analysis, and a finalised summary.
+    """Create a roll in the DB with 1 section and a finalised summary.
 
-    Returns [moment_id] so tests can reference it in key_moments.
+    Returns [section_id] so tests can reference it in key_moments.
     """
     from server.db import (
         connect,
         create_roll,
-        insert_analyses,
-        insert_moments,
+        insert_section,
         set_summary_state,
     )
 
@@ -62,24 +61,14 @@ def _setup_finalised_roll(db_path: Path, roll_id: str, project_root: Path) -> li
             player_a_name="Greig",
             player_b_name="Partner",
         )
-        inserted = insert_moments(
+        sec_row = insert_section(
             conn,
             roll_id=roll_id,
-            moments=[{"frame_idx": 30, "timestamp_s": 12.5, "pose_delta": 0.1}],
+            start_s=12.5,
+            end_s=30.0,
+            sample_interval_s=5.0,
         )
-        m_id = inserted[0]["id"]
-        insert_analyses(
-            conn,
-            moment_id=m_id,
-            players=[{
-                "player": "a",
-                "position_id": "closed_guard_bottom",
-                "confidence": 0.9,
-                "description": None,
-                "coach_tip": None,
-            }],
-            claude_version="test",
-        )
+        sec_id = sec_row["id"]
         set_summary_state(
             conn,
             roll_id=roll_id,
@@ -92,11 +81,11 @@ def _setup_finalised_roll(db_path: Path, roll_id: str, project_root: Path) -> li
                 },
                 "top_improvements": ["Chain sweeps from closed guard."],
                 "strengths": ["Strong retention."],
-                "key_moments": [{"moment_id": m_id, "note": "First sweep attempt."}],
+                "key_moments": [{"section_id": sec_id, "note": "First sweep attempt."}],
             },
             finalised_at=1713700100,
         )
-        return [m_id]
+        return [sec_id]
     finally:
         conn.close()
 

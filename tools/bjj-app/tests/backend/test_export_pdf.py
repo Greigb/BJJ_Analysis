@@ -54,21 +54,6 @@ from datetime import datetime, timezone
 from server.export.pdf import build_report_context
 
 
-def _fixture_taxonomy():
-    return {
-        "categories": [
-            {"id": "guard_top", "label": "Guard top"},
-            {"id": "guard_bottom", "label": "Guard bottom"},
-            {"id": "standing", "label": "Standing"},
-            {"id": "scramble", "label": "Scramble"},
-        ],
-        "positions": [
-            {"id": "closed_guard_bottom", "category": "guard_bottom"},
-            {"id": "closed_guard_top", "category": "guard_top"},
-        ],
-    }
-
-
 def _fixture_roll(**overrides):
     base = {
         "id": "abcdef1234567890abcdef1234567890",
@@ -101,27 +86,19 @@ def _fixture_scores():
             "Calm under pressure.",
         ],
         "key_moments": [
-            {"moment_id": "m1", "note": "First sweep attempt."},
-            {"moment_id": "m2", "note": "Passed half guard."},
-            {"moment_id": "m3", "note": "Back take attempt."},
+            {"section_id": "sec1", "note": "First sweep attempt."},
+            {"section_id": "sec2", "note": "Passed half guard."},
+            {"section_id": "sec3", "note": "Back take attempt."},
         ],
     }
 
 
-def _fixture_moments():
+def _fixture_sections():
     return [
-        {"id": "m1", "frame_idx": 30, "timestamp_s": 12.5, "category": "guard_bottom"},
-        {"id": "m2", "frame_idx": 60, "timestamp_s": 45.0, "category": "guard_top"},
-        {"id": "m3", "frame_idx": 90, "timestamp_s": 130.0, "category": "scramble"},
+        {"id": "sec1", "start_s": 12.5, "end_s": 30.0, "narrative": "some narrative"},
+        {"id": "sec2", "start_s": 45.0, "end_s": 60.0, "narrative": "another narrative"},
+        {"id": "sec3", "start_s": 130.0, "end_s": 150.0, "narrative": "third narrative"},
     ]
-
-
-def _fixture_distribution():
-    return {
-        "timeline": ["guard_bottom", "guard_top", "scramble"],
-        "counts": {"guard_bottom": 1, "guard_top": 1, "scramble": 1},
-        "percentages": {"guard_bottom": 33, "guard_top": 34, "scramble": 33},
-    }
 
 
 class TestBuildReportContext:
@@ -129,9 +106,7 @@ class TestBuildReportContext:
         ctx = build_report_context(
             roll=_fixture_roll(),
             scores=_fixture_scores(),
-            distribution=_fixture_distribution(),
-            moments=_fixture_moments(),
-            taxonomy=_fixture_taxonomy(),
+            sections=_fixture_sections(),
             generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
         )
         assert ctx["title"] == "Tuesday Roll"
@@ -148,9 +123,7 @@ class TestBuildReportContext:
         ctx = build_report_context(
             roll=_fixture_roll(),
             scores=_fixture_scores(),
-            distribution=_fixture_distribution(),
-            moments=_fixture_moments(),
-            taxonomy=_fixture_taxonomy(),
+            sections=_fixture_sections(),
             generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
         )
         assert ctx["scores"] == [
@@ -159,43 +132,33 @@ class TestBuildReportContext:
             {"id": "transition_quality", "label": "Transition Quality", "value": 8, "bar_pct": 80, "color_bucket": "high"},
         ]
 
-    def test_distribution_bar_uses_human_labels(self):
+    def test_distribution_bar_is_always_empty(self):
         ctx = build_report_context(
             roll=_fixture_roll(),
             scores=_fixture_scores(),
-            distribution=_fixture_distribution(),
-            moments=_fixture_moments(),
-            taxonomy=_fixture_taxonomy(),
+            sections=_fixture_sections(),
             generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
         )
-        # Every segment maps category id → human label, carries width + a CSS color variable name.
-        labels = {seg["label"]: seg["width_pct"] for seg in ctx["distribution_bar"]}
-        assert labels == {"Guard bottom": 33, "Guard top": 34, "Scramble": 33}
-        for seg in ctx["distribution_bar"]:
-            assert seg["color_class"].startswith("cat-")
+        assert ctx["distribution_bar"] == []
 
-    def test_key_moments_resolve_to_mm_ss_and_category_labels(self):
+    def test_key_moments_resolve_to_mm_ss_and_section_range_labels(self):
         ctx = build_report_context(
             roll=_fixture_roll(),
             scores=_fixture_scores(),
-            distribution=_fixture_distribution(),
-            moments=_fixture_moments(),
-            taxonomy=_fixture_taxonomy(),
+            sections=_fixture_sections(),
             generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
         )
         assert ctx["key_moments"] == [
-            {"timestamp_human": "00:12", "category_label": "Guard bottom", "blurb": "First sweep attempt."},
-            {"timestamp_human": "00:45", "category_label": "Guard top", "blurb": "Passed half guard."},
-            {"timestamp_human": "02:10", "category_label": "Scramble", "blurb": "Back take attempt."},
+            {"timestamp_human": "00:12", "category_label": "00:12–00:30", "blurb": "First sweep attempt."},
+            {"timestamp_human": "00:45", "category_label": "00:45–01:00", "blurb": "Passed half guard."},
+            {"timestamp_human": "02:10", "category_label": "02:10–02:30", "blurb": "Back take attempt."},
         ]
 
     def test_improvements_and_strengths_passthrough(self):
         ctx = build_report_context(
             roll=_fixture_roll(),
             scores=_fixture_scores(),
-            distribution=_fixture_distribution(),
-            moments=_fixture_moments(),
-            taxonomy=_fixture_taxonomy(),
+            sections=_fixture_sections(),
             generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
         )
         assert ctx["improvements"] == [
@@ -207,18 +170,16 @@ class TestBuildReportContext:
             "Calm under pressure.",
         ]
 
-    def test_missing_key_moment_id_is_skipped(self):
+    def test_missing_section_id_is_skipped(self):
         scores = _fixture_scores()
-        scores["key_moments"].append({"moment_id": "does-not-exist", "note": "should be dropped"})
+        scores["key_moments"].append({"section_id": "does-not-exist", "note": "should be dropped"})
         ctx = build_report_context(
             roll=_fixture_roll(),
             scores=scores,
-            distribution=_fixture_distribution(),
-            moments=_fixture_moments(),
-            taxonomy=_fixture_taxonomy(),
+            sections=_fixture_sections(),
             generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
         )
-        # Only the three valid moments come through.
+        # Only the three valid sections come through.
         assert len(ctx["key_moments"]) == 3
 
     def test_raises_when_scores_missing(self):
@@ -226,11 +187,54 @@ class TestBuildReportContext:
             build_report_context(
                 roll=_fixture_roll(),
                 scores=None,
-                distribution=_fixture_distribution(),
-                moments=_fixture_moments(),
-                taxonomy=_fixture_taxonomy(),
+                sections=_fixture_sections(),
                 generated_at=datetime(2026, 4, 21, 14, 32, tzinfo=timezone.utc),
             )
+
+
+def test_build_report_context_key_moments_resolve_by_section_id():
+    from datetime import datetime, timezone
+    from server.export.pdf import build_report_context
+    roll = {
+        "id": "abcdef0123", "title": "T", "date": "2026-04-22",
+        "player_a_name": "A", "player_b_name": "B", "duration_s": 60.0,
+    }
+    scores = {
+        "summary": "S",
+        "scores": {"guard_retention": 7, "positional_awareness": 6, "transition_quality": 7},
+        "top_improvements": ["a", "b", "c"],
+        "strengths": ["x", "y"],
+        "key_moments": [{"section_id": "sec1", "note": "n1"}],
+    }
+    sections = [{"id": "sec1", "start_s": 3.0, "end_s": 7.0}]
+    ctx = build_report_context(
+        roll=roll, scores=scores, sections=sections,
+        generated_at=datetime.now(timezone.utc),
+    )
+    assert ctx["distribution_bar"] == []
+    assert ctx["key_moments"][0]["timestamp_human"] == "00:03"
+
+
+def test_render_report_pdf_omits_distribution_section_when_empty():
+    from datetime import datetime, timezone
+    from server.export.pdf import build_report_context, render_report_pdf
+    ctx = build_report_context(
+        roll={
+            "id": "x" * 16, "title": "T", "date": "2026-04-22",
+            "player_a_name": "A", "player_b_name": "B", "duration_s": 60.0,
+        },
+        scores={
+            "summary": "S",
+            "scores": {"guard_retention": 7, "positional_awareness": 6, "transition_quality": 7},
+            "top_improvements": ["a", "b", "c"],
+            "strengths": ["x", "y"],
+            "key_moments": [],
+        },
+        sections=[],
+        generated_at=datetime.now(timezone.utc),
+    )
+    pdf = render_report_pdf(ctx)
+    assert pdf[:4] == b"%PDF"
 
 
 from server.export.pdf import render_report_pdf
