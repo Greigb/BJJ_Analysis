@@ -12,6 +12,20 @@ class SummaryResponseError(Exception):
     """Raised when Claude's summary output fails schema or reference validation."""
 
 
+_SCORING_RUBRIC = (
+    "Scoring rubric (calibrate each score against the footage provided, not against BJJ "
+    "practice as a whole — 10 means execution was reliable throughout THIS roll):\n"
+    "- 0–3: needs focused work; frequent positional loss or stalled execution.\n"
+    "- 4–6: developing; skill is emerging but inconsistent under pressure.\n"
+    "- 7–10: reliable; consistent, technical execution against the partner in this footage.\n"
+    "\n"
+    "Per-metric definitions:\n"
+    "- guard_retention: ability to recover / hold guard when pressured.\n"
+    "- positional_awareness: reads the partner's posture and responds with the right frame / grip / shape.\n"
+    "- transition_quality: technical fluency moving between positions (passes, sweeps, escapes)."
+)
+
+
 _OUTPUT_SCHEMA_HINT = (
     'Output ONE JSON object with this exact shape — no prose, no markdown fences:\n'
     '{\n'
@@ -90,7 +104,7 @@ def build_summary_prompt(
     else:
         sections_block = "Per-section analyses (chronological):\n(no sections analysed)"
 
-    return "\n\n".join([preamble, meta, sections_block, _OUTPUT_SCHEMA_HINT])
+    return "\n\n".join([preamble, meta, sections_block, _SCORING_RUBRIC, _OUTPUT_SCHEMA_HINT])
 
 
 _REQUIRED_SCORES = ("guard_retention", "positional_awareness", "transition_quality")

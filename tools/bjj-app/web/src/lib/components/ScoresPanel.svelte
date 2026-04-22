@@ -39,6 +39,8 @@
     if (score >= 5) return 'border-amber-400/50 bg-amber-500/10 text-amber-100';
     return 'border-rose-400/50 bg-rose-500/10 text-rose-100';
   }
+
+  let rubricOpen = $state(false);
 </script>
 
 <section class="space-y-4 rounded-lg border border-white/10 bg-white/[0.02] p-5">
@@ -62,6 +64,40 @@
       <div class="text-xl font-semibold tabular-nums">{scores.scores.transition_quality}/10</div>
       <div class="mt-1 text-[10px] uppercase tracking-wider opacity-75">Transition</div>
     </div>
+  </div>
+
+  <div class="text-[11px] text-white/50">
+    <button
+      type="button"
+      onclick={() => (rubricOpen = !rubricOpen)}
+      class="text-white/60 hover:text-white/85 underline underline-offset-2"
+      aria-expanded={rubricOpen}
+    >
+      {rubricOpen ? 'Hide' : 'What does'} x/10 {rubricOpen ? 'rubric' : 'mean?'}
+    </button>
+    {#if rubricOpen}
+      <div class="mt-2 space-y-2 rounded-md border border-white/10 bg-white/[0.02] p-3 text-white/70">
+        <div>
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-white/50">Bands</div>
+          <ul class="mt-1 list-disc space-y-0.5 pl-5">
+            <li><strong class="text-white/80">0–3</strong> — needs focused work; frequent positional loss or stalled execution.</li>
+            <li><strong class="text-white/80">4–6</strong> — developing; skill is emerging but inconsistent under pressure.</li>
+            <li><strong class="text-white/80">7–10</strong> — reliable; consistent, technical execution against the partner in this footage.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-white/50">Per metric</div>
+          <ul class="mt-1 space-y-0.5">
+            <li><strong class="text-white/80">Retention</strong> — ability to recover / hold guard when pressured.</li>
+            <li><strong class="text-white/80">Awareness</strong> — reads the partner's posture + responds with the right frame / grip / shape.</li>
+            <li><strong class="text-white/80">Transition</strong> — technical fluency moving between positions (passes, sweeps, escapes).</li>
+          </ul>
+        </div>
+        <div class="text-white/50">
+          Scores are calibrated per roll — not across BJJ as a whole. A 10 means execution was reliable throughout <em>this</em> footage, not that the practitioner is a world champion.
+        </div>
+      </div>
+    {/if}
   </div>
 
   <p class="text-sm leading-relaxed text-white/85">{scores.summary}</p>
