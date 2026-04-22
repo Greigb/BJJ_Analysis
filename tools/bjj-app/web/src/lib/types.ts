@@ -192,3 +192,9 @@ export type SummariseResponse = {
   scores: SummaryPayload;
   distribution: Distribution;
 };
+
+// ---------- M6b: PDF export types ----------
+
+export type ExportPdfResult =
+  | { kind: 'ok'; blob: Blob; filename: string }
+  | { kind: 'conflict'; blob: Blob; filename: string };

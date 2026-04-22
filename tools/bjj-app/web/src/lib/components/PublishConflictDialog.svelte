@@ -19,8 +19,9 @@
     <div class="max-w-md rounded-lg border border-white/12 bg-black/80 p-5 shadow-lg">
       <h2 class="text-sm font-semibold text-white/95">Vault conflict</h2>
       <p class="mt-2 text-sm text-white/70">
-        Your Notes or a summary section was edited in Obsidian since you last published. If you
-        overwrite, the external edit will be lost (check git if you need to recover).
+        Your Notes, a summary section, or the Report section was edited in Obsidian since you last
+        published. If you overwrite, the external edit will be lost (check git if you need to
+        recover).
       </p>
       <div class="mt-4 flex items-center justify-end gap-2">
         <button

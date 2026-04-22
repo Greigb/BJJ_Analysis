@@ -1,0 +1,109 @@
+@page {
+  size: A4 portrait;
+  margin: 20mm;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
+  font-size: 11pt;
+  line-height: 1.45;
+  color: #222;
+  margin: 0;
+}
+
+h1, h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  margin: 0;
+}
+
+.masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 0.5pt solid #999;
+  padding-bottom: 4pt;
+  font-family: Georgia, serif;
+  font-variant: small-caps;
+  letter-spacing: 0.5pt;
+  font-size: 9pt;
+  color: #555;
+}
+
+.title-block { margin-top: 14pt; }
+.title-block h1 { font-size: 22pt; letter-spacing: -0.2pt; }
+.subtitle { font-size: 10pt; color: #666; margin-top: 2pt; }
+
+.summary { margin-top: 12pt; text-align: center; }
+.summary p { font-style: italic; font-size: 12pt; margin: 0; }
+
+.scores {
+  display: flex;
+  gap: 10pt;
+  margin-top: 16pt;
+}
+.score-box {
+  flex: 1;
+  border: 0.5pt solid #ccc;
+  border-radius: 4pt;
+  padding: 10pt;
+}
+.score-label { font-size: 9pt; color: #666; text-transform: uppercase; letter-spacing: 0.5pt; }
+.score-value { font-family: Georgia, serif; font-size: 28pt; font-weight: 600; line-height: 1.1; }
+.score-value span { font-size: 12pt; color: #888; font-weight: 400; }
+.score-bar { height: 4pt; background: #eee; border-radius: 2pt; margin-top: 6pt; overflow: hidden; }
+.score-bar .fill { height: 100%; border-radius: 2pt; }
+.bucket-low  .fill { background: #b6413a; }
+.bucket-mid  .fill { background: #c18a2b; }
+.bucket-high .fill { background: #3f8a4b; }
+
+.distribution { margin-top: 18pt; }
+.distribution h2 { font-size: 11pt; margin-bottom: 4pt; }
+.dist-bar {
+  display: flex;
+  height: 22pt;
+  border-radius: 3pt;
+  overflow: hidden;
+  border: 0.5pt solid #ccc;
+}
+.dist-seg {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 4pt;
+  color: #fff;
+  font-size: 8pt;
+  white-space: nowrap;
+  overflow: hidden;
+}
+/* Muted print-friendly category hues, ~40% saturation drop from the app palette. */
+.cat-standing      { background: #8a8aa0; }
+.cat-guard-top     { background: #5a7ea0; }
+.cat-guard-bottom  { background: #a07a5a; }
+.cat-dominant      { background: #5a8a5a; }
+.cat-inferior      { background: #a05a5a; }
+.cat-leg-ent       { background: #8a6aa0; }
+.cat-scramble      { background: #a09a5a; }
+.cat-pass          { background: #6a8aa0; }
+.cat-submission    { background: #a05a7a; }
+
+.improvements, .strengths, .key-moments { margin-top: 16pt; }
+.improvements h2, .strengths h2, .key-moments h2 { font-size: 11pt; margin-bottom: 4pt; }
+.improvements ol, .strengths ul { margin: 0; padding-left: 18pt; }
+.improvements li, .strengths li { margin-bottom: 3pt; }
+
+.key-moments table { width: 100%; border-collapse: collapse; }
+.key-moments td { padding: 4pt 6pt; border-bottom: 0.25pt solid #eee; vertical-align: top; font-size: 10pt; }
+.key-moments td.ts { font-family: Georgia, serif; font-weight: 600; white-space: nowrap; width: 48pt; }
+.key-moments td.cat { color: #666; white-space: nowrap; width: 90pt; }
+
+.footer-strip {
+  margin-top: 20pt;
+  padding-top: 4pt;
+  border-top: 0.5pt solid #999;
+  font-size: 8pt;
+  color: #777;
+  text-align: right;
+}

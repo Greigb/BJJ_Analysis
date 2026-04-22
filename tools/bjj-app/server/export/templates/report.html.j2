@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }} — Match Report</title>
+  <link rel="stylesheet" href="report.css">
+</head>
+<body>
+
+<header class="masthead">
+  <span class="brand">BJJ Match Report</span>
+  <span class="date">{{ date_human }}</span>
+</header>
+
+<section class="title-block">
+  <h1>{{ title }}</h1>
+  <p class="subtitle">{{ player_a_name }} vs {{ player_b_name }}
+    &bull; {{ duration_human }}
+    &bull; {{ moments_analysed_count }} moments analysed</p>
+</section>
+
+<section class="summary">
+  <p>{{ summary_sentence }}</p>
+</section>
+
+<section class="scores">
+  {% for score in scores %}
+  <div class="score-box bucket-{{ score.color_bucket }}">
+    <div class="score-label">{{ score.label }}</div>
+    <div class="score-value">{{ score.value }}<span>/10</span></div>
+    <div class="score-bar"><div class="fill" style="width: {{ score.bar_pct }}%"></div></div>
+  </div>
+  {% endfor %}
+</section>
+
+<section class="distribution">
+  <h2>Position flow</h2>
+  <div class="dist-bar">
+    {% for seg in distribution_bar %}
+    <div class="dist-seg {{ seg.color_class }}" style="width: {{ seg.width_pct }}%;">
+      <span class="dist-label">{{ seg.label }} {{ seg.width_pct }}%</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="improvements">
+  <h2>Top improvements</h2>
+  <ol>
+    {% for imp in improvements %}<li>{{ imp }}</li>{% endfor %}
+  </ol>
+</section>
+
+<section class="strengths">
+  <h2>Strengths observed</h2>
+  <ul>
+    {% for s in strengths %}<li>{{ s }}</li>{% endfor %}
+  </ul>
+</section>
+
+<section class="key-moments">
+  <h2>Key moments</h2>
+  <table>
+    {% for km in key_moments %}
+    <tr>
+      <td class="ts">{{ km.timestamp_human }}</td>
+      <td class="cat">{{ km.category_label }}</td>
+      <td class="blurb">{{ km.blurb }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</section>
+
+<footer class="footer-strip">
+  Generated {{ generated_at_human }} &middot; {{ roll_id_short }}
+</footer>
+
+</body>
+</html>
