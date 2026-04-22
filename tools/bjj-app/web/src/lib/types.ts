@@ -23,11 +23,19 @@ export type Annotation = {
   created_at: number;
 };
 
+export interface Section {
+  id: string;
+  start_s: number;
+  end_s: number;
+  sample_interval_s: number;
+}
+
 export type Moment = {
   id: string;
   frame_idx: number;
   timestamp_s: number;
   pose_delta: number | null;
+  section_id: string | null;
   analyses: Analysis[];
   annotations: Annotation[];
 };
@@ -47,6 +55,7 @@ export type RollDetail = {
   finalised_at: number | null;
   scores: SummaryPayload | null;
   distribution: Distribution | null;
+  sections: Section[];
   moments: Moment[];
 };
 
@@ -61,7 +70,6 @@ export type CreateRollInput = {
 
 export type AnalyseEvent =
   | { stage: 'frames'; pct: number; total?: number }
-  | { stage: 'pose'; pct: number; total?: number }
   | {
       stage: 'done';
       total?: number;
@@ -69,7 +77,7 @@ export type AnalyseEvent =
         id: string;
         frame_idx: number;
         timestamp_s: number;
-        pose_delta: number | null;
+        section_id: string | null;
       }>;
     };
 

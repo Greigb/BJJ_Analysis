@@ -13,10 +13,12 @@
     summariseRoll,
     SummariseRateLimitedError
   } from '$lib/api';
+  import type { SectionInput } from '$lib/api';
   import GraphCluster from '$lib/components/GraphCluster.svelte';
   import MomentDetail from '$lib/components/MomentDetail.svelte';
   import PublishConflictDialog from '$lib/components/PublishConflictDialog.svelte';
   import ScoresPanel from '$lib/components/ScoresPanel.svelte';
+  import SectionPicker from '$lib/components/SectionPicker.svelte';
   import type { AnalyseEvent, GraphPaths, GraphTaxonomy, Moment, RollDetail } from '$lib/types';
 
   let roll = $state<RollDetail | null>(null);
@@ -81,19 +83,34 @@
     }
   });
 
-  async function onAnalyseClick() {
+  async function onAnalyseSections(sections: SectionInput[]) {
     if (!roll || analysing) return;
     analysing = true;
-    progress = { stage: 'frames', pct: 0 };
+    progress = null;
     try {
-      for await (const event of analyseRoll(roll.id)) {
-        handleAnalyseEvent(event);
+      const response = await analyseRoll(roll.id, sections);
+      if (!response.ok || !response.body) {
+        error = `Analyse failed (${response.status})`;
+        return;
       }
-    } catch (err) {
-      error = err instanceof ApiError ? err.message : String(err);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        let idx: number;
+        while ((idx = buffer.indexOf('\n\n')) >= 0) {
+          const chunk = buffer.slice(0, idx);
+          buffer = buffer.slice(idx + 2);
+          if (!chunk.startsWith('data: ')) continue;
+          const event = JSON.parse(chunk.slice(6)) as AnalyseEvent;
+          handleAnalyseEvent(event);
+        }
+      }
     } finally {
       analysing = false;
-      progress = null;
     }
   }
 
@@ -104,7 +121,8 @@
         id: m.id,
         frame_idx: m.frame_idx,
         timestamp_s: m.timestamp_s,
-        pose_delta: m.pose_delta,
+        pose_delta: null,
+        section_id: m.section_id,
         analyses: [],
         annotations: []
       })) as Moment[];
@@ -132,7 +150,6 @@
   function progressLabel(p: { stage: string; pct: number } | null): string {
     if (!p) return '';
     if (p.stage === 'frames') return `Extracting frames… ${p.pct}%`;
-    if (p.stage === 'pose') return `Detecting poses… ${p.pct}%`;
     if (p.stage === 'done') return 'Analysis complete';
     return `${p.stage}… ${p.pct}%`;
   }
@@ -291,16 +308,6 @@
           <span>{formatDuration(roll.duration_s)}</span>
         </div>
       </div>
-      <div class="flex gap-2">
-        <button
-          type="button"
-          onclick={onAnalyseClick}
-          disabled={analysing}
-          class="rounded-md px-3 py-1.5 text-xs font-medium bg-blue-500/20 border border-blue-400/40 text-blue-100 hover:bg-blue-500/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {analysing ? 'Analysing…' : 'Analyse'}
-        </button>
-      </div>
     </header>
 
     <div class="rounded-lg overflow-hidden border border-white/8 bg-black">
@@ -315,6 +322,13 @@
         Your browser can't play this video file.
       </video>
     </div>
+
+    <SectionPicker
+      videoEl={videoEl}
+      durationS={roll.duration_s ?? 0}
+      onAnalyse={onAnalyseSections}
+      busy={analysing}
+    />
 
     {#if progress}
       <div
@@ -393,7 +407,7 @@
       <div class="rounded-lg border border-white/10 bg-white/[0.02] p-6 text-center">
         <p class="text-sm text-white/60">No moments yet.</p>
         <p class="mt-1 text-xs text-white/35">
-          Click <strong>Analyse</strong> to run the pose pre-pass and flag interesting moments.
+          Pick sections above by playing the video and clicking <strong>Mark start</strong> / <strong>Mark end</strong>, then click <strong>Analyse ranges</strong> to run Claude classification on those frames.
         </p>
       </div>
     {/if}

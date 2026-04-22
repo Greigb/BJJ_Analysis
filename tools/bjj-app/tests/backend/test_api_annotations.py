@@ -18,7 +18,10 @@ async def _upload_and_detect_moment(client: AsyncClient, short_video_path: Path)
     assert up.status_code == 201
     roll_id = up.json()["id"]
 
-    pre = await client.post(f"/api/rolls/{roll_id}/analyse")
+    pre = await client.post(
+        f"/api/rolls/{roll_id}/analyse",
+        json={"sections": [{"start_s": 0.0, "end_s": 2.0, "sample_interval_s": 1.0}]},
+    )
     assert pre.status_code == 200
 
     detail = await client.get(f"/api/rolls/{roll_id}")

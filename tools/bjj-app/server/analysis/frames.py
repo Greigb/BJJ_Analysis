@@ -1,4 +1,9 @@
-"""OpenCV frame extraction for uploaded videos."""
+"""OpenCV frame extraction for uploaded videos.
+
+After M9 this module exposes only `extract_frames_at_timestamps` — the
+old whole-video fps-sampling `extract_frames` is gone since the pose
+pre-pass was retired.
+"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,23 +11,26 @@ from pathlib import Path
 import cv2
 
 
-def extract_frames(
+def extract_frames_at_timestamps(
     video_path: Path,
+    timestamps: list[float],
     out_dir: Path,
-    fps: float = 1.0,
+    start_index: int = 0,
 ) -> list[Path]:
-    """Extract one frame per (1/fps) seconds to out_dir as frame_NNNNNN.jpg.
+    """Write one JPEG frame per requested timestamp (seconds) to out_dir.
 
-    Returns the list of created frame paths in timestamp order.
+    Files are named `frame_NNNNNN.jpg` with NNNNNN = start_index,
+    start_index+1, ... in request order. `timestamps` is consumed in order;
+    the caller is responsible for sorting or deduping if that matters.
 
     Raises:
         FileNotFoundError: if video_path does not exist.
-        ValueError: if the video can't be opened or has no frames.
+        ValueError: if the video can't be opened.
     """
     if not video_path.exists():
         raise FileNotFoundError(video_path)
-    if fps <= 0:
-        raise ValueError(f"fps must be > 0, got {fps}")
+    if not timestamps:
+        return []
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -31,26 +39,18 @@ def extract_frames(
         if not cap.isOpened():
             raise ValueError(f"Not a readable video: {video_path}")
 
-        video_fps = cap.get(cv2.CAP_PROP_FPS)
-        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        if video_fps <= 0 or total_frames <= 0:
-            raise ValueError(f"Video has no frames / unknown fps: {video_path}")
-
-        step = max(int(round(video_fps / fps)), 1)
         paths: list[Path] = []
-        frame_idx = 0
-        out_idx = 0
-
-        while frame_idx < total_frames:
-            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
+        for i, ts in enumerate(timestamps):
+            # POS_MSEC is more reliable than POS_FRAMES for fractional seconds
+            cap.set(cv2.CAP_PROP_POS_MSEC, ts * 1000.0)
             ok, image = cap.read()
             if not ok:
-                break
-            path = out_dir / f"frame_{out_idx:06d}.jpg"
+                raise ValueError(
+                    f"Could not read frame at timestamp {ts}s from {video_path}"
+                )
+            path = out_dir / f"frame_{start_index + i:06d}.jpg"
             cv2.imwrite(str(path), image, [cv2.IMWRITE_JPEG_QUALITY, 85])
             paths.append(path)
-            out_idx += 1
-            frame_idx += step
 
         return paths
     finally:

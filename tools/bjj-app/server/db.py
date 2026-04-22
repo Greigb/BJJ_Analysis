@@ -68,6 +68,15 @@ CREATE TABLE IF NOT EXISTS claude_cache (
     created_at INTEGER NOT NULL,
     PRIMARY KEY (prompt_hash, frame_hash)
 );
+
+CREATE TABLE IF NOT EXISTS sections (
+    id TEXT PRIMARY KEY,
+    roll_id TEXT NOT NULL REFERENCES rolls(id) ON DELETE CASCADE,
+    start_s REAL NOT NULL,
+    end_s REAL NOT NULL,
+    sample_interval_s REAL NOT NULL,
+    created_at INTEGER NOT NULL
+);
 """
 
 
@@ -120,6 +129,24 @@ def _backfill_default_player_names(conn: sqlite3.Connection) -> None:
     )
 
 
+def _migrate_moments_m9(conn: sqlite3.Connection) -> None:
+    """Idempotently add M9 fields to moments + create the unique index.
+
+    - Adds `section_id` column if missing.
+    - Creates `idx_moments_roll_frame` UNIQUE on (roll_id, frame_idx) if missing.
+    """
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(moments)").fetchall()}
+    if "section_id" not in existing:
+        conn.execute(
+            "ALTER TABLE moments ADD COLUMN section_id TEXT "
+            "REFERENCES sections(id) ON DELETE SET NULL"
+        )
+    conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS "
+        "idx_moments_roll_frame ON moments(roll_id, frame_idx)"
+    )
+
+
 def init_db(db_path: Path) -> None:
     """Create the schema if it doesn't already exist. Safe to call every startup."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -128,6 +155,7 @@ def init_db(db_path: Path) -> None:
         _migrate_rolls_m4(conn)
         _backfill_default_player_names(conn)
         _migrate_analyses_player_enum(conn)
+        _migrate_moments_m9(conn)
         conn.commit()
 
 
@@ -185,7 +213,7 @@ def insert_moments(
     """Replace all moments for `roll_id` with the supplied list.
 
     Each moment dict must contain: frame_idx (int), timestamp_s (float),
-    pose_delta (float or None). `selected_for_analysis` defaults to 0.
+    pose_delta (float or None), and may include section_id (str or None).
     Returns the newly inserted rows in insertion order.
     """
     conn.execute("DELETE FROM moments WHERE roll_id = ?", (roll_id,))
@@ -195,9 +223,10 @@ def insert_moments(
         conn.execute(
             """
             INSERT INTO moments (
-                id, roll_id, frame_idx, timestamp_s, pose_delta, selected_for_analysis
+                id, roll_id, frame_idx, timestamp_s, pose_delta,
+                selected_for_analysis, section_id
             )
-            VALUES (?, ?, ?, ?, ?, 0)
+            VALUES (?, ?, ?, ?, ?, 0, ?)
             """,
             (
                 moment_id,
@@ -205,6 +234,7 @@ def insert_moments(
                 int(m["frame_idx"]),
                 float(m["timestamp_s"]),
                 None if m.get("pose_delta") is None else float(m["pose_delta"]),
+                m.get("section_id"),
             ),
         )
         inserted_ids.append(moment_id)
@@ -446,4 +476,46 @@ def set_vault_summary_hashes(
         "UPDATE rolls SET vault_summary_hashes = ? WHERE id = ?",
         (value, roll_id),
     )
+    conn.commit()
+
+
+def insert_section(
+    conn,
+    *,
+    roll_id: str,
+    start_s: float,
+    end_s: float,
+    sample_interval_s: float,
+) -> sqlite3.Row:
+    """Insert one section. Returns the full row."""
+    section_id = uuid.uuid4().hex
+    now = int(time.time())
+    conn.execute(
+        """
+        INSERT INTO sections (
+            id, roll_id, start_s, end_s, sample_interval_s, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (section_id, roll_id, float(start_s), float(end_s), float(sample_interval_s), now),
+    )
+    conn.commit()
+    row = conn.execute(
+        "SELECT * FROM sections WHERE id = ?", (section_id,)
+    ).fetchone()
+    return row
+
+
+def get_sections_by_roll(conn, roll_id: str) -> list[sqlite3.Row]:
+    """Return all sections for a roll, ordered by start_s ascending."""
+    cur = conn.execute(
+        "SELECT * FROM sections WHERE roll_id = ? ORDER BY start_s ASC, created_at ASC",
+        (roll_id,),
+    )
+    return cur.fetchall()
+
+
+def delete_section_and_moments(conn, *, section_id: str) -> None:
+    """Delete a section and all its moments in one transaction."""
+    conn.execute("DELETE FROM moments WHERE section_id = ?", (section_id,))
+    conn.execute("DELETE FROM sections WHERE id = ?", (section_id,))
     conn.commit()

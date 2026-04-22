@@ -10,7 +10,6 @@ Runs entirely on your Mac. No cloud services, no API keys — uses the `claude` 
 flowchart LR
     Browser["Browser<br/>SvelteKit UI"]
     API["FastAPI backend"]
-    Pose["MediaPipe<br/>pose pre-pass"]
     Claude["Claude CLI<br/>classify + summarise"]
     PDF["Jinja2 + WeasyPrint<br/>PDF render"]
     SQLite[("SQLite<br/>ephemeral state")]
@@ -18,7 +17,6 @@ flowchart LR
     Assets[("assets/[roll_id]/<br/>video · frames · report.pdf")]
 
     Browser -->|HTTP + SSE| API
-    API --> Pose
     API --> Claude
     API --> PDF
     API --> SQLite
@@ -29,7 +27,7 @@ flowchart LR
 **Per-roll flow:**
 
 1. **Upload** video → row in SQLite, file under `assets/<roll_id>/`.
-2. **Pose pre-pass** picks ~20-40 interesting moments (frames where the position changed).
+2. **Pick sections** of interest by playing the video and pressing Mark start / Mark end; tune per-section frame density (1s / 0.5s / 2s).
 3. **Classify** a moment → Claude identifies both players' positions against `tools/taxonomy.json`.
 4. **Annotate** with free-text coaching notes per moment.
 5. **Finalise** → one Claude call returns scores, summary, improvements, strengths, and 3 key moments.
