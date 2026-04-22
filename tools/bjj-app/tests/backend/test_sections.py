@@ -50,3 +50,65 @@ class TestBuildSampleTimestamps:
             build_sample_timestamps(0.0, 3.0, 0.0)
         with pytest.raises(ValueError, match="interval_s"):
             build_sample_timestamps(0.0, 3.0, -1.0)
+
+
+from pathlib import Path
+
+from server.analysis.frames import extract_frames_at_timestamps
+
+
+def _short_video_path() -> Path:
+    # The repo ships a short fixture at tests/backend/fixtures/short_video.mp4
+    return Path(__file__).parent / "fixtures" / "short_video.mp4"
+
+
+class TestExtractFramesAtTimestamps:
+    def test_writes_one_file_per_timestamp(self, tmp_path):
+        video = _short_video_path()
+        paths = extract_frames_at_timestamps(
+            video, timestamps=[0.0, 0.5, 1.0], out_dir=tmp_path
+        )
+        assert len(paths) == 3
+        for p in paths:
+            assert p.exists()
+            assert p.suffix == ".jpg"
+
+    def test_sequential_filenames_starting_at_zero(self, tmp_path):
+        video = _short_video_path()
+        paths = extract_frames_at_timestamps(
+            video, timestamps=[0.0, 0.5, 1.0], out_dir=tmp_path
+        )
+        assert paths[0].name == "frame_000000.jpg"
+        assert paths[1].name == "frame_000001.jpg"
+        assert paths[2].name == "frame_000002.jpg"
+
+    def test_start_index_offsets_filenames(self, tmp_path):
+        video = _short_video_path()
+        paths = extract_frames_at_timestamps(
+            video, timestamps=[0.0, 0.5], out_dir=tmp_path, start_index=10
+        )
+        assert paths[0].name == "frame_000010.jpg"
+        assert paths[1].name == "frame_000011.jpg"
+
+    def test_empty_timestamps_returns_empty(self, tmp_path):
+        video = _short_video_path()
+        paths = extract_frames_at_timestamps(
+            video, timestamps=[], out_dir=tmp_path
+        )
+        assert paths == []
+
+    def test_out_dir_created_if_missing(self, tmp_path):
+        video = _short_video_path()
+        nested = tmp_path / "a" / "b" / "c"
+        paths = extract_frames_at_timestamps(
+            video, timestamps=[0.0], out_dir=nested
+        )
+        assert nested.is_dir()
+        assert paths[0].exists()
+
+    def test_missing_video_raises(self, tmp_path):
+        import pytest as _pytest
+        with _pytest.raises(FileNotFoundError):
+            extract_frames_at_timestamps(
+                tmp_path / "nope.mp4", timestamps=[0.0], out_dir=tmp_path
+            )
