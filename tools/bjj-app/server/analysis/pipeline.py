@@ -35,6 +35,13 @@ def run_section_analysis(
     Sections are validated by the caller (api/analyse.py) — this function
     trusts the input shape.
     """
+    # Clear any sections (and their moments) from a prior analyse run.
+    # This intentionally mirrors insert_moments' "DELETE WHERE roll_id = ?"
+    # semantics — each Analyse click replaces prior state, not appends.
+    conn.execute("DELETE FROM moments WHERE roll_id = ?", (roll_id,))
+    conn.execute("DELETE FROM sections WHERE roll_id = ?", (roll_id,))
+    conn.commit()
+
     # Insert section rows first so moments can reference them.
     section_rows = [
         insert_section(

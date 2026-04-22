@@ -121,8 +121,8 @@
         id: m.id,
         frame_idx: m.frame_idx,
         timestamp_s: m.timestamp_s,
-        pose_delta: m.pose_delta,
-        section_id: (m as { section_id?: string | null }).section_id ?? null,
+        pose_delta: null,
+        section_id: m.section_id,
         analyses: [],
         annotations: []
       })) as Moment[];
@@ -150,7 +150,6 @@
   function progressLabel(p: { stage: string; pct: number } | null): string {
     if (!p) return '';
     if (p.stage === 'frames') return `Extracting frames… ${p.pct}%`;
-    if (p.stage === 'pose') return `Detecting poses… ${p.pct}%`;
     if (p.stage === 'done') return 'Analysis complete';
     return `${p.stage}… ${p.pct}%`;
   }
@@ -408,7 +407,7 @@
       <div class="rounded-lg border border-white/10 bg-white/[0.02] p-6 text-center">
         <p class="text-sm text-white/60">No moments yet.</p>
         <p class="mt-1 text-xs text-white/35">
-          Pick sections below, then click <strong>Analyse ranges</strong> to run the pose pre-pass and flag interesting moments.
+          Pick sections above by playing the video and clicking <strong>Mark start</strong> / <strong>Mark end</strong>, then click <strong>Analyse ranges</strong> to run Claude classification on those frames.
         </p>
       </div>
     {/if}

@@ -119,3 +119,50 @@ def test_run_section_analysis_dedupes_overlapping_timestamps(tmp_path):
         assert timestamps == [0.0, 1.0]  # 1.0 deduped
     finally:
         conn.close()
+
+
+def test_re_running_replaces_prior_sections(tmp_path):
+    """Second call to run_section_analysis must not leak prior-run sections."""
+    db = tmp_path / "db.sqlite"
+    init_db(db)
+    conn = connect(db)
+    try:
+        _make_roll(conn)
+        frames_dir = tmp_path / "frames"
+
+        # First run: 2 sections.
+        list(
+            run_section_analysis(
+                conn=conn,
+                roll_id="r1",
+                video_path=_short_video_path(),
+                frames_dir=frames_dir,
+                sections=[
+                    {"start_s": 0.0, "end_s": 1.0, "sample_interval_s": 1.0},
+                    {"start_s": 1.0, "end_s": 2.0, "sample_interval_s": 1.0},
+                ],
+                duration_s=2.0,
+            )
+        )
+        assert len(get_sections_by_roll(conn, "r1")) == 2
+
+        # Second run: 1 section. Prior 2 must be replaced.
+        list(
+            run_section_analysis(
+                conn=conn,
+                roll_id="r1",
+                video_path=_short_video_path(),
+                frames_dir=frames_dir,
+                sections=[
+                    {"start_s": 0.0, "end_s": 1.0, "sample_interval_s": 1.0},
+                ],
+                duration_s=2.0,
+            )
+        )
+        sections_after = get_sections_by_roll(conn, "r1")
+        assert len(sections_after) == 1, (
+            f"Expected 1 section after re-run, got {len(sections_after)} — "
+            f"sections from the prior run leaked"
+        )
+    finally:
+        conn.close()

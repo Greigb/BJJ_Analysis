@@ -70,7 +70,6 @@ export type CreateRollInput = {
 
 export type AnalyseEvent =
   | { stage: 'frames'; pct: number; total?: number }
-  | { stage: 'pose'; pct: number; total?: number }
   | {
       stage: 'done';
       total?: number;
@@ -78,7 +77,7 @@ export type AnalyseEvent =
         id: string;
         frame_idx: number;
         timestamp_s: number;
-        pose_delta: number | null;
+        section_id: string | null;
       }>;
     };
 
