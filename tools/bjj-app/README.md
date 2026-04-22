@@ -1,6 +1,6 @@
 # BJJ Local Review App
 
-Local web app for reviewing BJJ rolls — replaces the Streamlit prototype at `../app.py`.
+Local web app for reviewing BJJ rolls.
 See `docs/superpowers/specs/2026-04-20-bjj-local-review-app-design.md` for full design.
 
 ## One-time setup
@@ -59,4 +59,5 @@ cd web && npm test
 - **M5 (shipped):** Full `/graph` page with clustered state-space visualisation, both players' paths overlaid, filter chips, vault-markdown side drawer, scrubber with smoothly-animated path-head markers. Mini graph widget on `/review/[id]`.
 - **M6a (shipped):** Summary step. `POST /api/rolls/:id/summarise` runs one Claude call across all moments + annotations → scores + summary + top-3 improvements + strengths + 3 key-moment pointers. `ScoresPanel` renders on the review page; `Save to Vault` now emits `## Summary`, `## Scores`, `## Position Distribution`, `## Key Moments`, `## Top Improvements`, `## Strengths Observed` sections alongside `## Your Notes`. Per-section hash-based conflict detection. Design at `docs/superpowers/specs/2026-04-21-bjj-app-m6a-summary-step-design.md`.
 - **M6b (this milestone):** PDF export via WeasyPrint. "Export PDF" button on the review page renders a one-page white-paper match report (header, one-sentence summary, three score boxes, position-flow bar, improvements, strengths, key moments). The PDF writes to `assets/<roll_id>/report.pdf`, the roll's markdown gains a `## Report` section with an Obsidian wikilink, and the browser downloads the file. Export internally invokes `publish()` first so vault summary sections stay current; if any section conflicts, the existing PublishConflictDialog fires (generalised copy covers Notes, summary sections, and the Report section). Requires a one-time `brew install pango` on macOS for WeasyPrint's Cairo/Pango backend. Design at `docs/superpowers/specs/2026-04-21-bjj-app-m6b-pdf-export-design.md`.
-- **M7–M8:** PWA + mobile polish; cleanup (delete Streamlit `tools/app.py`).
+- **M7 (abandoned):** PWA + mobile polish. Mobile use case cut — desktop-only is sufficient.
+- **M8 (shipped):** Retired the Streamlit prototype (`tools/app.py` deleted, `streamlit` + `streamlit-agraph` removed from root `requirements.txt`).
