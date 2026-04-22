@@ -14,7 +14,6 @@
       </div>
       <div>
         <div class="text-[15px] font-semibold tracking-tight">BJJ Review</div>
-        <div class="text-[11px] text-white/50">Tempo Jiu Jitsu</div>
       </div>
     </a>
     <nav class="flex gap-1 text-sm">

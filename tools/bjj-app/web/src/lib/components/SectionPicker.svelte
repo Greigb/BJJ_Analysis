@@ -91,13 +91,15 @@
 
   function onAnalyseClick() {
     if (busy || sections.length === 0) return;
-    onAnalyse(
-      sections.map(({ start_s, end_s, sample_interval_s }) => ({
-        start_s,
-        end_s,
-        sample_interval_s,
-      })),
-    );
+    const payload = sections.map(({ start_s, end_s, sample_interval_s }) => ({
+      start_s,
+      end_s,
+      sample_interval_s,
+    }));
+    // Clear staged list so a subsequent mark doesn't resubmit prior ranges
+    // and end up re-analysing already-analysed sections.
+    sections = [];
+    onAnalyse(payload);
   }
 </script>
 
