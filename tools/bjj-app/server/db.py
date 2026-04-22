@@ -438,48 +438,48 @@ def get_vault_state(conn, roll_id: str) -> dict | None:
 def insert_annotation(
     conn,
     *,
-    moment_id: str,
+    section_id: str,
     body: str,
     created_at: int,
 ) -> sqlite3.Row:
-    """Append a new annotation to a moment. Returns the inserted row."""
+    """Append a new annotation to a section. Returns the inserted row."""
     annotation_id = uuid.uuid4().hex
     conn.execute(
         """
-        INSERT INTO annotations (id, moment_id, body, created_at, updated_at)
+        INSERT INTO annotations (id, section_id, body, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?)
         """,
-        (annotation_id, moment_id, body, created_at, created_at),
+        (annotation_id, section_id, body, created_at, created_at),
     )
     conn.commit()
     cur = conn.execute("SELECT * FROM annotations WHERE id = ?", (annotation_id,))
     return cur.fetchone()
 
 
-def get_annotations_by_moment(conn, moment_id: str) -> list[sqlite3.Row]:
-    """Return all annotations for a moment ordered by created_at ascending."""
+def get_annotations_by_section(conn, section_id: str) -> list[sqlite3.Row]:
+    """Return all annotations for a section ordered by created_at ascending."""
     cur = conn.execute(
-        "SELECT * FROM annotations WHERE moment_id = ? ORDER BY created_at",
-        (moment_id,),
+        "SELECT * FROM annotations WHERE section_id = ? ORDER BY created_at",
+        (section_id,),
     )
     return list(cur.fetchall())
 
 
 def get_annotations_by_roll(conn, roll_id: str) -> list[sqlite3.Row]:
-    """Return all annotations for a roll, joined with moment timestamps.
+    """Return all annotations for a roll, joined with their section's time range.
 
-    Ordered for vault rendering: by moment timestamp_s ascending, then by
-    created_at ascending within each moment.
-    Each row carries: id, moment_id, body, created_at, updated_at, timestamp_s, frame_idx.
+    Ordered for vault rendering: by section start_s ascending, then by
+    created_at ascending within each section.
+    Each row carries: id, section_id, body, created_at, updated_at, start_s, end_s.
     """
     cur = conn.execute(
         """
-        SELECT a.id, a.moment_id, a.body, a.created_at, a.updated_at,
-               m.timestamp_s, m.frame_idx
+        SELECT a.id, a.section_id, a.body, a.created_at, a.updated_at,
+               s.start_s, s.end_s
           FROM annotations a
-          JOIN moments m ON m.id = a.moment_id
-         WHERE m.roll_id = ?
-         ORDER BY m.timestamp_s ASC, a.created_at ASC
+          JOIN sections s ON s.id = a.section_id
+         WHERE s.roll_id = ?
+         ORDER BY s.start_s ASC, a.created_at ASC
         """,
         (roll_id,),
     )
