@@ -19,12 +19,6 @@
     </a>
     <nav class="flex gap-1 text-sm">
       <a
-        class="px-3 py-1.5 rounded-md hover:bg-white/5 text-white/70 hover:text-white transition-colors"
-        href="/graph"
-      >
-        Graph
-      </a>
-      <a
         class="px-3 py-1.5 rounded-md bg-blue-500/15 text-blue-200 border border-blue-400/40"
         href="/new"
       >

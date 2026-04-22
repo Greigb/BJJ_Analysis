@@ -1,20 +1,20 @@
 <script lang="ts">
-  import type { Moment, SummaryPayload } from '$lib/types';
+  import type { Section, SummaryPayload } from '$lib/types';
 
   let {
     scores,
-    moments,
+    sections,
     finalisedAt,
     ongoto
   }: {
     scores: SummaryPayload;
-    moments: Moment[];
+    sections: Section[];
     finalisedAt: number;
-    ongoto: (momentId: string) => void;
+    ongoto: (sectionId: string) => void;
   } = $props();
 
-  const momentsById = $derived(
-    new Map(moments.map((m) => [m.id, m]))
+  const sectionsById = $derived(
+    new Map(sections.map((s) => [s.id, s]))
   );
 
   function formatMmSs(seconds: number): string {
@@ -94,19 +94,19 @@
     </div>
     <ul class="space-y-1 text-sm text-white/80">
       {#each scores.key_moments as km, i (i)}
-        {@const moment = momentsById.get(km.moment_id)}
+        {@const section = sectionsById.get(km.section_id)}
         <li class="flex items-start justify-between gap-3">
           <div class="flex-1">
             <span class="font-mono tabular-nums text-white/60">
-              {moment ? formatMmSs(moment.timestamp_s) : '?:??'}
+              {section ? `${formatMmSs(section.start_s)} – ${formatMmSs(section.end_s)}` : '?:??'}
             </span>
             <span class="ml-1 text-white/40">—</span>
             <span class="ml-1">{km.note}</span>
           </div>
           <button
             type="button"
-            onclick={() => ongoto(km.moment_id)}
-            aria-label="Go to moment"
+            onclick={() => ongoto(km.section_id)}
+            aria-label="Go to section"
             class="shrink-0 rounded-md border border-white/15 bg-white/[0.04] px-2 py-0.5 text-[11px] text-white/75 hover:bg-white/[0.08]"
           >
             Go to →

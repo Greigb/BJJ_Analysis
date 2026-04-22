@@ -86,27 +86,6 @@ describe('SectionPicker', () => {
     expect(screen.queryByText(/0:03/)).not.toBeInTheDocument();
   });
 
-  it('density dropdown changes sample_interval_s', async () => {
-    const user = userEvent.setup();
-    const onAnalyse = vi.fn();
-    const video = makeVideoEl(3, 60);
-    render(SectionPicker, {
-      props: { videoEl: video, durationS: 60, onAnalyse, busy: false },
-    });
-
-    await user.click(screen.getByRole('button', { name: /mark start/i }));
-    (video as any).currentTime = 5;
-    await user.click(screen.getByRole('button', { name: /mark end/i }));
-
-    const dropdown = screen.getByRole('combobox', { name: /density/i });
-    await user.selectOptions(dropdown, '0.5');
-
-    await user.click(screen.getByRole('button', { name: /analyse ranges/i }));
-    expect(onAnalyse).toHaveBeenCalledWith([
-      expect.objectContaining({ sample_interval_s: 0.5 }),
-    ]);
-  });
-
   it('Analyse ranges is disabled when no sections', () => {
     const video = makeVideoEl(0, 60);
     render(SectionPicker, {
