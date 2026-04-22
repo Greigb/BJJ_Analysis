@@ -68,7 +68,6 @@ Requires the `claude` CLI on `PATH`, signed in with an active subscription.
 ├── Techniques/               # Obsidian technique notes
 ├── Roll Log/                 # Per-roll coaching markdown (source of truth)
 ├── Templates/                # Obsidian templates
-├── ML Learning Path/         # Structured ML study lessons
 ├── assets/<roll_id>/         # Video + extracted frames + exported PDF
 ├── docs/superpowers/         # Design specs + implementation plans
 └── Home.md                   # Vault dashboard

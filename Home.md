@@ -20,9 +20,6 @@ Welcome to your BJJ analysis knowledge base. This vault combines position knowle
   python analyse_roll.py path/to/video.mp4 --player-name Greig --markdown
   ```
 
-### Learning
-- **[[00 - Overview]]** - Start the ML Learning Path
-
 ## Position Categories
 
 | Category | Positions | Colour |
@@ -33,16 +30,6 @@ Welcome to your BJJ analysis knowledge base. This vault combines position knowle
 | Dominant (Top) | [[Side Control (Top)]], [[Mount (Top)]], [[Back Mount - Back Control]], [[Knee on Belly]], [[North-South (Top)]], [[Crucifix]] | Green |
 | Inferior (Bottom) | [[Bottom Side Control]], [[Bottom Mount]], [[Back Taken (Defending)]], [[Turtle (Bottom)]], [[North-South (Bottom)]] | Red |
 | Scramble | [[50-50]], [[Turtle Attack (Top)]], [[Front Headlock - Guillotine Position]], [[Leg Entanglement]], [[Scramble (No Clear Position)]] | Purple |
-
-## ML Learning Path
-
-1. [[00 - Overview]] - What we're building and why
-2. [[01 - Image Classification Basics]] - Core ML concepts
-3. [[02 - Data Collection Strategy]] - Building your dataset
-4. [[03 - Labelling with Claude Vision]] - Using AI for initial labels
-5. [[04 - Training a Position Classifier]] - Your first model
-6. [[05 - Pose Estimation with MediaPipe]] - Skeleton-based features
-7. [[06 - Evaluation and Iteration]] - Improving your model
 
 ## Tools
 
