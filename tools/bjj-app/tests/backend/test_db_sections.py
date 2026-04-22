@@ -171,3 +171,32 @@ def test_unique_index_rejects_duplicate_frame_idx(tmp_path):
             )
     finally:
         conn.close()
+
+
+def test_update_section_analysis_writes_narrative_and_tip(tmp_path):
+    from server.db import (
+        connect, create_roll, get_sections_by_roll, init_db,
+        insert_section, update_section_analysis,
+    )
+    db = tmp_path / "db.sqlite"
+    init_db(db)
+    conn = connect(db)
+    try:
+        create_roll(
+            conn, id="r1", title="T", date="2026-04-22",
+            video_path="assets/r1/source.mp4", duration_s=10.0,
+            partner=None, result="unknown", created_at=1,
+        )
+        row = insert_section(conn, roll_id="r1", start_s=0.0, end_s=4.0, sample_interval_s=1.0)
+        update_section_analysis(
+            conn, section_id=row["id"],
+            narrative="Player A recovers guard.",
+            coach_tip="Keep elbows tight.",
+            analysed_at=1713700000,
+        )
+        got = get_sections_by_roll(conn, "r1")[0]
+        assert got["narrative"] == "Player A recovers guard."
+        assert got["coach_tip"] == "Keep elbows tight."
+        assert got["analysed_at"] == 1713700000
+    finally:
+        conn.close()

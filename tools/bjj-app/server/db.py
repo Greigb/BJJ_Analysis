@@ -560,3 +560,21 @@ def delete_section_and_moments(conn, *, section_id: str) -> None:
     conn.execute("DELETE FROM moments WHERE section_id = ?", (section_id,))
     conn.execute("DELETE FROM sections WHERE id = ?", (section_id,))
     conn.commit()
+
+
+def update_section_analysis(
+    conn,
+    *,
+    section_id: str,
+    narrative: str,
+    coach_tip: str,
+    analysed_at: int,
+) -> None:
+    """Write Claude's per-section narrative + coach_tip + completion timestamp."""
+    conn.execute(
+        "UPDATE sections "
+        "   SET narrative = ?, coach_tip = ?, analysed_at = ? "
+        " WHERE id = ?",
+        (narrative, coach_tip, analysed_at, section_id),
+    )
+    conn.commit()
