@@ -185,11 +185,14 @@ Same URL, same request body shape. The `sample_interval_s` field is now optional
 
 Streaming response events gain the new per-section shape:
 - `{stage: "section_started", section_id, start_s, end_s, idx, total}`
+- `{stage: "section_queued", section_id, retry_after_s}` — emitted when the sliding-window rate limiter blocks the next Claude call.
 - `{stage: "section_done", section_id, start_s, end_s, narrative, coach_tip}`
 - `{stage: "section_error", section_id, error}`
 - `{stage: "done", total}`
 
 The old `{stage: "frames", pct}` event is removed (frame extraction is internal to each section's work now). Frontend updates accordingly.
+
+**Rate-limit queue surfacing.** When `run_claude` raises `RateLimitedError` for a section's call, the pipeline emits `{stage: "section_queued", section_id, retry_after_s}`, sleeps for `retry_after_s`, and retries the same section. Max 3 retries per section; after the third, emit `section_error` with a rate-limit-specific message and move on. Frontend renders `"Queued — Claude cooldown, retrying in Xs…"` in the progress strip until the next `section_started` event for that ID arrives.
 
 ### Finalise (M6a) rewrite
 
@@ -244,8 +247,9 @@ Cascades to moments + annotations + frame files on disk via `delete_section_and_
 **Removed:**
 - Chips row for per-moment moments.
 - `$lib/components/MomentDetail.svelte` — deleted (functionality migrates to `SectionCard`).
-- `$lib/components/GraphCluster.svelte` — kept on disk but unreferenced.
+- `$lib/components/GraphCluster.svelte` — kept on disk but unreferenced (both the full `/graph` page AND the mini-graph that rendered inline on the review page).
 - Nav link to `/graph` in the app header.
+- The mini-graph block on the review page that previously mounted `<GraphCluster>` below `MomentDetail` — gone.
 
 **Modified:**
 - `$lib/components/SectionPicker.svelte` — drop the density dropdown from each staged chip (user-facing density is auto); chip now shows `0:03 – 0:07` only.
@@ -257,6 +261,8 @@ Cascades to moments + annotations + frame files on disk via `delete_section_and_
 **New:**
 - `$lib/components/SectionCard.svelte` — props: `section`, `busy: boolean`, `onSeek(start_s)`, `onDelete(section_id)`, `onAddAnnotation(section_id, body)`. Body renders: timestamp-range header + seek/delete buttons + narrative paragraph + coach-tip callout + annotations list + add-annotation textarea.
 - `web/tests/section-card.test.ts` — ~6 tests covering render states, callbacks, error state.
+
+**Progress-strip banner** (in the existing review-page progress area): when an SSE `section_queued` event arrives for section X, show `"Queued — Claude cooldown, retrying in {retry_after_s}s…"` with a countdown. Clears when `section_started` for the same X arrives, or when `section_error` fires after the third retry.
 
 ### Testing
 
