@@ -96,3 +96,57 @@ def test_build_prompt_raises_if_frame_missing(tiny_taxonomy: Path, tmp_path: Pat
             taxonomy_path=tiny_taxonomy,
             timestamp_s=0.0,
         )
+
+
+def test_build_section_prompt_contains_frame_refs_and_names(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+
+    frames = [tmp_path / f"frame_{i:06d}.jpg" for i in range(3)]
+    for f in frames:
+        f.write_bytes(b"x")
+
+    prompt = build_section_prompt(
+        start_s=3.0,
+        end_s=7.0,
+        frame_paths=frames,
+        timestamps=[3.0, 4.0, 5.0],
+        player_a_name="Greig",
+        player_b_name="Sam",
+    )
+    assert "Greig" in prompt
+    assert "Sam" in prompt
+    assert "4" in prompt  # duration
+    for f in frames:
+        assert f"@{f}" in prompt
+    assert '"narrative"' in prompt
+    assert '"coach_tip"' in prompt
+
+
+def test_parse_section_response_happy_path():
+    from server.analysis.prompt import parse_section_response
+
+    raw = '{"narrative": "Player A passes to side control.", "coach_tip": "Stay heavy."}'
+    out = parse_section_response(raw)
+    assert out["narrative"] == "Player A passes to side control."
+    assert out["coach_tip"] == "Stay heavy."
+
+
+def test_parse_section_response_rejects_malformed_json():
+    import pytest
+    from server.analysis.prompt import parse_section_response, SectionResponseError
+    with pytest.raises(SectionResponseError):
+        parse_section_response("not json")
+
+
+def test_parse_section_response_rejects_missing_field():
+    import pytest
+    from server.analysis.prompt import parse_section_response, SectionResponseError
+    with pytest.raises(SectionResponseError):
+        parse_section_response('{"narrative": "x"}')
+
+
+def test_parse_section_response_rejects_empty_string_field():
+    import pytest
+    from server.analysis.prompt import parse_section_response, SectionResponseError
+    with pytest.raises(SectionResponseError):
+        parse_section_response('{"narrative": "", "coach_tip": "x"}')
