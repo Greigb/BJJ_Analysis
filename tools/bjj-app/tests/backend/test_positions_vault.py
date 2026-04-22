@@ -91,3 +91,72 @@ def test_load_positions_index_markdown_body_includes_frontmatter_removed(tmp_pat
     # frontmatter delimiters should not be present in the markdown body
     assert md.strip().startswith("# B")
     assert "---" not in md.split("\n")[0]
+
+
+# ---------- M10: how_to_identify extraction ----------
+
+
+def test_load_positions_index_extracts_how_to_identify_single_paragraph(tmp_path: Path):
+    _write_position(
+        tmp_path,
+        "CG.md",
+        ["position_id: closed_guard_bottom"],
+        (
+            "# Closed Guard\n\n"
+            "## How to Identify\n\n"
+            "Ankles LOCKED behind the top person's back.\n\n"
+            "## Transitions\n\nStuff.\n"
+        ),
+    )
+    entry = load_positions_index(tmp_path)["closed_guard_bottom"]
+    assert entry["how_to_identify"] == "Ankles LOCKED behind the top person's back."
+
+
+def test_load_positions_index_extracts_how_to_identify_multi_paragraph(tmp_path: Path):
+    _write_position(
+        tmp_path,
+        "SC.md",
+        ["position_id: side_control_top"],
+        (
+            "# Side Control\n\n"
+            "## How to Identify\n\n"
+            "First paragraph describing the position.\n\n"
+            "Second paragraph with more cues.\n\n"
+            "## Transitions\n\nFoo.\n"
+        ),
+    )
+    entry = load_positions_index(tmp_path)["side_control_top"]
+    assert entry["how_to_identify"] == (
+        "First paragraph describing the position.\n\n"
+        "Second paragraph with more cues."
+    )
+
+
+def test_load_positions_index_returns_none_when_how_to_identify_missing(tmp_path: Path):
+    _write_position(
+        tmp_path,
+        "Scramble.md",
+        ["position_id: scramble_generic"],
+        "# Scramble\n\n## Techniques\n\nSome techniques.\n",
+    )
+    entry = load_positions_index(tmp_path)["scramble_generic"]
+    assert entry["how_to_identify"] is None
+
+
+def test_load_positions_index_how_to_identify_stops_at_next_heading_without_blank_line(
+    tmp_path: Path,
+):
+    """A `## ` immediately after the body (no blank line) must still terminate."""
+    _write_position(
+        tmp_path,
+        "X.md",
+        ["position_id: x"],
+        (
+            "# X\n\n"
+            "## How to Identify\n\n"
+            "One-liner identification.\n"
+            "## Techniques\n\nFoo.\n"
+        ),
+    )
+    entry = load_positions_index(tmp_path)["x"]
+    assert entry["how_to_identify"] == "One-liner identification."

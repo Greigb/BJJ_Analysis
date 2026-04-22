@@ -9,6 +9,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from server.analysis.positions_vault import PositionNote
+
 
 def _system_preamble(player_a_name: str, player_b_name: str) -> str:
     return (
@@ -89,6 +91,34 @@ _SECTION_SCHEMA_HINT = (
 )
 
 
+_POSITIONS_REFERENCE_HEADER = (
+    "Canonical BJJ positions — use this exact vocabulary and these visual cues "
+    "when identifying what you see in the frames:"
+)
+
+
+def _build_positions_reference_block(positions: list[PositionNote]) -> str:
+    """Render an ordered position-reference block for the section prompt.
+
+    Preserves input order (caller controls taxonomy sort). Positions whose
+    `how_to_identify` is missing or empty are silently skipped. Returns
+    empty string when nothing would be rendered — caller uses that as the
+    signal to omit the whole block from the prompt.
+    """
+    lines: list[str] = []
+    for p in positions:
+        body = (p.get("how_to_identify") or "").strip()
+        if not body:
+            continue
+        # Flatten whitespace so each position fits on one bullet line — the
+        # section prompt is long enough without double newlines inside it.
+        flat = " ".join(body.split())
+        lines.append(f"- {p['name']} ({p['position_id']}): {flat}")
+    if not lines:
+        return ""
+    return _POSITIONS_REFERENCE_HEADER + "\n" + "\n".join(lines)
+
+
 def build_section_prompt(
     *,
     start_s: float,
@@ -99,6 +129,7 @@ def build_section_prompt(
     player_b_name: str,
     player_a_description: str | None = None,
     player_b_description: str | None = None,
+    positions: list[PositionNote] | None = None,
 ) -> str:
     """Build the multi-image section narrative prompt.
 
@@ -108,6 +139,13 @@ def build_section_prompt(
     `player_a_description` / `player_b_description`, when provided, are short
     visual-identification hints (gi colour, hair, build) that help Claude
     consistently tag the same person as player_a across frames.
+
+    `positions`, when provided, is an ordered list of canonical BJJ positions
+    (typically taxonomy-category-ordered). Their `how_to_identify` bodies are
+    rendered into a reference block inserted BEFORE the guidance sentence so
+    Claude has the canonical vocabulary in front of it when the instruction
+    "use standard BJJ vocabulary" is given. `None` or `[]` means M9b behaviour
+    (no grounding block).
     """
     if len(frame_paths) != len(timestamps):
         raise ValueError(
@@ -154,7 +192,12 @@ def build_section_prompt(
     parts = [preamble]
     if identification:
         parts.append(identification)
-    parts.extend([intro, "\n".join(frame_lines), guidance, _SECTION_SCHEMA_HINT])
+    parts.extend([intro, "\n".join(frame_lines)])
+    if positions:
+        reference = _build_positions_reference_block(positions)
+        if reference:
+            parts.append(reference)
+    parts.extend([guidance, _SECTION_SCHEMA_HINT])
     return "\n\n".join(parts)
 
 

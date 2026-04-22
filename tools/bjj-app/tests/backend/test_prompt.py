@@ -154,6 +154,58 @@ def test_build_section_prompt_omits_identification_when_no_descriptions(tmp_path
     assert "appearance hints" not in prompt.lower()
 
 
+def test_build_section_prompt_omits_reference_block_when_positions_is_none(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+    frames = [tmp_path / "frame_000000.jpg"]
+    frames[0].write_bytes(b"x")
+    prompt = build_section_prompt(
+        start_s=0.0, end_s=1.0,
+        frame_paths=frames, timestamps=[0.0],
+        player_a_name="A", player_b_name="B",
+    )
+    assert "Canonical BJJ positions" not in prompt
+
+
+def test_build_section_prompt_includes_reference_block_when_positions_provided(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+    frames = [tmp_path / "frame_000000.jpg"]
+    frames[0].write_bytes(b"x")
+    prompt = build_section_prompt(
+        start_s=0.0, end_s=1.0,
+        frame_paths=frames, timestamps=[0.0],
+        player_a_name="A", player_b_name="B",
+        positions=[
+            _fake_position("closed_guard_bottom", "Closed Guard (Bottom)", "Ankles LOCKED."),
+            _fake_position("mount_top", "Mount (Top)", "Sitting astride torso."),
+        ],
+    )
+    assert "Closed Guard (Bottom)" in prompt
+    assert "Mount (Top)" in prompt
+    assert "Canonical BJJ positions" in prompt
+    # Schema hint must remain last so JSON adherence is unaffected.
+    assert prompt.rstrip().endswith("}")
+    schema_idx = prompt.index('"narrative"')
+    ref_idx = prompt.index("Canonical BJJ positions")
+    assert ref_idx < schema_idx, "reference block must precede schema hint"
+
+
+def test_build_section_prompt_reference_block_precedes_guidance(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+    frames = [tmp_path / "frame_000000.jpg"]
+    frames[0].write_bytes(b"x")
+    prompt = build_section_prompt(
+        start_s=0.0, end_s=1.0,
+        frame_paths=frames, timestamps=[0.0],
+        player_a_name="A", player_b_name="B",
+        positions=[_fake_position("a", "A Position", "Cue.")],
+    )
+    ref_idx = prompt.index("Canonical BJJ positions")
+    guidance_idx = prompt.index("standard BJJ vocabulary")
+    assert ref_idx < guidance_idx, (
+        "reference block must appear before the 'standard BJJ vocabulary' guidance"
+    )
+
+
 def test_parse_section_response_happy_path():
     from server.analysis.prompt import parse_section_response
 
@@ -161,6 +213,61 @@ def test_parse_section_response_happy_path():
     out = parse_section_response(raw)
     assert out["narrative"] == "Player A passes to side control."
     assert out["coach_tip"] == "Stay heavy."
+
+
+def _fake_position(pid: str, name: str, how: str | None) -> dict:
+    return {
+        "position_id": pid,
+        "name": name,
+        "markdown": f"# {name}",
+        "vault_path": f"Positions/{name}.md",
+        "how_to_identify": how,
+    }
+
+
+def test_positions_reference_block_empty_list_returns_empty_string():
+    from server.analysis.prompt import _build_positions_reference_block
+    assert _build_positions_reference_block([]) == ""
+
+
+def test_positions_reference_block_includes_each_position_name_and_body():
+    from server.analysis.prompt import _build_positions_reference_block
+    out = _build_positions_reference_block([
+        _fake_position("closed_guard_bottom", "Closed Guard (Bottom)", "Ankles LOCKED."),
+        _fake_position("mount_top", "Mount (Top)", "Sitting astride torso."),
+    ])
+    assert "Closed Guard (Bottom)" in out
+    assert "Mount (Top)" in out
+    assert "Ankles LOCKED." in out
+    assert "Sitting astride torso." in out
+    assert "closed_guard_bottom" in out
+    assert "mount_top" in out
+
+
+def test_positions_reference_block_skips_positions_without_how_to_identify():
+    from server.analysis.prompt import _build_positions_reference_block
+    out = _build_positions_reference_block([
+        _fake_position("a", "A", "Has body."),
+        _fake_position("b", "B", None),
+        _fake_position("c", "C", "Also has body."),
+    ])
+    assert "Has body." in out
+    assert "Also has body." in out
+    # Only A and C produce bullets; B (no how_to_identify) must not appear
+    # as a bullet entry.
+    bullets = [line for line in out.splitlines() if line.startswith("- ")]
+    assert len(bullets) == 2
+    assert not any("(b):" in line for line in bullets)
+
+
+def test_positions_reference_block_preserves_input_order():
+    from server.analysis.prompt import _build_positions_reference_block
+    out = _build_positions_reference_block([
+        _fake_position("second", "Second", "Second cue."),
+        _fake_position("first", "First", "First cue."),
+    ])
+    # Second's cue appears before First's cue in output (input order preserved).
+    assert out.index("Second cue.") < out.index("First cue.")
 
 
 def test_parse_section_response_rejects_malformed_json():
