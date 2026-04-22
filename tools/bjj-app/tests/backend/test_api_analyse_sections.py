@@ -126,3 +126,46 @@ class TestAnalyseSectionsEndpoint:
             conn.close()
 
         assert (root / "assets" / roll_id / "frames" / "frame_000000.jpg").exists()
+
+    def test_analyse_passes_positions_from_app_state_into_pipeline(
+        self, app_client, monkeypatch
+    ):
+        """/analyse should read app.state.positions_index + app.state.taxonomy
+        and forward an ordered list[PositionNote] into run_section_analysis."""
+        client, _, roll_id = app_client
+
+        captured: dict = {}
+
+        async def fake_pipeline(**kwargs):
+            # Async generator — capture kwargs then yield one terminal event.
+            captured.update(kwargs)
+            yield {"stage": "done", "total": 0}
+
+        monkeypatch.setattr(
+            "server.api.analyse.run_section_analysis", fake_pipeline
+        )
+
+        fake_note = {
+            "position_id": "fixture_pos",
+            "name": "Fixture Position",
+            "markdown": "# Fixture Position",
+            "vault_path": "Positions/Fixture Position.md",
+            "how_to_identify": "Distinctive cue here.",
+        }
+        client.app.state.positions_index = {"fixture_pos": fake_note}
+        client.app.state.taxonomy = {
+            "positions": [
+                {"id": "fixture_pos", "name": "Fixture Position", "category": "guard_bottom"}
+            ]
+        }
+
+        r = client.post(
+            f"/api/rolls/{roll_id}/analyse",
+            json={"sections": [{"start_s": 0.0, "end_s": 1.0}]},
+        )
+        assert r.status_code == 200
+
+        positions = captured.get("positions")
+        assert isinstance(positions, list)
+        assert len(positions) == 1
+        assert positions[0]["position_id"] == "fixture_pos"
