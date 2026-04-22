@@ -13,12 +13,22 @@ import frontmatter
 
 _H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 
+# Matches an H2 "How to Identify" heading and captures the body up to (but not
+# including) the next H2 heading or end-of-text. `re.DOTALL` lets `.` cross
+# newlines; the lookahead tolerates a following heading with or without a
+# preceding blank line.
+_HOW_TO_IDENTIFY_RE = re.compile(
+    r"^##\s+How to Identify\s*\n+(.+?)(?=\n##\s|\Z)",
+    re.DOTALL | re.MULTILINE | re.IGNORECASE,
+)
+
 
 class PositionNote(TypedDict):
     position_id: str
     name: str
     markdown: str
     vault_path: str  # relative to vault root
+    how_to_identify: str | None  # parsed body of `## How to Identify`, or None if absent
 
 
 def load_positions_index(vault_root: Path) -> dict[str, PositionNote]:
@@ -44,6 +54,7 @@ def load_positions_index(vault_root: Path) -> dict[str, PositionNote]:
             name=name,
             markdown=post.content,
             vault_path=f"Positions/{md_path.name}",
+            how_to_identify=_extract_how_to_identify(post.content),
         )
     return index
 
@@ -58,3 +69,16 @@ def get_position(
 def _extract_name(content: str, *, fallback: str) -> str:
     m = _H1_RE.search(content)
     return m.group(1) if m else fallback
+
+
+def _extract_how_to_identify(content: str) -> str | None:
+    """Return the stripped body of `## How to Identify`, or None if absent.
+
+    Body spans from the heading's terminating newline to the next H2 heading
+    (exclusive) or end-of-file. Note editors may follow the body with another
+    H2 immediately (no blank line) — the lookahead handles that.
+    """
+    m = _HOW_TO_IDENTIFY_RE.search(content)
+    if m is None:
+        return None
+    return m.group(1).strip() or None
