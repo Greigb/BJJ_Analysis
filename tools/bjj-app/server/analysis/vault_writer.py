@@ -118,7 +118,21 @@ import os
 import re as _re  # re is already imported at top, alias to avoid shadowing any later additions
 import time
 
-from server.analysis.summarise import CATEGORY_EMOJI, compute_distribution
+# TODO(Task 11): CATEGORY_EMOJI and compute_distribution removed in M9b; vault_writer to be rewritten.
+CATEGORY_EMOJI: dict[str, str] = {
+    "standing":          "⬜",
+    "guard_bottom":      "🟦",
+    "guard_top":         "🟨",
+    "dominant_top":      "🟩",
+    "inferior_bottom":   "🟥",
+    "leg_entanglement":  "🟫",
+    "scramble":          "🟪",
+}
+
+
+def compute_distribution(analyses: list[dict], categories: list[dict]) -> dict:
+    """Stub — will be removed when vault_writer is rewritten in Task 11."""
+    return {"timeline": [], "counts": {}, "percentages": {}}
 from server.db import (
     get_analyses,
     get_annotations_by_roll,

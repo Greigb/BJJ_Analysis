@@ -1,4 +1,4 @@
-"""Tests for summarise.py — pure helpers."""
+"""Tests for summarise.py — pure helpers (M9b section-based)."""
 from __future__ import annotations
 
 import json
@@ -6,309 +6,147 @@ import json
 import pytest
 
 from server.analysis.summarise import (
-    CATEGORY_EMOJI,
     SummaryResponseError,
     build_summary_prompt,
-    compute_distribution,
     parse_summary_response,
 )
-
-
-# ---------- compute_distribution ----------
-
-
-_FIXTURE_CATEGORIES = [
-    {"id": "standing", "label": "Standing"},
-    {"id": "guard_bottom", "label": "Guard (Bottom)"},
-    {"id": "guard_top", "label": "Guard (Top)"},
-    {"id": "scramble", "label": "Scramble"},
-]
-
-_FIXTURE_POSITION_TO_CATEGORY = {
-    "standing_neutral": "standing",
-    "closed_guard_bottom": "guard_bottom",
-    "closed_guard_top": "guard_top",
-    "scramble_entry": "scramble",
-}
-
-
-def _analyses(*position_ids_in_order: str) -> list[dict]:
-    rows: list[dict] = []
-    for i, pid in enumerate(position_ids_in_order):
-        rows.append({
-            "position_id": pid,
-            "player": "a",
-            "timestamp_s": float(i),
-            "category": _FIXTURE_POSITION_TO_CATEGORY.get(pid, "scramble"),
-        })
-    return rows
-
-
-def test_compute_distribution_returns_timeline_in_chronological_order():
-    analyses = _analyses("standing_neutral", "closed_guard_bottom", "scramble_entry")
-    dist = compute_distribution(analyses, _FIXTURE_CATEGORIES)
-    assert dist["timeline"] == ["standing", "guard_bottom", "scramble"]
-
-
-def test_compute_distribution_counts_per_category():
-    analyses = _analyses(
-        "standing_neutral", "closed_guard_bottom", "closed_guard_bottom",
-        "closed_guard_bottom", "scramble_entry",
-    )
-    dist = compute_distribution(analyses, _FIXTURE_CATEGORIES)
-    assert dist["counts"] == {"standing": 1, "guard_bottom": 3, "scramble": 1}
-
-
-def test_compute_distribution_percentages_sum_to_100():
-    analyses = _analyses("standing_neutral", "closed_guard_bottom", "scramble_entry")
-    dist = compute_distribution(analyses, _FIXTURE_CATEGORIES)
-    total = sum(dist["percentages"].values())
-    assert 99 <= total <= 100
-
-
-def test_compute_distribution_handles_empty_analyses():
-    dist = compute_distribution([], _FIXTURE_CATEGORIES)
-    assert dist == {"timeline": [], "counts": {}, "percentages": {}}
-
-
-def test_compute_distribution_only_counts_player_a():
-    analyses = [
-        {"position_id": "standing_neutral", "player": "a", "timestamp_s": 0.0, "category": "standing"},
-        {"position_id": "closed_guard_top", "player": "b", "timestamp_s": 0.0, "category": "guard_top"},
-        {"position_id": "closed_guard_bottom", "player": "a", "timestamp_s": 1.0, "category": "guard_bottom"},
-    ]
-    dist = compute_distribution(analyses, _FIXTURE_CATEGORIES)
-    assert dist["counts"] == {"standing": 1, "guard_bottom": 1}
-    assert dist["timeline"] == ["standing", "guard_bottom"]
-
-
-def test_category_emoji_covers_canonical_categories():
-    expected = {
-        "standing", "guard_bottom", "guard_top", "dominant_top",
-        "inferior_bottom", "leg_entanglement", "scramble",
-    }
-    assert expected.issubset(set(CATEGORY_EMOJI.keys()))
 
 
 # ---------- build_summary_prompt ----------
 
 
-def _roll(**overrides) -> dict:
-    base = {
-        "id": "roll-1", "title": "Sample", "date": "2026-04-21", "duration_s": 225.0,
-        "player_a_name": "Alice", "player_b_name": "Bob",
+def _roll() -> dict:
+    return {
+        "player_a_name": "Greig", "player_b_name": "Sam",
+        "duration_s": 60.0, "date": "2026-04-22",
     }
-    base.update(overrides)
-    return base
 
 
-def _moment(mid: str, frame_idx: int, timestamp_s: float) -> dict:
-    return {"id": mid, "frame_idx": frame_idx, "timestamp_s": timestamp_s}
-
-
-def test_build_summary_prompt_includes_player_names():
-    prompt = build_summary_prompt(
-        roll_row=_roll(), moment_rows=[], analyses_by_moment={}, annotations_by_moment={},
-    )
-    assert "Alice" in prompt
-    assert "Bob" in prompt
-    assert "Greig" not in prompt
-    assert "Anthony" not in prompt
-
-
-def test_build_summary_prompt_lists_analysed_moments_chronologically():
-    moments = [_moment("m1", 3, 3.0), _moment("m2", 12, 12.0)]
-    analyses = {
-        "m1": [
-            {"player": "a", "position_id": "closed_guard_bottom", "confidence": 0.8,
-             "description": "Greig in guard", "coach_tip": "Break posture"},
-            {"player": "b", "position_id": "closed_guard_top", "confidence": 0.75,
-             "description": None, "coach_tip": None},
-        ],
-        "m2": [
-            {"player": "a", "position_id": "half_guard_bottom", "confidence": 0.7,
-             "description": "Slipped to half", "coach_tip": "Underhook"},
-            {"player": "b", "position_id": "half_guard_top", "confidence": 0.68,
-             "description": None, "coach_tip": None},
-        ],
+def test_build_summary_prompt_includes_section_narratives_and_annotations():
+    sections = [
+        {
+            "id": "sec1", "start_s": 3.0, "end_s": 7.0,
+            "narrative": "Greig recovers closed guard.",
+            "coach_tip": "Stay elbows in.",
+        },
+        {
+            "id": "sec2", "start_s": 15.0, "end_s": 22.0,
+            "narrative": "Sam passes half guard.",
+            "coach_tip": "Frame on hips.",
+        },
+    ]
+    annotations_by_section = {
+        "sec1": [{"body": "triangle was there", "created_at": 1713700000}],
+        "sec2": [],
     }
-    prompt = build_summary_prompt(
-        roll_row=_roll(), moment_rows=moments,
-        analyses_by_moment=analyses, annotations_by_moment={},
+    out = build_summary_prompt(
+        roll_row=_roll(), sections=sections,
+        annotations_by_section=annotations_by_section,
     )
-    m1_idx = prompt.find("moment_id=m1")
-    m2_idx = prompt.find("moment_id=m2")
-    assert m1_idx != -1 and m2_idx != -1
-    assert m1_idx < m2_idx
-    assert "closed_guard_bottom" in prompt
-    assert "Break posture" in prompt
-    assert "Underhook" in prompt
+    assert "Greig recovers closed guard." in out
+    assert "Sam passes half guard." in out
+    assert "triangle was there" in out
+    assert "sec1" in out
+    assert "0:03" in out
+    assert "0:15" in out
 
 
-def test_build_summary_prompt_omits_annotations_block_when_no_annotations():
-    moments = [_moment("m1", 3, 3.0)]
-    analyses = {
-        "m1": [
-            {"player": "a", "position_id": "standing_neutral", "confidence": 0.9,
-             "description": "Standing", "coach_tip": "Engage"},
-            {"player": "b", "position_id": "standing_neutral", "confidence": 0.88,
-             "description": None, "coach_tip": None},
-        ],
-    }
-    prompt = build_summary_prompt(
-        roll_row=_roll(), moment_rows=moments,
-        analyses_by_moment=analyses, annotations_by_moment={"m1": []},
+def test_build_summary_prompt_skips_sections_without_narrative():
+    sections = [
+        {"id": "s1", "start_s": 0.0, "end_s": 2.0, "narrative": "", "coach_tip": ""},
+        {"id": "s2", "start_s": 5.0, "end_s": 10.0,
+         "narrative": "Passes to mount.", "coach_tip": "Drive the knee across."},
+    ]
+    out = build_summary_prompt(
+        roll_row=_roll(), sections=sections, annotations_by_section={},
     )
-    assert "User's own notes" not in prompt
+    assert "Passes to mount." in out
+    assert "s1" not in out  # unanalysed section not referenced
 
 
-def test_build_summary_prompt_includes_annotations_when_present():
-    moments = [_moment("m1", 3, 3.0)]
-    analyses = {
-        "m1": [
-            {"player": "a", "position_id": "standing_neutral", "confidence": 0.9,
-             "description": "Standing", "coach_tip": "Engage"},
-            {"player": "b", "position_id": "standing_neutral", "confidence": 0.88,
-             "description": None, "coach_tip": None},
-        ],
-    }
-    annotations = {
-        "m1": [
-            {"id": "a1", "body": "I was too passive here", "created_at": 1},
-            {"id": "a2", "body": "could have shot a single", "created_at": 2},
-        ],
-    }
-    prompt = build_summary_prompt(
-        roll_row=_roll(), moment_rows=moments,
-        analyses_by_moment=analyses, annotations_by_moment=annotations,
+def test_build_summary_prompt_handles_no_analysed_sections():
+    out = build_summary_prompt(
+        roll_row=_roll(), sections=[], annotations_by_section={},
     )
-    assert "User's own notes" in prompt
-    assert "too passive" in prompt
-    assert "shot a single" in prompt
-
-
-def test_build_summary_prompt_includes_output_json_schema_keys():
-    prompt = build_summary_prompt(
-        roll_row=_roll(), moment_rows=[], analyses_by_moment={}, annotations_by_moment={},
-    )
-    for key in (
-        "summary", "scores", "guard_retention", "positional_awareness",
-        "transition_quality", "top_improvements", "strengths", "key_moments",
-        "moment_id",
-    ):
-        assert key in prompt
+    assert "(no sections analysed)" in out
 
 
 # ---------- parse_summary_response ----------
 
 
-def _valid_payload() -> dict:
-    return {
-        "summary": "A good roll.",
-        "scores": {"guard_retention": 8, "positional_awareness": 6, "transition_quality": 7},
-        "top_improvements": ["a", "b", "c"],
-        "strengths": ["x", "y"],
-        "key_moments": [
-            {"moment_id": "m1", "note": "first"},
-            {"moment_id": "m2", "note": "second"},
-            {"moment_id": "m3", "note": "third"},
-        ],
+_VALID_PAYLOAD_TEMPLATE = {
+    "summary": "ok",
+    "scores": {
+        "guard_retention": 7,
+        "positional_awareness": 6,
+        "transition_quality": 7,
+    },
+    "top_improvements": ["a", "b", "c"],
+    "strengths": ["x", "y"],
+    "key_moments": [
+        {"section_id": "sec1", "note": "first"},
+        {"section_id": "sec2", "note": "second"},
+        {"section_id": "sec3", "note": "third"},
+    ],
+}
+
+
+def test_parse_summary_response_happy_path():
+    raw = json.dumps(_VALID_PAYLOAD_TEMPLATE)
+    out = parse_summary_response(raw, {"sec1", "sec2", "sec3"})
+    assert out["key_moments"][0]["section_id"] == "sec1"
+    assert out["scores"]["guard_retention"] == 7
+
+
+def test_parse_summary_response_rejects_unknown_section_id():
+    raw = json.dumps(_VALID_PAYLOAD_TEMPLATE)
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(raw, {"sec1", "sec2"})  # sec3 unknown
+
+
+def test_parse_summary_response_rejects_duplicate_section_id():
+    payload = dict(_VALID_PAYLOAD_TEMPLATE)
+    payload["key_moments"] = [
+        {"section_id": "sec1", "note": "a"},
+        {"section_id": "sec1", "note": "b"},
+        {"section_id": "sec2", "note": "c"},
+    ]
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response(json.dumps(payload), {"sec1", "sec2"})
+
+
+def test_parse_summary_response_rejects_malformed_json():
+    with pytest.raises(SummaryResponseError):
+        parse_summary_response("{ not json", {"sec1"})
+
+
+def test_parse_summary_response_clamps_scores():
+    payload = dict(_VALID_PAYLOAD_TEMPLATE)
+    payload["scores"] = {
+        "guard_retention": 15,        # clamps to 10
+        "positional_awareness": -2,   # clamps to 0
+        "transition_quality": 7.6,    # rounds to 8
+    }
+    out = parse_summary_response(json.dumps(payload), {"sec1", "sec2", "sec3"})
+    assert out["scores"] == {
+        "guard_retention": 10,
+        "positional_awareness": 0,
+        "transition_quality": 8,
     }
 
 
-_VALID_IDS = {"m1", "m2", "m3", "m4"}
-
-
-def test_parse_summary_response_accepts_valid_payload():
-    raw = json.dumps(_valid_payload())
-    out = parse_summary_response(raw, _VALID_IDS)
-    assert out["summary"] == "A good roll."
-    assert out["scores"]["guard_retention"] == 8
-
-
-def test_parse_summary_response_rejects_non_json():
+def test_parse_summary_response_rejects_bool_as_score():
+    payload = dict(_VALID_PAYLOAD_TEMPLATE)
+    payload["scores"] = {
+        "guard_retention": True,
+        "positional_awareness": 5,
+        "transition_quality": 5,
+    }
     with pytest.raises(SummaryResponseError):
-        parse_summary_response("not json", _VALID_IDS)
+        parse_summary_response(json.dumps(payload), {"sec1", "sec2", "sec3"})
 
 
-def test_parse_summary_response_rejects_missing_top_level_keys():
-    payload = _valid_payload()
-    del payload["scores"]
+def test_parse_summary_response_rejects_missing_required_key():
+    payload = {k: v for k, v in _VALID_PAYLOAD_TEMPLATE.items() if k != "strengths"}
     with pytest.raises(SummaryResponseError):
-        parse_summary_response(json.dumps(payload), _VALID_IDS)
-
-
-def test_parse_summary_response_clamps_out_of_range_scores():
-    payload = _valid_payload()
-    payload["scores"] = {"guard_retention": 42, "positional_awareness": -3, "transition_quality": 7}
-    out = parse_summary_response(json.dumps(payload), _VALID_IDS)
-    assert out["scores"]["guard_retention"] == 10
-    assert out["scores"]["positional_awareness"] == 0
-    assert out["scores"]["transition_quality"] == 7
-
-
-def test_parse_summary_response_rejects_key_moments_length_not_3():
-    payload = _valid_payload()
-    payload["key_moments"] = payload["key_moments"][:2]
-    with pytest.raises(SummaryResponseError):
-        parse_summary_response(json.dumps(payload), _VALID_IDS)
-
-
-def test_parse_summary_response_rejects_hallucinated_moment_id():
-    payload = _valid_payload()
-    payload["key_moments"][0]["moment_id"] = "not-a-real-id"
-    with pytest.raises(SummaryResponseError):
-        parse_summary_response(json.dumps(payload), _VALID_IDS)
-
-
-def test_parse_summary_response_rejects_duplicate_moment_ids():
-    payload = _valid_payload()
-    payload["key_moments"][1]["moment_id"] = payload["key_moments"][0]["moment_id"]
-    with pytest.raises(SummaryResponseError):
-        parse_summary_response(json.dumps(payload), _VALID_IDS)
-
-
-def test_parse_summary_response_rejects_top_improvements_length_not_3():
-    payload = _valid_payload()
-    payload["top_improvements"] = ["a", "b"]
-    with pytest.raises(SummaryResponseError):
-        parse_summary_response(json.dumps(payload), _VALID_IDS)
-
-
-def test_parse_summary_response_requires_strengths_between_2_and_4_items():
-    # 0 items — reject
-    payload = _valid_payload()
-    payload["strengths"] = []
-    with pytest.raises(SummaryResponseError):
-        parse_summary_response(json.dumps(payload), _VALID_IDS)
-
-    # 1 item — reject (spec says 2-4)
-    payload = _valid_payload()
-    payload["strengths"] = ["only one"]
-    with pytest.raises(SummaryResponseError):
-        parse_summary_response(json.dumps(payload), _VALID_IDS)
-
-    # 5 items — reject (spec says 2-4)
-    payload = _valid_payload()
-    payload["strengths"] = ["a", "b", "c", "d", "e"]
-    with pytest.raises(SummaryResponseError):
-        parse_summary_response(json.dumps(payload), _VALID_IDS)
-
-    # 2 items — accept
-    payload = _valid_payload()
-    payload["strengths"] = ["first", "second"]
-    out = parse_summary_response(json.dumps(payload), _VALID_IDS)
-    assert out["strengths"] == ["first", "second"]
-
-    # 4 items — accept
-    payload = _valid_payload()
-    payload["strengths"] = ["a", "b", "c", "d"]
-    out = parse_summary_response(json.dumps(payload), _VALID_IDS)
-    assert len(out["strengths"]) == 4
-
-
-def test_parse_summary_response_rejects_bool_scores():
-    payload = _valid_payload()
-    payload["scores"]["guard_retention"] = True  # noqa: disallow bool score
-    with pytest.raises(SummaryResponseError):
-        parse_summary_response(json.dumps(payload), _VALID_IDS)
+        parse_summary_response(json.dumps(payload), {"sec1", "sec2", "sec3"})

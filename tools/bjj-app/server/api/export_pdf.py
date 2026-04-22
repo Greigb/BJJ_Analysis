@@ -8,7 +8,6 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
-from server.analysis.summarise import compute_distribution
 from server.analysis.vault_writer import (
     ConflictError,
     publish as vault_publish,
@@ -73,7 +72,8 @@ def export_roll_pdf(
                     "category": position_to_category.get(a["position_id"], "scramble"),
                 })
 
-        distribution = compute_distribution(flat_analyses, taxonomy.get("categories", []))
+        # TODO(Task 12): compute_distribution removed in M9b; export-pdf to be rewritten.
+        distribution: dict = {"timeline": [], "counts": {}, "percentages": {}}
 
         moments_with_cat = [
             {
