@@ -1,8 +1,7 @@
 """Pure helpers for the summary step — no IO, no subprocess.
 
-- build_summary_prompt: assembles the Claude coach-summary prompt.
+- build_summary_prompt: assembles the Claude coach-summary prompt (sections in).
 - parse_summary_response: validates Claude's JSON output.
-- compute_distribution: counts positions + builds the timeline bar data.
 """
 from __future__ import annotations
 
@@ -13,41 +12,18 @@ class SummaryResponseError(Exception):
     """Raised when Claude's summary output fails schema or reference validation."""
 
 
-CATEGORY_EMOJI: dict[str, str] = {
-    "standing":          "⬜",
-    "guard_bottom":      "🟦",
-    "guard_top":         "🟨",
-    "dominant_top":      "🟩",
-    "inferior_bottom":   "🟥",
-    "leg_entanglement":  "🟫",
-    "scramble":          "🟪",
-}
-
-
-def compute_distribution(
-    analyses: list[dict],
-    categories: list[dict],
-) -> dict:
-    """Compute timeline + category counts + percentages from analyses.
-
-    Only considers rows where `player == "a"` (the person being coached).
-    """
-    player_a_only = [a for a in analyses if a.get("player") == "a"]
-    if not player_a_only:
-        return {"timeline": [], "counts": {}, "percentages": {}}
-
-    timeline: list[str] = [a["category"] for a in player_a_only]
-
-    counts: dict[str, int] = {}
-    for cat in timeline:
-        counts[cat] = counts.get(cat, 0) + 1
-
-    total = sum(counts.values())
-    percentages: dict[str, int] = {
-        cat: round((n / total) * 100) for cat, n in counts.items()
-    }
-
-    return {"timeline": timeline, "counts": counts, "percentages": percentages}
+_SCORING_RUBRIC = (
+    "Scoring rubric (calibrate each score against the footage provided, not against BJJ "
+    "practice as a whole — 10 means execution was reliable throughout THIS roll):\n"
+    "- 0–3: needs focused work; frequent positional loss or stalled execution.\n"
+    "- 4–6: developing; skill is emerging but inconsistent under pressure.\n"
+    "- 7–10: reliable; consistent, technical execution against the partner in this footage.\n"
+    "\n"
+    "Per-metric definitions:\n"
+    "- guard_retention: ability to recover / hold guard when pressured.\n"
+    "- positional_awareness: reads the partner's posture and responds with the right frame / grip / shape.\n"
+    "- transition_quality: technical fluency moving between positions (passes, sweeps, escapes)."
+)
 
 
 _OUTPUT_SCHEMA_HINT = (
@@ -62,9 +38,9 @@ _OUTPUT_SCHEMA_HINT = (
     '  "top_improvements": ["<sentence>", "<sentence>", "<sentence>"],\n'
     '  "strengths": ["<short phrase>", ...],\n'
     '  "key_moments": [\n'
-    '    {"moment_id": "<from the list above>", "note": "<brief pointer sentence>"},\n'
-    '    {"moment_id": "<...>", "note": "<...>"},\n'
-    '    {"moment_id": "<...>", "note": "<...>"}\n'
+    '    {"section_id": "<from the list above>", "note": "<brief pointer sentence>"},\n'
+    '    {"section_id": "<...>", "note": "<...>"},\n'
+    '    {"section_id": "<...>", "note": "<...>"}\n'
     '  ]\n'
     '}'
 )
@@ -79,75 +55,62 @@ def _format_mm_ss(seconds: float) -> str:
 
 def build_summary_prompt(
     roll_row: dict,
-    moment_rows: list[dict],
-    analyses_by_moment: dict[str, list[dict]],
-    annotations_by_moment: dict[str, list[dict]],
+    sections: list[dict],
+    annotations_by_section: dict[str, list[dict]],
 ) -> str:
-    """Construct the summary prompt for Claude."""
+    """Construct the summary prompt for Claude (M9b section-based)."""
     a_name = roll_row["player_a_name"]
     b_name = roll_row["player_b_name"]
     duration_s = roll_row.get("duration_s") or 0.0
     date = roll_row.get("date", "")
 
     preamble = (
-        f"You are a BJJ coach reviewing a roll. Analyse the sequence below and produce "
+        f"You are a BJJ coach reviewing a roll. Analyse the sections below and produce "
         f"a concise coaching report. The practitioner is {a_name} (the person being coached); "
         f"{b_name} is their partner."
     )
+    analysed_count = sum(1 for s in sections if (s.get("narrative") or "").strip())
     meta = (
         f"Roll metadata:\n"
         f"- Duration: {_format_mm_ss(duration_s)}\n"
         f"- Date: {date}\n"
-        f"- Total moments analysed: {sum(1 for m in moment_rows if analyses_by_moment.get(m['id']))}"
+        f"- Total sections analysed: {analysed_count}"
     )
 
-    moment_lines: list[str] = []
-    for m in moment_rows:
-        rows = analyses_by_moment.get(m["id"], [])
-        if not rows:
+    section_blocks: list[str] = []
+    for s in sections:
+        narrative = (s.get("narrative") or "").strip()
+        if not narrative:
             continue
-        a_row = next((r for r in rows if r["player"] == "a"), None)
-        b_row = next((r for r in rows if r["player"] == "b"), None)
-        if a_row is None or b_row is None:
-            continue
-        mm_ss = _format_mm_ss(m["timestamp_s"])
-        a_conf = int(round((a_row.get("confidence") or 0.0) * 100))
-        description = (a_row.get("description") or "").strip()
-        coach_tip = (a_row.get("coach_tip") or "").strip()
-        moment_lines.append(
-            f"- {mm_ss} moment_id={m['id']} — "
-            f"{a_name}: {a_row['position_id']} ({a_conf}%); "
-            f"{b_name}: {b_row['position_id']}."
-            + (f"\n  {description}" if description else "")
-            + (f"\n  Coach tip: {coach_tip}" if coach_tip else "")
-        )
+        start = _format_mm_ss(s["start_s"])
+        end = _format_mm_ss(s["end_s"])
+        coach_tip = (s.get("coach_tip") or "").strip()
+        notes = annotations_by_section.get(s["id"], [])
+        block = [
+            f"Section section_id={s['id']} ({start} – {end}):",
+            f"  Narrative: {narrative}",
+        ]
+        if coach_tip:
+            block.append(f"  Coach tip: {coach_tip}")
+        if notes:
+            block.append(f"  {a_name}'s notes:")
+            for note in notes:
+                body = (note["body"] or "").replace("\n", " ").strip()
+                block.append(f"    - {body}")
+        section_blocks.append("\n".join(block))
 
-    moments_block = "Per-moment analyses (chronological):\n" + "\n".join(moment_lines) if moment_lines else \
-        "Per-moment analyses (chronological):\n(no moments analysed)"
+    if section_blocks:
+        sections_block = "Per-section analyses (chronological):\n" + "\n\n".join(section_blocks)
+    else:
+        sections_block = "Per-section analyses (chronological):\n(no sections analysed)"
 
-    annotation_lines: list[str] = []
-    for m in moment_rows:
-        for ann in annotations_by_moment.get(m["id"], []):
-            mm_ss = _format_mm_ss(m["timestamp_s"])
-            body = ann["body"].replace("\n", " ").strip()
-            annotation_lines.append(f"- {mm_ss} moment_id={m['id']}: \"{body}\"")
-
-    annotations_block = "User's own notes on specific moments:\n" + "\n".join(annotation_lines) if annotation_lines else ""
-
-    parts = [preamble, meta, moments_block]
-    if annotations_block:
-        parts.append(annotations_block)
-    parts.append(_OUTPUT_SCHEMA_HINT)
-
-    return "\n\n".join(parts)
+    return "\n\n".join([preamble, meta, sections_block, _SCORING_RUBRIC, _OUTPUT_SCHEMA_HINT])
 
 
 _REQUIRED_SCORES = ("guard_retention", "positional_awareness", "transition_quality")
 
 
 def _clamp_score(value) -> int:
-    # Reject bool explicitly — isinstance(True, int) is True in Python, and
-    # silently interpreting True as score=1 is surprising.
     if isinstance(value, bool):
         raise SummaryResponseError(f"score must not be a bool: {value!r}")
     if not isinstance(value, (int, float)):
@@ -155,7 +118,7 @@ def _clamp_score(value) -> int:
     return max(0, min(10, int(round(value))))
 
 
-def parse_summary_response(raw: str, valid_moment_ids: set[str]) -> dict:
+def parse_summary_response(raw: str, valid_section_ids: set[str]) -> dict:
     """Parse + validate Claude's summary JSON output. Raises SummaryResponseError."""
     try:
         data = json.loads(raw)
@@ -201,16 +164,16 @@ def parse_summary_response(raw: str, valid_moment_ids: set[str]) -> dict:
     for entry in km:
         if not isinstance(entry, dict):
             raise SummaryResponseError("each key_moments entry must be an object")
-        mid = entry.get("moment_id")
+        sid = entry.get("section_id")
         note = entry.get("note")
-        if not isinstance(mid, str) or not mid:
-            raise SummaryResponseError("key_moments[*].moment_id must be a non-empty string")
-        if mid in seen:
-            raise SummaryResponseError(f"duplicate key_moments moment_id: {mid}")
-        if mid not in valid_moment_ids:
-            raise SummaryResponseError(f"key_moments references unknown moment_id: {mid}")
+        if not isinstance(sid, str) or not sid:
+            raise SummaryResponseError("key_moments[*].section_id must be a non-empty string")
+        if sid in seen:
+            raise SummaryResponseError(f"duplicate key_moments section_id: {sid}")
+        if sid not in valid_section_ids:
+            raise SummaryResponseError(f"key_moments references unknown section_id: {sid}")
         if not isinstance(note, str) or not note.strip():
             raise SummaryResponseError("key_moments[*].note must be a non-empty string")
-        seen.add(mid)
+        seen.add(sid)
 
     return data

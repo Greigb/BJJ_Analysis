@@ -5,18 +5,18 @@ import shutil
 import time
 import uuid
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile, status
 from pydantic import BaseModel
 
-from server.analysis.summarise import compute_distribution
 from server.analysis.vault import RollSummary, list_rolls
 from server.analysis.video import read_duration
 from server.config import Settings, load_settings
 from server.db import (
     connect,
     create_roll,
+    delete_section_and_moments,
     get_analyses,
-    get_annotations_by_moment,
+    get_annotations_by_section,
     get_moments,
     get_roll,
     get_sections_by_roll,
@@ -67,6 +67,10 @@ class SectionOut(BaseModel):
     start_s: float
     end_s: float
     sample_interval_s: float
+    narrative: str | None = None
+    coach_tip: str | None = None
+    analysed_at: int | None = None
+    annotations: list[AnnotationOut] = []
 
 
 class MomentOut(BaseModel):
@@ -93,6 +97,8 @@ class RollDetailOut(BaseModel):
     vault_published_at: int | None = None
     player_a_name: str = "Player A"
     player_b_name: str = "Player B"
+    player_a_description: str | None = None
+    player_b_description: str | None = None
     finalised_at: int | None = None
     scores: dict | None = None
     distribution: dict | None = None
@@ -120,6 +126,8 @@ async def upload_roll(
     partner: str | None = Form(default=None),
     player_a_name: str = Form(default="Player A"),
     player_b_name: str = Form(default="Player B"),
+    player_a_description: str | None = Form(default=None),
+    player_b_description: str | None = Form(default=None),
     settings: Settings = Depends(load_settings),
 ) -> RollDetailOut:
     # roll_id is a 32-char hex string (no hyphens). Server-generated, never user input.
@@ -157,6 +165,8 @@ async def upload_roll(
                 created_at=int(time.time()),
                 player_a_name=player_a_name,
                 player_b_name=player_b_name,
+                player_a_description=(player_a_description or None),
+                player_b_description=(player_b_description or None),
             )
         finally:
             conn.close()
@@ -178,6 +188,8 @@ async def upload_roll(
         vault_published_at=None,
         player_a_name=player_a_name,
         player_b_name=player_b_name,
+        player_a_description=(player_a_description or None),
+        player_b_description=(player_b_description or None),
         finalised_at=None,
         scores=None,
         distribution=None,
@@ -205,10 +217,10 @@ def get_roll_detail(
         analyses_by_moment: dict[str, list] = {
             m["id"]: get_analyses(conn, m["id"]) for m in moment_rows
         }
-        annotations_by_moment: dict[str, list] = {
-            m["id"]: get_annotations_by_moment(conn, m["id"]) for m in moment_rows
-        }
         section_rows = get_sections_by_roll(conn, roll_id)
+        annotations_by_section: dict[str, list] = {
+            s["id"]: get_annotations_by_section(conn, s["id"]) for s in section_rows
+        }
     finally:
         conn.close()
 
@@ -230,10 +242,7 @@ def get_roll_detail(
                 )
                 for a in analyses_by_moment[m["id"]]
             ],
-            annotations=[
-                AnnotationOut(id=an["id"], body=an["body"], created_at=an["created_at"])
-                for an in annotations_by_moment[m["id"]]
-            ],
+            annotations=[],
         )
         for m in moment_rows
     ]
@@ -245,20 +254,32 @@ def get_roll_detail(
         except Exception:
             scores = None
 
-    distribution = None
-    taxonomy = getattr(request.app.state, "taxonomy", None)
-    if taxonomy is not None and any(analyses_by_moment[m["id"]] for m in moment_rows):
-        position_to_category = {p["id"]: p["category"] for p in taxonomy.get("positions", [])}
-        flat_analyses: list[dict] = []
-        for m in moment_rows:
-            for a in analyses_by_moment[m["id"]]:
-                flat_analyses.append({
-                    "position_id": a["position_id"],
-                    "player": a["player"],
-                    "timestamp_s": m["timestamp_s"],
-                    "category": position_to_category.get(a["position_id"], "scramble"),
-                })
-        distribution = compute_distribution(flat_analyses, taxonomy.get("categories", []))
+    sections_out = [
+        SectionOut(
+            id=s["id"],
+            start_s=s["start_s"],
+            end_s=s["end_s"],
+            sample_interval_s=s["sample_interval_s"],
+            narrative=s["narrative"],
+            coach_tip=s["coach_tip"],
+            analysed_at=s["analysed_at"],
+            annotations=[
+                AnnotationOut(id=a["id"], body=a["body"], created_at=a["created_at"])
+                for a in annotations_by_section[s["id"]]
+            ],
+        )
+        for s in section_rows
+    ]
+
+    # Older DBs may predate the player_*_description columns; guard access.
+    try:
+        player_a_description = row["player_a_description"]
+    except (IndexError, KeyError):
+        player_a_description = None
+    try:
+        player_b_description = row["player_b_description"]
+    except (IndexError, KeyError):
+        player_b_description = None
 
     return RollDetailOut(
         id=row["id"],
@@ -272,17 +293,40 @@ def get_roll_detail(
         vault_published_at=row["vault_published_at"],
         player_a_name=row["player_a_name"] or "Player A",
         player_b_name=row["player_b_name"] or "Player B",
+        player_a_description=player_a_description,
+        player_b_description=player_b_description,
         finalised_at=row["finalised_at"],
         scores=scores,
-        distribution=distribution,
+        distribution=None,
         moments=moments_out,
-        sections=[
-            SectionOut(
-                id=s["id"],
-                start_s=s["start_s"],
-                end_s=s["end_s"],
-                sample_interval_s=s["sample_interval_s"],
-            )
-            for s in section_rows
-        ],
+        sections=sections_out,
     )
+
+
+@router.delete(
+    "/rolls/{roll_id}/sections/{section_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_section(
+    roll_id: str,
+    section_id: str,
+    settings: Settings = Depends(load_settings),
+) -> Response:
+    conn = connect(settings.db_path)
+    try:
+        if get_roll(conn, roll_id) is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found"
+            )
+        sections = get_sections_by_roll(conn, roll_id)
+        if not any(s["id"] == section_id for s in sections):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Section not found"
+            )
+        frames_dir = settings.project_root / "assets" / roll_id / "frames"
+        delete_section_and_moments(
+            conn, section_id=section_id, frames_dir=frames_dir
+        )
+    finally:
+        conn.close()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -29,7 +29,9 @@ CREATE TABLE IF NOT EXISTS rolls (
     vault_published_at INTEGER,
     player_a_name TEXT,
     player_b_name TEXT,
-    vault_summary_hashes TEXT
+    vault_summary_hashes TEXT,
+    player_a_description TEXT,
+    player_b_description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS moments (
@@ -55,7 +57,7 @@ CREATE TABLE IF NOT EXISTS analyses (
 
 CREATE TABLE IF NOT EXISTS annotations (
     id TEXT PRIMARY KEY,
-    moment_id TEXT NOT NULL REFERENCES moments(id) ON DELETE CASCADE,
+    section_id TEXT NOT NULL REFERENCES sections(id) ON DELETE CASCADE,
     body TEXT NOT NULL,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
@@ -75,7 +77,10 @@ CREATE TABLE IF NOT EXISTS sections (
     start_s REAL NOT NULL,
     end_s REAL NOT NULL,
     sample_interval_s REAL NOT NULL,
-    created_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL,
+    narrative TEXT,
+    coach_tip TEXT,
+    analysed_at INTEGER
 );
 """
 
@@ -89,6 +94,11 @@ _ROLLS_M4_COLUMNS: tuple[tuple[str, str], ...] = (
     ("vault_summary_hashes", "TEXT"),
 )
 
+_ROLLS_M9B2_COLUMNS: tuple[tuple[str, str], ...] = (
+    ("player_a_description", "TEXT"),
+    ("player_b_description", "TEXT"),
+)
+
 
 def _migrate_rolls_m4(conn: sqlite3.Connection) -> None:
     """Idempotently add M4 columns to an existing rolls table.
@@ -99,6 +109,19 @@ def _migrate_rolls_m4(conn: sqlite3.Connection) -> None:
     """
     existing = {row[1] for row in conn.execute("PRAGMA table_info(rolls)").fetchall()}
     for name, sql_type in _ROLLS_M4_COLUMNS:
+        if name not in existing:
+            conn.execute(f"ALTER TABLE rolls ADD COLUMN {name} {sql_type}")
+
+
+def _migrate_rolls_player_descriptions(conn: sqlite3.Connection) -> None:
+    """Idempotently add player_a_description / player_b_description to rolls.
+
+    Freeform text; used to feed Claude a visual-identification hint so the same
+    player is consistently tagged player_a across frames (e.g. "navy gi, bald,
+    bottom at the start of this roll").
+    """
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(rolls)").fetchall()}
+    for name, sql_type in _ROLLS_M9B2_COLUMNS:
         if name not in existing:
             conn.execute(f"ALTER TABLE rolls ADD COLUMN {name} {sql_type}")
 
@@ -147,6 +170,42 @@ def _migrate_moments_m9(conn: sqlite3.Connection) -> None:
     )
 
 
+_SECTIONS_M9B_COLUMNS: tuple[tuple[str, str], ...] = (
+    ("narrative",   "TEXT"),
+    ("coach_tip",   "TEXT"),
+    ("analysed_at", "INTEGER"),
+)
+
+
+def _migrate_sections_m9b(conn: sqlite3.Connection) -> None:
+    """Idempotently add M9b columns to an existing sections table."""
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(sections)").fetchall()}
+    for name, sql_type in _SECTIONS_M9B_COLUMNS:
+        if name not in existing:
+            conn.execute(f"ALTER TABLE sections ADD COLUMN {name} {sql_type}")
+
+
+def _migrate_annotations_m9b(conn: sqlite3.Connection) -> None:
+    """Rebuild annotations with section_id FK if still on moment_id FK.
+
+    SQLite can't ALTER FK in place — recreate the table. Pre-M9b rows are
+    smoke-test-only, so the migration discards them (spec decision).
+    """
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)").fetchall()}
+    if "section_id" in cols and "moment_id" not in cols:
+        return  # already migrated
+    conn.execute("DROP TABLE IF EXISTS annotations")
+    conn.execute(
+        "CREATE TABLE annotations ("
+        "  id TEXT PRIMARY KEY, "
+        "  section_id TEXT NOT NULL REFERENCES sections(id) ON DELETE CASCADE, "
+        "  body TEXT NOT NULL, "
+        "  created_at INTEGER NOT NULL, "
+        "  updated_at INTEGER NOT NULL"
+        ")"
+    )
+
+
 def init_db(db_path: Path) -> None:
     """Create the schema if it doesn't already exist. Safe to call every startup."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -156,6 +215,9 @@ def init_db(db_path: Path) -> None:
         _backfill_default_player_names(conn)
         _migrate_analyses_player_enum(conn)
         _migrate_moments_m9(conn)
+        _migrate_sections_m9b(conn)
+        _migrate_annotations_m9b(conn)
+        _migrate_rolls_player_descriptions(conn)
         conn.commit()
 
 
@@ -180,6 +242,8 @@ def create_roll(
     created_at: int,
     player_a_name: str = "Player A",
     player_b_name: str = "Player B",
+    player_a_description: str | None = None,
+    player_b_description: str | None = None,
 ) -> sqlite3.Row:
     """Insert a roll row and return it. Callers pass an open connection."""
     conn.execute(
@@ -187,12 +251,14 @@ def create_roll(
         INSERT INTO rolls (
             id, title, date, video_path, duration_s, partner,
             result, scores_json, finalised_at, created_at,
-            player_a_name, player_b_name
+            player_a_name, player_b_name,
+            player_a_description, player_b_description
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)
         """,
         (id, title, date, video_path, duration_s, partner, result, created_at,
-         player_a_name, player_b_name),
+         player_a_name, player_b_name,
+         player_a_description, player_b_description),
     )
     conn.commit()
     return get_roll(conn, id)  # type: ignore[return-value]
@@ -217,6 +283,55 @@ def insert_moments(
     Returns the newly inserted rows in insertion order.
     """
     conn.execute("DELETE FROM moments WHERE roll_id = ?", (roll_id,))
+    inserted_ids: list[str] = []
+    for m in moments:
+        moment_id = uuid.uuid4().hex
+        conn.execute(
+            """
+            INSERT INTO moments (
+                id, roll_id, frame_idx, timestamp_s, pose_delta,
+                selected_for_analysis, section_id
+            )
+            VALUES (?, ?, ?, ?, ?, 0, ?)
+            """,
+            (
+                moment_id,
+                roll_id,
+                int(m["frame_idx"]),
+                float(m["timestamp_s"]),
+                None if m.get("pose_delta") is None else float(m["pose_delta"]),
+                m.get("section_id"),
+            ),
+        )
+        inserted_ids.append(moment_id)
+    conn.commit()
+
+    if not inserted_ids:
+        return []
+
+    cur = conn.execute(
+        f"SELECT * FROM moments WHERE id IN ({','.join('?' * len(inserted_ids))})",
+        inserted_ids,
+    )
+    rows_by_id = {r["id"]: r for r in cur.fetchall()}
+    return [rows_by_id[i] for i in inserted_ids]
+
+
+def append_moments(
+    conn,
+    *,
+    roll_id: str,
+    moments: list[dict],
+) -> list[sqlite3.Row]:
+    """Append moments to a roll without deleting prior rows (append semantics).
+
+    Each moment dict must contain: frame_idx (int), timestamp_s (float),
+    pose_delta (float or None), and may include section_id (str or None).
+    Returns the newly inserted rows in insertion order.
+
+    Use this instead of insert_moments when prior moments must be preserved
+    (e.g. the M9b per-section pipeline where each section is a separate call).
+    """
     inserted_ids: list[str] = []
     for m in moments:
         moment_id = uuid.uuid4().hex
@@ -397,48 +512,48 @@ def get_vault_state(conn, roll_id: str) -> dict | None:
 def insert_annotation(
     conn,
     *,
-    moment_id: str,
+    section_id: str,
     body: str,
     created_at: int,
 ) -> sqlite3.Row:
-    """Append a new annotation to a moment. Returns the inserted row."""
+    """Append a new annotation to a section. Returns the inserted row."""
     annotation_id = uuid.uuid4().hex
     conn.execute(
         """
-        INSERT INTO annotations (id, moment_id, body, created_at, updated_at)
+        INSERT INTO annotations (id, section_id, body, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?)
         """,
-        (annotation_id, moment_id, body, created_at, created_at),
+        (annotation_id, section_id, body, created_at, created_at),
     )
     conn.commit()
     cur = conn.execute("SELECT * FROM annotations WHERE id = ?", (annotation_id,))
     return cur.fetchone()
 
 
-def get_annotations_by_moment(conn, moment_id: str) -> list[sqlite3.Row]:
-    """Return all annotations for a moment ordered by created_at ascending."""
+def get_annotations_by_section(conn, section_id: str) -> list[sqlite3.Row]:
+    """Return all annotations for a section ordered by created_at ascending."""
     cur = conn.execute(
-        "SELECT * FROM annotations WHERE moment_id = ? ORDER BY created_at",
-        (moment_id,),
+        "SELECT * FROM annotations WHERE section_id = ? ORDER BY created_at",
+        (section_id,),
     )
     return list(cur.fetchall())
 
 
 def get_annotations_by_roll(conn, roll_id: str) -> list[sqlite3.Row]:
-    """Return all annotations for a roll, joined with moment timestamps.
+    """Return all annotations for a roll, joined with their section's time range.
 
-    Ordered for vault rendering: by moment timestamp_s ascending, then by
-    created_at ascending within each moment.
-    Each row carries: id, moment_id, body, created_at, updated_at, timestamp_s, frame_idx.
+    Ordered for vault rendering: by section start_s ascending, then by
+    created_at ascending within each section.
+    Each row carries: id, section_id, body, created_at, updated_at, start_s, end_s.
     """
     cur = conn.execute(
         """
-        SELECT a.id, a.moment_id, a.body, a.created_at, a.updated_at,
-               m.timestamp_s, m.frame_idx
+        SELECT a.id, a.section_id, a.body, a.created_at, a.updated_at,
+               s.start_s, s.end_s
           FROM annotations a
-          JOIN moments m ON m.id = a.moment_id
-         WHERE m.roll_id = ?
-         ORDER BY m.timestamp_s ASC, a.created_at ASC
+          JOIN sections s ON s.id = a.section_id
+         WHERE s.roll_id = ?
+         ORDER BY s.start_s ASC, a.created_at ASC
         """,
         (roll_id,),
     )
@@ -514,8 +629,40 @@ def get_sections_by_roll(conn, roll_id: str) -> list[sqlite3.Row]:
     return cur.fetchall()
 
 
-def delete_section_and_moments(conn, *, section_id: str) -> None:
-    """Delete a section and all its moments in one transaction."""
+def delete_section_and_moments(conn, *, section_id: str, frames_dir: Path) -> None:
+    """Delete a section, all its moments, and their frame files on disk.
+
+    `frames_dir` is the directory that holds `frame_NNNNNN.jpg` files for the roll.
+    Missing files are tolerated silently (never leave a DB delete blocked on a
+    missing disk file).
+    """
+    rows = conn.execute(
+        "SELECT frame_idx FROM moments WHERE section_id = ?", (section_id,)
+    ).fetchall()
     conn.execute("DELETE FROM moments WHERE section_id = ?", (section_id,))
     conn.execute("DELETE FROM sections WHERE id = ?", (section_id,))
+    conn.commit()
+    for row in rows:
+        path = frames_dir / f"frame_{int(row['frame_idx']):06d}.jpg"
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def update_section_analysis(
+    conn,
+    *,
+    section_id: str,
+    narrative: str,
+    coach_tip: str,
+    analysed_at: int,
+) -> None:
+    """Write Claude's per-section narrative + coach_tip + completion timestamp."""
+    conn.execute(
+        "UPDATE sections "
+        "   SET narrative = ?, coach_tip = ?, analysed_at = ? "
+        " WHERE id = ?",
+        (narrative, coach_tip, analysed_at, section_id),
+    )
     conn.commit()

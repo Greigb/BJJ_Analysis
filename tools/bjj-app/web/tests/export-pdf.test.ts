@@ -2,26 +2,6 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mirror review-analyse.test.ts — cytoscape mocks required because the page mounts a graph.
-vi.mock('cytoscape', () => {
-  const cyInstance: any = {
-    on: vi.fn(),
-    add: vi.fn(),
-    remove: vi.fn(),
-    getElementById: vi.fn(() => ({ length: 0, style: vi.fn(), position: vi.fn(), addClass: vi.fn(), removeClass: vi.fn() })),
-    nodes: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn() })),
-    edges: vi.fn(() => ({ forEach: vi.fn(), addClass: vi.fn(), removeClass: vi.fn(), length: 0, remove: vi.fn() })),
-    elements: vi.fn(() => ({ removeClass: vi.fn(), addClass: vi.fn(), remove: vi.fn() })),
-    layout: vi.fn(() => ({ run: vi.fn(), stop: vi.fn() })),
-    fit: vi.fn(),
-    resize: vi.fn(),
-    destroy: vi.fn()
-  };
-  const cytoscape = vi.fn(() => cyInstance);
-  (cytoscape as any).use = vi.fn();
-  return { default: cytoscape };
-});
-vi.mock('cytoscape-cose-bilkent', () => ({ default: () => {} }));
 vi.mock('marked', () => ({ marked: { parse: (s: string) => s } }));
 
 import Page from '../src/routes/review/[id]/+page.svelte';
@@ -53,7 +33,8 @@ function unfinalisedDetail() {
     finalised_at: null,
     scores: null,
     distribution: null,
-    moments: []
+    moments: [],
+    sections: []
   };
 }
 
@@ -151,9 +132,7 @@ describe('Review page — Export PDF', () => {
       status: 200,
       json: async () => finalisedDetail()
     });
-    // 2. graph taxonomy fails; inner catch swallows
-    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
-    // 3. POST /export-pdf
+    // 2. POST /export-pdf
     fetchMock.mockResolvedValueOnce(pdfResponse({ status: 200 }));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -182,7 +161,6 @@ describe('Review page — Export PDF', () => {
       status: 200,
       json: async () => finalisedDetail()
     });
-    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
     fetchMock.mockResolvedValueOnce(pdfResponse({ status: 409, conflict: true }));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -209,7 +187,6 @@ describe('Review page — Export PDF', () => {
       status: 200,
       json: async () => finalisedDetail()
     });
-    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
     // First export attempt → 409
     fetchMock.mockResolvedValueOnce(pdfResponse({ status: 409, conflict: true }));
     // Second attempt (with overwrite=1) → 200
@@ -230,7 +207,7 @@ describe('Review page — Export PDF', () => {
     await user.click(screen.getByRole('button', { name: /overwrite/i }));
 
     await waitFor(() => {
-      // Two export-pdf calls total (positions 3 and 4 after GET + graph-fail).
+      // Two export-pdf calls total (positions 2 and 3 after GET detail).
       const exportCalls = fetchMock.mock.calls.filter((c: any[]) => String(c[0]).includes('/export-pdf'));
       expect(exportCalls.length).toBe(2);
       expect(String(exportCalls[1][0])).toContain('overwrite=1');
@@ -245,7 +222,6 @@ describe('Review page — Export PDF', () => {
       status: 200,
       json: async () => finalisedDetail()
     });
-    fetchMock.mockRejectedValueOnce(new Error('graph not needed'));
 
     let resolve: any;
     const pending = new Promise<Response>((r) => { resolve = r; });

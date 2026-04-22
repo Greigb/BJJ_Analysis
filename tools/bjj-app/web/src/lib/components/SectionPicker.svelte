@@ -82,13 +82,6 @@
     sections = sections.map((s) => (s.id === id ? { ...s, end_s: parsed } : s));
   }
 
-  function onDensityChange(id: string, value: string) {
-    const interval = parseFloat(value);
-    sections = sections.map((s) =>
-      s.id === id ? { ...s, sample_interval_s: interval } : s,
-    );
-  }
-
   function onSeek(start_s: number) {
     if (videoEl) {
       videoEl.currentTime = start_s;
@@ -98,13 +91,15 @@
 
   function onAnalyseClick() {
     if (busy || sections.length === 0) return;
-    onAnalyse(
-      sections.map(({ start_s, end_s, sample_interval_s }) => ({
-        start_s,
-        end_s,
-        sample_interval_s,
-      })),
-    );
+    const payload = sections.map(({ start_s, end_s, sample_interval_s }) => ({
+      start_s,
+      end_s,
+      sample_interval_s,
+    }));
+    // Clear staged list so a subsequent mark doesn't resubmit prior ranges
+    // and end up re-analysing already-analysed sections.
+    sections = [];
+    onAnalyse(payload);
   }
 </script>
 
@@ -161,20 +156,6 @@
             value={formatMmSs(section.end_s)}
             onblur={(e) => onEditEnd(section.id, (e.target as HTMLInputElement).value)}
           />
-          <label class="flex items-center gap-1 text-xs text-white/60">
-            <span class="sr-only">Density</span>
-            <select
-              aria-label="Density"
-              class="rounded bg-black/30 px-1 py-0.5 text-white/85"
-              value={String(section.sample_interval_s)}
-              onchange={(e) =>
-                onDensityChange(section.id, (e.target as HTMLSelectElement).value)}
-            >
-              <option value="1">1s</option>
-              <option value="0.5">0.5s</option>
-              <option value="2">2s</option>
-            </select>
-          </label>
           <button
             type="button"
             class="rounded border border-white/15 bg-white/[0.04] px-2 py-0.5 text-xs text-white/70 hover:bg-white/[0.08]"

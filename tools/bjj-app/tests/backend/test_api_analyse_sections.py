@@ -1,4 +1,4 @@
-"""Integration tests for POST /api/rolls/:id/analyse (M9 sections)."""
+"""Integration tests for POST /api/rolls/:id/analyse (M9b sections)."""
 from __future__ import annotations
 
 import json
@@ -24,6 +24,11 @@ def app_client(monkeypatch, tmp_path):
         "events": {}, "categories": {}, "positions": [], "valid_transitions": [],
     }))
 
+    # Stub run_claude so no real subprocess is spawned.
+    async def fake_run_claude(prompt, *, settings, limiter, stream_callback=None):
+        return '{"narrative": "test narrative", "coach_tip": "test tip"}'
+    monkeypatch.setattr("server.analysis.pipeline.run_claude", fake_run_claude)
+
     from server.main import create_app
     from server.db import connect, create_roll, init_db
 
@@ -37,17 +42,11 @@ def app_client(monkeypatch, tmp_path):
     conn = connect(tmp_path / "test.db")
     try:
         create_roll(
-            conn,
-            id=roll_id,
-            title="Fixture",
-            date="2026-04-22",
+            conn, id=roll_id, title="Fixture", date="2026-04-22",
             video_path=f"assets/{roll_id}/source.mp4",
-            duration_s=2.0,
-            partner=None,
-            result="unknown",
+            duration_s=2.0, partner=None, result="unknown",
             created_at=1713700000,
-            player_a_name="Player A",
-            player_b_name="Player B",
+            player_a_name="Player A", player_b_name="Player B",
         )
     finally:
         conn.close()
@@ -61,22 +60,18 @@ class TestAnalyseSectionsEndpoint:
     def test_400_when_sections_missing(self, app_client):
         client, _, roll_id = app_client
         r = client.post(f"/api/rolls/{roll_id}/analyse", json={})
-        assert r.status_code == 400 or r.status_code == 422
+        assert r.status_code in (400, 422)
 
     def test_400_when_sections_empty(self, app_client):
         client, _, roll_id = app_client
         r = client.post(f"/api/rolls/{roll_id}/analyse", json={"sections": []})
-        assert r.status_code == 400 or r.status_code == 422
+        assert r.status_code in (400, 422)
 
     def test_400_when_end_before_start(self, app_client):
         client, _, roll_id = app_client
         r = client.post(
             f"/api/rolls/{roll_id}/analyse",
-            json={
-                "sections": [
-                    {"start_s": 2.0, "end_s": 1.0, "sample_interval_s": 1.0}
-                ]
-            },
+            json={"sections": [{"start_s": 2.0, "end_s": 1.0}]},
         )
         assert r.status_code == 400
 
@@ -84,61 +79,50 @@ class TestAnalyseSectionsEndpoint:
         client, _, roll_id = app_client
         r = client.post(
             f"/api/rolls/{roll_id}/analyse",
-            json={
-                "sections": [
-                    {"start_s": 0.0, "end_s": 999.0, "sample_interval_s": 1.0}
-                ]
-            },
+            json={"sections": [{"start_s": 0.0, "end_s": 999.0}]},
         )
         assert r.status_code == 400
 
-    def test_400_when_interval_not_allowed(self, app_client):
+    def test_accepts_sample_interval_s_but_ignores_it(self, app_client):
+        """Old frontends may still send sample_interval_s — backend accepts, ignores."""
         client, _, roll_id = app_client
         r = client.post(
             f"/api/rolls/{roll_id}/analyse",
-            json={
-                "sections": [
-                    {"start_s": 0.0, "end_s": 1.0, "sample_interval_s": 0.25}
-                ]
-            },
+            json={"sections": [
+                {"start_s": 0.0, "end_s": 1.0, "sample_interval_s": 0.25},
+            ]},
         )
-        assert r.status_code == 400
+        assert r.status_code == 200
 
     def test_404_when_roll_missing(self, app_client):
         client, _, _ = app_client
         r = client.post(
             "/api/rolls/no-such-roll/analyse",
-            json={
-                "sections": [
-                    {"start_s": 0.0, "end_s": 1.0, "sample_interval_s": 1.0}
-                ]
-            },
+            json={"sections": [{"start_s": 0.0, "end_s": 1.0}]},
         )
         assert r.status_code == 404
 
-    def test_happy_path_streams_events_and_persists(self, app_client):
+    def test_happy_path_streams_section_events_and_persists(self, app_client):
         client, root, roll_id = app_client
         r = client.post(
             f"/api/rolls/{roll_id}/analyse",
-            json={
-                "sections": [
-                    {"start_s": 0.0, "end_s": 1.0, "sample_interval_s": 1.0},
-                ]
-            },
+            json={"sections": [{"start_s": 0.0, "end_s": 1.0}]},
         )
         assert r.status_code == 200
         body = r.text
-        assert "stage" in body
-        assert "\"done\"" in body
+        assert "section_started" in body
+        assert "section_done" in body
+        assert '"stage": "done"' in body or '"stage":"done"' in body
 
-        # DB has a section + moment
-        from server.db import connect, get_moments, get_sections_by_roll
+        from server.db import connect, get_sections_by_roll
         conn = connect(root / "test.db")
         try:
-            assert len(get_sections_by_roll(conn, roll_id)) == 1
-            assert len(get_moments(conn, roll_id)) == 1
+            sections = get_sections_by_roll(conn, roll_id)
+            assert len(sections) == 1
+            assert sections[0]["narrative"] == "test narrative"
+            assert sections[0]["coach_tip"] == "test tip"
+            assert sections[0]["analysed_at"] is not None
         finally:
             conn.close()
 
-        # Frame on disk
         assert (root / "assets" / roll_id / "frames" / "frame_000000.jpg").exists()

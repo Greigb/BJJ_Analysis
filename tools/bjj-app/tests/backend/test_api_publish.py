@@ -8,7 +8,7 @@ from httpx import ASGITransport, AsyncClient
 
 
 async def _upload_annotate(client: AsyncClient, short_video_path: Path) -> tuple[str, str]:
-    """Upload + pose pre-pass + add one annotation. Returns (roll_id, moment_id)."""
+    """Upload + pre-analysis + add one annotation. Returns (roll_id, section_id)."""
     with short_video_path.open("rb") as f:
         up = await client.post(
             "/api/rolls",
@@ -25,14 +25,14 @@ async def _upload_annotate(client: AsyncClient, short_video_path: Path) -> tuple
     assert pre.status_code == 200
 
     detail = await client.get(f"/api/rolls/{roll_id}")
-    moment_id = detail.json()["moments"][0]["id"]
+    section_id = detail.json()["sections"][0]["id"]
 
     ann = await client.patch(
-        f"/api/rolls/{roll_id}/moments/{moment_id}/annotations",
+        f"/api/rolls/{roll_id}/sections/{section_id}/annotations",
         json={"body": "my note"},
     )
     assert ann.status_code == 201
-    return roll_id, moment_id
+    return roll_id, section_id
 
 
 @pytest.mark.asyncio
@@ -86,7 +86,7 @@ async def test_publish_returns_409_on_external_your_notes_edit(
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
-        roll_id, moment_id = await _upload_annotate(client, short_video_path)
+        roll_id, section_id = await _upload_annotate(client, short_video_path)
         first = await client.post(f"/api/rolls/{roll_id}/publish", json={})
         assert first.status_code == 200
         vault_path = tmp_project_root / first.json()["vault_path"]
@@ -98,7 +98,7 @@ async def test_publish_returns_409_on_external_your_notes_edit(
 
         # Add another annotation + re-publish without force → 409.
         await client.patch(
-            f"/api/rolls/{roll_id}/moments/{moment_id}/annotations",
+            f"/api/rolls/{roll_id}/sections/{section_id}/annotations",
             json={"body": "second note"},
         )
         second = await client.post(f"/api/rolls/{roll_id}/publish", json={})
@@ -124,7 +124,7 @@ async def test_publish_force_true_overrides_conflict(
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
-        roll_id, moment_id = await _upload_annotate(client, short_video_path)
+        roll_id, section_id = await _upload_annotate(client, short_video_path)
         first = await client.post(f"/api/rolls/{roll_id}/publish", json={})
         vault_path = tmp_project_root / first.json()["vault_path"]
 
@@ -132,7 +132,7 @@ async def test_publish_force_true_overrides_conflict(
         vault_path.write_text(tampered)
 
         await client.patch(
-            f"/api/rolls/{roll_id}/moments/{moment_id}/annotations",
+            f"/api/rolls/{roll_id}/sections/{section_id}/annotations",
             json={"body": "force note"},
         )
 
@@ -172,24 +172,9 @@ async def test_publish_finalised_roll_writes_summary_sections_to_vault(
     tmp_project_root: Path,
     short_video_path: Path,
 ) -> None:
-    """Integration: finalised roll publishes with all six summary sections."""
+    """Integration: finalised roll publishes with all five summary sections (no Position Distribution)."""
     import json
     import time
-
-    tax_dir = tmp_project_root / "tools"
-    tax_dir.mkdir(exist_ok=True)
-    (tax_dir / "taxonomy.json").write_text(json.dumps({
-        "events": {},
-        "categories": {
-            "standing": {"label": "Standing", "dominance": 0, "visual_cues": "x"},
-            "guard_bottom": {"label": "Guard (Bottom)", "dominance": 1, "visual_cues": "y"},
-        },
-        "positions": [
-            {"id": "standing_neutral", "name": "Standing", "category": "standing", "visual_cues": "a"},
-            {"id": "closed_guard_bottom", "name": "CG Bottom", "category": "guard_bottom", "visual_cues": "b"},
-        ],
-        "valid_transitions": [],
-    }))
 
     monkeypatch.setenv("BJJ_PROJECT_ROOT", str(tmp_project_root))
     monkeypatch.setenv("BJJ_VAULT_ROOT", str(tmp_project_root))
@@ -201,27 +186,25 @@ async def test_publish_finalised_roll_writes_summary_sections_to_vault(
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
-        roll_id, moment_id = await _upload_annotate(client, short_video_path)
+        roll_id, section_id = await _upload_annotate(client, short_video_path)
 
-    from server.db import connect, set_summary_state
+    from server.db import connect, get_sections_by_roll, set_summary_state
 
     conn = connect(tmp_project_root / "test.db")
     try:
-        rows = conn.execute(
-            "SELECT id FROM moments WHERE roll_id = ? ORDER BY timestamp_s", (roll_id,)
-        ).fetchall()
-        # Need at least 3 distinct moment_ids for key_moments validation.
-        if len(rows) < 3:
-            pytest.skip(f"fixture produced only {len(rows)} moments; need >= 3")
+        section_rows = get_sections_by_roll(conn, roll_id)
+        if len(section_rows) < 1:
+            pytest.skip(f"fixture produced no sections")
+        # Build key_moments from available sections (up to 3).
+        km_sections = section_rows[:3]
         scores_payload = {
             "summary": "Integration-test roll.",
             "scores": {"guard_retention": 7, "positional_awareness": 6, "transition_quality": 8},
             "top_improvements": ["one", "two", "three"],
             "strengths": ["strong"],
             "key_moments": [
-                {"moment_id": rows[0]["id"], "note": "first"},
-                {"moment_id": rows[1]["id"], "note": "second"},
-                {"moment_id": rows[2]["id"], "note": "third"},
+                {"section_id": s["id"], "note": f"note {i}"}
+                for i, s in enumerate(km_sections)
             ],
         }
         set_summary_state(
@@ -241,8 +224,9 @@ async def test_publish_finalised_roll_writes_summary_sections_to_vault(
     assert "## Summary" in text
     assert "Integration-test roll." in text
     assert "## Scores" in text
-    assert "## Position Distribution" in text
     assert "## Key Moments" in text
     assert "## Top Improvements" in text
     assert "## Strengths Observed" in text
     assert "## Your Notes" in text
+    # Position Distribution is gone post-M9b
+    assert "## Position Distribution" not in text

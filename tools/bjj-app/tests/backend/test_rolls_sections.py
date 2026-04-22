@@ -57,3 +57,48 @@ def test_roll_detail_includes_sections(app_client):
     assert body["sections"][0]["start_s"] == 3.0
     assert body["sections"][0]["sample_interval_s"] == 1.0
     assert body["sections"][1]["start_s"] == 10.0
+
+
+def test_delete_section_removes_row_and_moments(app_client):
+    r0 = app_client.get("/api/rolls/r1").json()
+    section_id = r0["sections"][0]["id"]
+    r = app_client.delete(f"/api/rolls/r1/sections/{section_id}")
+    assert r.status_code == 204
+    r1 = app_client.get("/api/rolls/r1").json()
+    assert section_id not in {s["id"] for s in r1["sections"]}
+
+
+def test_roll_detail_sections_include_narrative_coach_tip_annotations(app_client):
+    """The fixture inserts two sections; update the first with analysis + annotation."""
+    import os
+    from server.db import connect, insert_annotation, update_section_analysis
+
+    db_path = os.environ["BJJ_DB_OVERRIDE"]
+    conn = connect(db_path)
+    try:
+        r0 = app_client.get("/api/rolls/r1").json()
+        section_id = r0["sections"][0]["id"]
+        update_section_analysis(
+            conn, section_id=section_id,
+            narrative="A passes to side control.",
+            coach_tip="Stay heavy.",
+            analysed_at=1713700100,
+        )
+        insert_annotation(
+            conn, section_id=section_id, body="first note", created_at=1713700200,
+        )
+    finally:
+        conn.close()
+
+    r1 = app_client.get("/api/rolls/r1").json()
+    s0 = r1["sections"][0]
+    assert s0["narrative"] == "A passes to side control."
+    assert s0["coach_tip"] == "Stay heavy."
+    assert s0["analysed_at"] == 1713700100
+    assert len(s0["annotations"]) == 1
+    assert s0["annotations"][0]["body"] == "first note"
+
+
+def test_roll_detail_distribution_is_null(app_client):
+    r = app_client.get("/api/rolls/r1").json()
+    assert r["distribution"] is None

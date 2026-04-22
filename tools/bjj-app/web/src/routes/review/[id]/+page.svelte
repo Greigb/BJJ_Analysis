@@ -2,11 +2,11 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import {
+    addAnnotation,
     analyseRoll,
     ApiError,
+    deleteSection,
     exportRollPdf,
-    getGraph,
-    getGraphPaths,
     getRoll,
     publishRoll,
     PublishConflictError,
@@ -14,19 +14,17 @@
     SummariseRateLimitedError
   } from '$lib/api';
   import type { SectionInput } from '$lib/api';
-  import GraphCluster from '$lib/components/GraphCluster.svelte';
-  import MomentDetail from '$lib/components/MomentDetail.svelte';
   import PublishConflictDialog from '$lib/components/PublishConflictDialog.svelte';
   import ScoresPanel from '$lib/components/ScoresPanel.svelte';
+  import SectionCard from '$lib/components/SectionCard.svelte';
   import SectionPicker from '$lib/components/SectionPicker.svelte';
-  import type { AnalyseEvent, GraphPaths, GraphTaxonomy, Moment, RollDetail } from '$lib/types';
+  import type { AnalyseEvent, RollDetail, Section } from '$lib/types';
 
   let roll = $state<RollDetail | null>(null);
   let loading = $state(true);
   let error = $state<string | null>(null);
   let analysing = $state(false);
-  let progress = $state<{ stage: string; pct: number } | null>(null);
-  let selectedMomentId = $state<string | null>(null);
+  let queuedBanner = $state<{ sectionId: string; retryAfterS: number } | null>(null);
   let publishing = $state(false);
   let publishError = $state<string | null>(null);
   let publishToast = $state<string | null>(null);
@@ -36,43 +34,27 @@
   let exporting = $state(false);
   let exportConflictOpen = $state(false);
   let exportError = $state<string | null>(null);
-
   let videoEl: HTMLVideoElement | undefined = $state();
-  let graphTaxonomy = $state<GraphTaxonomy | null>(null);
-  let graphPaths = $state<GraphPaths | null>(null);
 
-  const selectedMoment = $derived(
-    roll?.moments.find((m) => m.id === selectedMomentId) ?? null
-  );
-
-  const hasAnyAnalyses = $derived(
-    roll?.moments?.some((m) => m.analyses.length > 0) ?? false
+  const hasAnyAnalysedSection = $derived(
+    roll?.sections?.some((s) => s.narrative != null) ?? false
   );
 
   onMount(async () => {
     const id = $page.params.id;
     try {
       roll = await getRoll(id);
-      try {
-        graphTaxonomy = await getGraph();
-        graphPaths = await getGraphPaths(id);
-      } catch {
-        // Mini graph is a nice-to-have; ignore failures so the review page still loads.
-      }
-
-      // Honor ?t=<seconds> by pre-seeking the video once it's loaded.
       const queryT = $page.url.searchParams.get('t');
       if (queryT !== null && videoEl) {
         const t = Number(queryT);
         if (!Number.isNaN(t)) {
-          // If the video metadata hasn't loaded yet, defer the seek.
-          const seek = () => {
+          const seekFn = () => {
             if (videoEl) videoEl.currentTime = t;
           };
           if (videoEl.readyState >= 1) {
-            seek();
+            seekFn();
           } else {
-            videoEl.addEventListener('loadedmetadata', seek, { once: true });
+            videoEl.addEventListener('loadedmetadata', seekFn, { once: true });
           }
         }
       }
@@ -86,7 +68,7 @@
   async function onAnalyseSections(sections: SectionInput[]) {
     if (!roll || analysing) return;
     analysing = true;
-    progress = null;
+    queuedBanner = null;
     try {
       const response = await analyseRoll(roll.id, sections);
       if (!response.ok || !response.body) {
@@ -111,24 +93,77 @@
       }
     } finally {
       analysing = false;
+      queuedBanner = null;
     }
   }
 
   function handleAnalyseEvent(event: AnalyseEvent) {
-    if (event.stage === 'done') {
-      if (!roll) return;
-      roll.moments = event.moments.map((m) => ({
-        id: m.id,
-        frame_idx: m.frame_idx,
-        timestamp_s: m.timestamp_s,
-        pose_delta: null,
-        section_id: m.section_id,
-        analyses: [],
+    if (!roll) return;
+    if (event.stage === 'section_started') {
+      queuedBanner = null;
+      const placeholder: Section = {
+        id: event.section_id,
+        start_s: event.start_s,
+        end_s: event.end_s,
+        sample_interval_s: 1.0,
+        narrative: null,
+        coach_tip: null,
+        analysed_at: null,
         annotations: []
-      })) as Moment[];
-      progress = { stage: 'done', pct: 100 };
-    } else {
-      progress = { stage: event.stage, pct: event.pct };
+      };
+      if (!roll.sections.some((s) => s.id === event.section_id)) {
+        roll.sections = [...roll.sections, placeholder];
+      }
+    } else if (event.stage === 'section_queued') {
+      queuedBanner = { sectionId: event.section_id, retryAfterS: event.retry_after_s };
+    } else if (event.stage === 'section_done') {
+      roll.sections = roll.sections.map((s) =>
+        s.id === event.section_id
+          ? {
+              ...s,
+              narrative: event.narrative,
+              coach_tip: event.coach_tip,
+              analysed_at: Math.floor(Date.now() / 1000)
+            }
+          : s
+      );
+    } else if (event.stage === 'section_error') {
+      // Leave the section in its placeholder state; no narrative means "not analysed".
+      queuedBanner = null;
+    }
+    // stage === 'done' → nothing; the loop exits naturally.
+  }
+
+  async function onSectionDelete(sectionId: string) {
+    if (!roll) return;
+    try {
+      await deleteSection(roll.id, sectionId);
+      roll.sections = roll.sections.filter((s) => s.id !== sectionId);
+    } catch (err) {
+      error = err instanceof ApiError ? err.message : String(err);
+    }
+  }
+
+  async function onSectionAnnotate(sectionId: string, body: string) {
+    if (!roll) return;
+    try {
+      const ann = await addAnnotation(roll.id, sectionId, body);
+      roll.sections = roll.sections.map((s) =>
+        s.id === sectionId ? { ...s, annotations: [...s.annotations, ann] } : s
+      );
+    } catch (err) {
+      error = err instanceof ApiError ? err.message : String(err);
+    }
+  }
+
+  function seek(t: number) {
+    if (!videoEl) return;
+    videoEl.currentTime = t;
+    const playPromise = videoEl.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        /* autoplay may be blocked; that's fine */
+      });
     }
   }
 
@@ -138,55 +173,6 @@
     const m = Math.floor(total / 60);
     const s = total % 60;
     return `${m}:${String(s).padStart(2, '0')}`;
-  }
-
-  function formatMomentTime(seconds: number): string {
-    const total = Math.round(seconds);
-    const m = Math.floor(total / 60);
-    const s = total % 60;
-    return `${m}:${String(s).padStart(2, '0')}`;
-  }
-
-  function progressLabel(p: { stage: string; pct: number } | null): string {
-    if (!p) return '';
-    if (p.stage === 'frames') return `Extracting frames… ${p.pct}%`;
-    if (p.stage === 'done') return 'Analysis complete';
-    return `${p.stage}… ${p.pct}%`;
-  }
-
-  function onChipClick(moment: Moment) {
-    selectedMomentId = moment.id;
-    if (videoEl) {
-      videoEl.currentTime = moment.timestamp_s;
-      const playPromise = videoEl.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          /* autoplay may be blocked; that's fine */
-        });
-      }
-    }
-  }
-
-  function onMomentAnalysed(updated: Moment) {
-    if (!roll) return;
-    roll.moments = roll.moments.map((m) => (m.id === updated.id ? updated : m));
-  }
-
-  function onMomentAnnotated(updated: Moment) {
-    if (!roll) return;
-    roll.moments = roll.moments.map((m) => (m.id === updated.id ? updated : m));
-  }
-
-  function chipStateClass(m: Moment, isSelected: boolean): string {
-    const base = 'rounded-md px-2.5 py-1 text-xs font-mono tabular-nums transition-colors';
-    if (m.analyses.length > 0) {
-      return `${base} border bg-emerald-500/15 border-emerald-400/40 text-emerald-100 hover:bg-emerald-500/25${
-        isSelected ? ' ring-1 ring-emerald-300' : ''
-      }`;
-    }
-    return `${base} border border-dashed bg-white/[0.02] border-white/20 text-white/75 hover:bg-white/[0.05] hover:border-white/40${
-      isSelected ? ' ring-1 ring-white/40' : ''
-    }`;
   }
 
   async function onSaveToVault(options: { force?: boolean } = {}) {
@@ -237,8 +223,6 @@
     exportError = null;
     try {
       const result = await exportRollPdf(roll.id, overwrite);
-      // The download is user-facing. If this is the retry after Overwrite, the user
-      // already has the file — skip the second download so they don't get a duplicate.
       if (!overwrite) {
         await triggerDownload(result.blob, result.filename);
       }
@@ -263,14 +247,13 @@
 
   async function onFinaliseClick() {
     if (!roll || finalising) return;
-    if (!hasAnyAnalyses) return;
+    if (!hasAnyAnalysedSection) return;
     finalising = true;
     finaliseError = null;
     try {
       const result = await summariseRoll(roll.id);
       roll.finalised_at = result.finalised_at;
       roll.scores = result.scores;
-      roll.distribution = result.distribution;
     } catch (err) {
       if (err instanceof SummariseRateLimitedError) {
         finaliseError = `Claude cooldown — ${err.retryAfterS}s until next call`;
@@ -284,9 +267,9 @@
     }
   }
 
-  function onKeyMomentGoTo(momentId: string) {
-    const moment = roll?.moments.find((m) => m.id === momentId);
-    if (moment) onChipClick(moment);
+  function onKeyMomentGoTo(sectionId: string) {
+    const section = roll?.sections.find((s) => s.id === sectionId);
+    if (section) seek(section.start_s);
   }
 </script>
 
@@ -330,92 +313,49 @@
       busy={analysing}
     />
 
-    {#if progress}
+    {#if queuedBanner}
       <div
-        class="rounded-md border border-white/10 bg-white/[0.02] px-4 py-2 text-xs text-white/65"
+        class="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100"
         role="status"
       >
-        {progressLabel(progress)}
+        Queued — Claude cooldown, retrying in {queuedBanner.retryAfterS}s…
       </div>
     {/if}
 
-    {#if roll.moments.length > 0}
-      <div class="space-y-2">
-        <div class="text-[10px] font-semibold uppercase tracking-wider text-white/40">
-          Moments ({roll.moments.length})
-        </div>
-        <div class="flex flex-wrap gap-1.5">
-          {#each roll.moments as moment (moment.id)}
-            <button
-              type="button"
-              onclick={() => onChipClick(moment)}
-              class={chipStateClass(moment, moment.id === selectedMomentId)}
-            >
-              {formatMomentTime(moment.timestamp_s)}
-            </button>
-          {/each}
-        </div>
+    {#if roll.sections && roll.sections.length > 0}
+      <div class="space-y-3">
+        {#each roll.sections as section (section.id)}
+          <SectionCard
+            {section}
+            busy={analysing && section.narrative === null}
+            onSeek={(t) => seek(t)}
+            onDelete={(id) => onSectionDelete(id)}
+            onAddAnnotation={(id, body) => onSectionAnnotate(id, body)}
+          />
+        {/each}
       </div>
 
       {#if roll.scores && roll.finalised_at}
         <ScoresPanel
           scores={roll.scores}
-          moments={roll.moments}
+          sections={roll.sections}
           finalisedAt={roll.finalised_at}
           ongoto={onKeyMomentGoTo}
         />
       {/if}
-
-      {#if selectedMoment}
-        <MomentDetail
-          rollId={roll.id}
-          moment={selectedMoment}
-          playerAName={roll.player_a_name}
-          playerBName={roll.player_b_name}
-          onanalysed={onMomentAnalysed}
-          onannotated={onMomentAnnotated}
-        />
-        {#if graphTaxonomy && graphPaths}
-          <section class="space-y-2 border-t border-white/8 pt-4">
-            <div class="text-[10px] font-semibold uppercase tracking-wider text-white/40">
-              Graph at this moment
-            </div>
-            <div class="h-[220px] rounded-md overflow-hidden border border-white/8">
-              <GraphCluster
-                variant="mini"
-                taxonomy={graphTaxonomy}
-                paths={graphPaths}
-                scrubTimeS={selectedMoment.timestamp_s}
-              />
-            </div>
-            <div class="text-right">
-              <a
-                href={`/graph?roll=${encodeURIComponent(roll.id)}&t=${Math.floor(selectedMoment.timestamp_s)}`}
-                class="text-[11px] text-white/60 hover:text-white/85 underline"
-              >
-                Open full BJJ graph →
-              </a>
-            </div>
-          </section>
-        {/if}
-      {:else}
-        <p class="text-[11px] text-white/35">
-          Click a chip to see the moment and analyse it with Claude.
-        </p>
-      {/if}
     {:else if !analysing}
       <div class="rounded-lg border border-white/10 bg-white/[0.02] p-6 text-center">
-        <p class="text-sm text-white/60">No moments yet.</p>
+        <p class="text-sm text-white/60">No sections yet.</p>
         <p class="mt-1 text-xs text-white/35">
-          Pick sections above by playing the video and clicking <strong>Mark start</strong> / <strong>Mark end</strong>, then click <strong>Analyse ranges</strong> to run Claude classification on those frames.
+          Pick sections above by playing the video and clicking <strong>Mark start</strong> / <strong>Mark end</strong>, then click <strong>Analyse ranges</strong>.
         </p>
       </div>
     {/if}
 
     <div class="flex items-center justify-between gap-3 border-t border-white/8 pt-4">
       <div class="text-[11px] text-white/40">
-        {#if !hasAnyAnalyses}
-          Analyse at least one moment first.
+        {#if !hasAnyAnalysedSection}
+          Analyse at least one section first.
         {:else if roll.finalised_at}
           Finalised. Click to recompute with the latest analyses + notes.
         {:else}
@@ -425,7 +365,7 @@
       <button
         type="button"
         onclick={onFinaliseClick}
-        disabled={finalising || !hasAnyAnalyses}
+        disabled={finalising || !hasAnyAnalysedSection}
         class="rounded-md border border-blue-400/40 bg-blue-500/15 px-3 py-1.5 text-xs font-medium text-blue-100 hover:bg-blue-500/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {finalising ? 'Finalising…' : roll.finalised_at ? 'Re-finalise' : 'Finalise'}

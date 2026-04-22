@@ -55,22 +55,20 @@ def build_report_context(
     *,
     roll: dict,
     scores: dict | None,
-    distribution: dict,
-    moments: list[dict],
-    taxonomy: dict,
+    sections: list[dict],
     generated_at: datetime,
 ) -> dict:
-    """Flatten DB / taxonomy state into the exact shape the Jinja template expects."""
+    """Flatten DB state into the exact shape the Jinja template expects.
+
+    M9b: no distribution data available; key_moments resolve by section_id.
+    """
     if scores is None:
         raise ValueError("build_report_context requires a non-null `scores` payload")
 
-    category_label_by_id = {c["id"]: c["label"] for c in taxonomy.get("categories", [])}
-    moment_by_id = {m["id"]: m for m in moments}
+    section_by_id = {s["id"]: s for s in sections}
 
-    # Header
     date_human = datetime.strptime(roll["date"], "%Y-%m-%d").strftime("%d %B %Y").lstrip("0")
 
-    # Scores
     score_rows: list[dict] = []
     for score_id, label in _SCORE_LABEL_BY_ID.items():
         value = int(scores["scores"].get(score_id, 0))
@@ -82,30 +80,15 @@ def build_report_context(
             "color_bucket": _bucket_for(value),
         })
 
-    # Distribution bar
-    percentages = distribution.get("percentages", {})
-    distribution_bar: list[dict] = []
-    for cat_id, pct in percentages.items():
-        distribution_bar.append({
-            "category_id": cat_id,
-            "label": category_label_by_id.get(cat_id, cat_id.replace("_", " ").capitalize()),
-            "width_pct": int(pct),
-            "color_class": f"cat-{cat_id.replace('_', '-')}",
-        })
-
-    # Key moments — resolve moment_id → (timestamp_s, category)
     key_moments: list[dict] = []
     for km in scores.get("key_moments", []):
-        mid = km.get("moment_id")
-        m = moment_by_id.get(mid)
-        if m is None:
+        sid = km.get("section_id")
+        sec = section_by_id.get(sid)
+        if sec is None:
             continue
         key_moments.append({
-            "timestamp_human": format_mm_ss(m["timestamp_s"]),
-            "category_label": category_label_by_id.get(
-                m.get("category") or "scramble",
-                (m.get("category") or "scramble").replace("_", " ").capitalize(),
-            ),
+            "timestamp_human": format_mm_ss(sec["start_s"]),
+            "category_label": f"{format_mm_ss(sec['start_s'])}–{format_mm_ss(sec['end_s'])}",
             "blurb": km.get("note", ""),
         })
 
@@ -115,10 +98,10 @@ def build_report_context(
         "player_a_name": roll["player_a_name"],
         "player_b_name": roll["player_b_name"],
         "duration_human": format_mm_ss(roll.get("duration_s") or 0),
-        "moments_analysed_count": len(moments),
+        "moments_analysed_count": sum(1 for s in sections if s.get("narrative")),
         "summary_sentence": scores.get("summary", ""),
         "scores": score_rows,
-        "distribution_bar": distribution_bar,
+        "distribution_bar": [],
         "improvements": list(scores.get("top_improvements", [])),
         "strengths": list(scores.get("strengths", [])),
         "key_moments": key_moments,

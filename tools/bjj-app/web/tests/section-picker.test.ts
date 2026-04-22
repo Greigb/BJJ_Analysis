@@ -86,27 +86,6 @@ describe('SectionPicker', () => {
     expect(screen.queryByText(/0:03/)).not.toBeInTheDocument();
   });
 
-  it('density dropdown changes sample_interval_s', async () => {
-    const user = userEvent.setup();
-    const onAnalyse = vi.fn();
-    const video = makeVideoEl(3, 60);
-    render(SectionPicker, {
-      props: { videoEl: video, durationS: 60, onAnalyse, busy: false },
-    });
-
-    await user.click(screen.getByRole('button', { name: /mark start/i }));
-    (video as any).currentTime = 5;
-    await user.click(screen.getByRole('button', { name: /mark end/i }));
-
-    const dropdown = screen.getByRole('combobox', { name: /density/i });
-    await user.selectOptions(dropdown, '0.5');
-
-    await user.click(screen.getByRole('button', { name: /analyse ranges/i }));
-    expect(onAnalyse).toHaveBeenCalledWith([
-      expect.objectContaining({ sample_interval_s: 0.5 }),
-    ]);
-  });
-
   it('Analyse ranges is disabled when no sections', () => {
     const video = makeVideoEl(0, 60);
     render(SectionPicker, {
@@ -129,6 +108,28 @@ describe('SectionPicker', () => {
     await rerender({ videoEl: video, durationS: 60, onAnalyse: vi.fn(), busy: true });
 
     expect(screen.getByRole('button', { name: /analyse ranges/i })).toBeDisabled();
+  });
+
+  it('clears the staged list after Analyse ranges is clicked', async () => {
+    const user = userEvent.setup();
+    const onAnalyse = vi.fn();
+    const video = makeVideoEl(3, 60);
+    render(SectionPicker, {
+      props: { videoEl: video, durationS: 60, onAnalyse, busy: false },
+    });
+    await user.click(screen.getByRole('button', { name: /mark start/i }));
+    (video as any).currentTime = 5;
+    await user.click(screen.getByRole('button', { name: /mark end/i }));
+    expect(screen.getByText(/0:03/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /analyse ranges/i }));
+
+    // Payload was sent to the parent.
+    expect(onAnalyse).toHaveBeenCalledWith([
+      expect.objectContaining({ start_s: 3.0, end_s: 5.0 }),
+    ]);
+    // Staged list is now empty so a follow-up mark doesn't resubmit the prior range.
+    expect(screen.queryByText(/0:03/)).not.toBeInTheDocument();
   });
 
   it('editing mm:ss input updates the section timestamps', async () => {

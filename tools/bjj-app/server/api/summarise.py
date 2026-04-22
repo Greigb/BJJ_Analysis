@@ -1,10 +1,10 @@
-"""POST /api/rolls/:id/summarise — one Claude call across all moments + annotations."""
+"""POST /api/rolls/:id/summarise — one Claude call across all sections + annotations."""
 from __future__ import annotations
 
 import math
 import time
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -17,16 +17,14 @@ from server.analysis.rate_limit import SlidingWindowLimiter
 from server.analysis.summarise import (
     SummaryResponseError,
     build_summary_prompt,
-    compute_distribution,
     parse_summary_response,
 )
 from server.config import Settings, load_settings
 from server.db import (
     connect,
-    get_analyses,
-    get_annotations_by_moment,
-    get_moments,
+    get_annotations_by_section,
     get_roll,
+    get_sections_by_roll,
     set_summary_state,
 )
 
@@ -40,10 +38,8 @@ class _SummariseIn(BaseModel):
 class _SummariseOut(BaseModel):
     finalised_at: int
     scores: dict
-    distribution: dict
 
 
-# Module-level singleton for summary rate limiting.
 _SUMMARY_LIMITER: SlidingWindowLimiter | None = None
 
 
@@ -61,7 +57,6 @@ def _get_limiter(settings: Settings) -> SlidingWindowLimiter:
 async def summarise_roll(
     roll_id: str,
     payload: _SummariseIn,
-    request: Request,
     settings: Settings = Depends(load_settings),
 ):
     conn = connect(settings.db_path)
@@ -71,29 +66,25 @@ async def summarise_roll(
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found"
             )
-        moment_rows = [dict(m) for m in get_moments(conn, roll_id)]
-        analyses_by_moment = {
-            m["id"]: [dict(a) for a in get_analyses(conn, m["id"])] for m in moment_rows
-        }
-        annotations_by_moment = {
-            m["id"]: [dict(a) for a in get_annotations_by_moment(conn, m["id"])]
-            for m in moment_rows
+        section_rows = [dict(s) for s in get_sections_by_roll(conn, roll_id)]
+        annotations_by_section = {
+            s["id"]: [dict(a) for a in get_annotations_by_section(conn, s["id"])]
+            for s in section_rows
         }
     finally:
         conn.close()
 
-    any_analyses = any(analyses_by_moment[m["id"]] for m in moment_rows)
-    if not any_analyses:
+    analysed_sections = [s for s in section_rows if s.get("narrative")]
+    if not analysed_sections:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Roll has no analyses — analyse at least one moment before finalising.",
+            detail="Roll has no analysed sections — analyse at least one section before finalising.",
         )
 
     prompt = build_summary_prompt(
         roll_row=dict(roll_row),
-        moment_rows=moment_rows,
-        analyses_by_moment=analyses_by_moment,
-        annotations_by_moment=annotations_by_moment,
+        sections=section_rows,
+        annotations_by_section=annotations_by_section,
     )
 
     limiter = _get_limiter(settings)
@@ -114,9 +105,9 @@ async def summarise_roll(
             detail=f"Claude subprocess failed: {exc}",
         )
 
-    valid_moment_ids = {m["id"] for m in moment_rows}
+    valid_section_ids = {s["id"] for s in section_rows}
     try:
-        parsed = parse_summary_response(raw, valid_moment_ids)
+        parsed = parse_summary_response(raw, valid_section_ids)
     except SummaryResponseError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
@@ -126,27 +117,8 @@ async def summarise_roll(
     now = int(time.time())
     conn = connect(settings.db_path)
     try:
-        set_summary_state(
-            conn, roll_id=roll_id, scores_payload=parsed, finalised_at=now,
-        )
+        set_summary_state(conn, roll_id=roll_id, scores_payload=parsed, finalised_at=now)
     finally:
         conn.close()
 
-    taxonomy = getattr(request.app.state, "taxonomy", None) or {"categories": [], "positions": []}
-    position_to_category = {p["id"]: p["category"] for p in taxonomy.get("positions", [])}
-    flat_analyses: list[dict] = []
-    for m in moment_rows:
-        for a in analyses_by_moment[m["id"]]:
-            flat_analyses.append({
-                "position_id": a["position_id"],
-                "player": a["player"],
-                "timestamp_s": m["timestamp_s"],
-                "category": position_to_category.get(a["position_id"], "scramble"),
-            })
-    distribution = compute_distribution(flat_analyses, taxonomy.get("categories", []))
-
-    return _SummariseOut(
-        finalised_at=now,
-        scores=parsed,
-        distribution=distribution,
-    )
+    return _SummariseOut(finalised_at=now, scores=parsed)

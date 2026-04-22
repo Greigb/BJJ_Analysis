@@ -16,50 +16,50 @@ def _row(**kwargs):
     return kwargs
 
 
-def test_render_your_notes_groups_by_moment_as_h3():
+def test_render_your_notes_groups_by_section_as_h3():
     rows = [
-        _row(moment_id="m1", timestamp_s=83.0, body="flat; framed too late.", created_at=1710000000),
-        _row(moment_id="m2", timestamp_s=165.0, body="good sweep.", created_at=1710000060),
+        _row(section_id="s1", start_s=83.0, end_s=100.0, body="flat; framed too late.", created_at=1710000000),
+        _row(section_id="s2", start_s=165.0, end_s=180.0, body="good sweep.", created_at=1710000060),
     ]
     body = render_your_notes(rows)
-    # Two H3 headers
-    assert "### 1:23" in body
-    assert "### 2:45" in body
+    # Two H3 headers using en-dash
+    assert "### 1:23 – 1:40" in body
+    assert "### 2:45 – 3:00" in body
     # The bullet bodies are present
     assert "flat; framed too late." in body
     assert "good sweep." in body
 
 
-def test_render_your_notes_sorts_moments_by_timestamp_and_bullets_by_created_at():
+def test_render_your_notes_sorts_sections_by_start_s_and_bullets_by_created_at():
     rows = [
         # Out-of-order intentionally — render must sort.
-        _row(moment_id="m2", timestamp_s=10.0, body="A on m2 late", created_at=200),
-        _row(moment_id="m1", timestamp_s=3.0,  body="C on m1 earliest", created_at=100),
-        _row(moment_id="m1", timestamp_s=3.0,  body="D on m1 latest", created_at=300),
-        _row(moment_id="m2", timestamp_s=10.0, body="B on m2 early", created_at=50),
+        _row(section_id="s2", start_s=10.0, end_s=20.0, body="A on s2 late", created_at=200),
+        _row(section_id="s1", start_s=3.0, end_s=9.0,  body="C on s1 earliest", created_at=100),
+        _row(section_id="s1", start_s=3.0, end_s=9.0,  body="D on s1 latest", created_at=300),
+        _row(section_id="s2", start_s=10.0, end_s=20.0, body="B on s2 early", created_at=50),
     ]
     body = render_your_notes(rows)
 
-    # m1 section (t=3) before m2 (t=10)
-    m1_idx = body.index("### 0:03")
-    m2_idx = body.index("### 0:10")
-    assert m1_idx < m2_idx
+    # s1 section (start=3) before s2 (start=10)
+    s1_idx = body.index("### 0:03")
+    s2_idx = body.index("### 0:10")
+    assert s1_idx < s2_idx
 
-    # Within m1: C before D
-    c_idx = body.index("C on m1 earliest")
-    d_idx = body.index("D on m1 latest")
+    # Within s1: C before D
+    c_idx = body.index("C on s1 earliest")
+    d_idx = body.index("D on s1 latest")
     assert c_idx < d_idx
 
-    # Within m2: B before A
-    b_idx = body.index("B on m2 early")
-    a_idx = body.index("A on m2 late")
+    # Within s2: B before A
+    b_idx = body.index("B on s2 early")
+    a_idx = body.index("A on s2 late")
     assert b_idx < a_idx
 
 
 def test_render_your_notes_includes_readable_timestamp_stamp_on_each_bullet():
     # 1700000000 = 2023-11-14 22:13:20 UTC. Locale-independent, checks the
     # YYYY-MM-DD HH:MM prefix is present regardless of actual time.
-    rows = [_row(moment_id="m1", timestamp_s=0.0, body="x", created_at=1700000000)]
+    rows = [_row(section_id="s1", start_s=0.0, end_s=10.0, body="x", created_at=1700000000)]
     body = render_your_notes(rows)
     # Match _(YYYY-MM-DD HH:MM)_ anywhere in the body.
     assert re.search(r"_\(\d{4}-\d{2}-\d{2} \d{2}:\d{2}\)_", body)
@@ -69,17 +69,17 @@ def test_render_your_notes_returns_empty_string_for_no_rows():
     assert render_your_notes([]) == ""
 
 
-def test_render_your_notes_formats_minute_colon_seconds_from_timestamp_s():
+def test_render_your_notes_formats_minute_colon_seconds_from_start_s():
     # 125 seconds → "2:05"
-    rows = [_row(moment_id="m1", timestamp_s=125.0, body="x", created_at=1)]
+    rows = [_row(section_id="s1", start_s=125.0, end_s=135.0, body="x", created_at=1)]
     body = render_your_notes(rows)
     assert "### 2:05" in body
 
 
 def test_render_your_notes_is_deterministic_for_identical_input():
     rows = [
-        _row(moment_id="m1", timestamp_s=1.0, body="note", created_at=1),
-        _row(moment_id="m1", timestamp_s=1.0, body="note2", created_at=2),
+        _row(section_id="s1", start_s=1.0, end_s=5.0, body="note", created_at=1),
+        _row(section_id="s1", start_s=1.0, end_s=5.0, body="note2", created_at=2),
     ]
     a = render_your_notes(rows)
     b = render_your_notes(rows)
@@ -151,7 +151,7 @@ from server.db import (  # noqa: E402
     create_roll,
     init_db,
     insert_annotation,
-    insert_moments,
+    insert_section,
     get_vault_state,
 )
 
@@ -172,16 +172,10 @@ def db_roll_annotations(tmp_path: Path):
         result="unknown",
         created_at=1700000000,
     )
-    moments = insert_moments(
-        conn,
-        roll_id="r-1",
-        moments=[
-            {"frame_idx": 3, "timestamp_s": 3.0, "pose_delta": 1.2},
-            {"frame_idx": 10, "timestamp_s": 10.0, "pose_delta": 0.9},
-        ],
-    )
-    insert_annotation(conn, moment_id=moments[0]["id"], body="first thought", created_at=1700000100)
-    insert_annotation(conn, moment_id=moments[1]["id"], body="second thought", created_at=1700000200)
+    section1 = insert_section(conn, roll_id="r-1", start_s=3.0, end_s=9.0, sample_interval_s=1.0)
+    section2 = insert_section(conn, roll_id="r-1", start_s=10.0, end_s=16.0, sample_interval_s=1.0)
+    insert_annotation(conn, section_id=section1["id"], body="first thought", created_at=1700000100)
+    insert_annotation(conn, section_id=section2["id"], body="second thought", created_at=1700000200)
     try:
         yield conn, tmp_path
     finally:
@@ -229,10 +223,10 @@ def test_publish_second_time_splices_only_your_notes(db_roll_annotations):
     full.write_text(existing)
 
     # Now add a new annotation and re-publish.
-    moment_id = conn.execute(
-        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    section_id = conn.execute(
+        "SELECT id FROM sections WHERE roll_id = 'r-1' ORDER BY start_s LIMIT 1"
     ).fetchone()["id"]
-    insert_annotation(conn, moment_id=moment_id, body="follow-up thought", created_at=1700000300)
+    insert_annotation(conn, section_id=section_id, body="follow-up thought", created_at=1700000300)
 
     second = publish(conn, roll_id="r-1", vault_root=vault_root)
     text_after = full.read_text()
@@ -257,10 +251,10 @@ def test_publish_raises_conflict_when_your_notes_edited_externally(db_roll_annot
     full.write_text(text)
 
     # Add a new annotation; re-publish without force → ConflictError.
-    moment_id = conn.execute(
-        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    section_id = conn.execute(
+        "SELECT id FROM sections WHERE roll_id = 'r-1' ORDER BY start_s LIMIT 1"
     ).fetchone()["id"]
-    insert_annotation(conn, moment_id=moment_id, body="new", created_at=1700000400)
+    insert_annotation(conn, section_id=section_id, body="new", created_at=1700000400)
 
     with pytest.raises(ConflictError) as exc:
         publish(conn, roll_id="r-1", vault_root=vault_root)
@@ -277,10 +271,10 @@ def test_publish_force_overrides_conflict(db_roll_annotations):
     text = text.replace("first thought", "first thought — edited in Obsidian")
     full.write_text(text)
 
-    moment_id = conn.execute(
-        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    section_id = conn.execute(
+        "SELECT id FROM sections WHERE roll_id = 'r-1' ORDER BY start_s LIMIT 1"
     ).fetchone()["id"]
-    insert_annotation(conn, moment_id=moment_id, body="forcey", created_at=1700000500)
+    insert_annotation(conn, section_id=section_id, body="forcey", created_at=1700000500)
 
     result = publish(conn, roll_id="r-1", vault_root=vault_root, force=True)
     text_after = full.read_text()
@@ -354,10 +348,10 @@ def test_publish_heading_match_is_line_anchored_not_substring(db_roll_annotation
     # The archive heading now appears before `## Your Notes`. Publishing should
     # not splice over the archive section — the real `## Your Notes` heading
     # is still a distinct line.
-    moment_id = conn.execute(
-        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    section_id = conn.execute(
+        "SELECT id FROM sections WHERE roll_id = 'r-1' ORDER BY start_s LIMIT 1"
     ).fetchone()["id"]
-    insert_annotation(conn, moment_id=moment_id, body="new note", created_at=1700000999)
+    insert_annotation(conn, section_id=section_id, body="new note", created_at=1700000999)
 
     # Force because the Your Notes section hash does change (we shifted it).
     publish(conn, roll_id="r-1", vault_root=vault_root, force=True)
@@ -384,10 +378,10 @@ def test_publish_hash_is_stable_under_crlf_line_endings(db_roll_annotations):
     # Add a new annotation and re-publish WITHOUT force. Should NOT raise
     # ConflictError because only line endings changed — semantic content
     # of the Your Notes section is identical.
-    moment_id = conn.execute(
-        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    section_id = conn.execute(
+        "SELECT id FROM sections WHERE roll_id = 'r-1' ORDER BY start_s LIMIT 1"
     ).fetchone()["id"]
-    insert_annotation(conn, moment_id=moment_id, body="followup", created_at=1700001000)
+    insert_annotation(conn, section_id=section_id, body="followup", created_at=1700001000)
 
     # Should complete without raising ConflictError.
     result = publish(conn, roll_id="r-1", vault_root=vault_root, force=False)
@@ -406,10 +400,10 @@ def test_publish_hash_is_stable_under_extra_blank_lines(db_roll_annotations):
     crunched = lf_text.replace("- _(", "\n\n- _(", 1)
     full.write_text(crunched)
 
-    moment_id = conn.execute(
-        "SELECT id FROM moments WHERE roll_id = 'r-1' ORDER BY timestamp_s LIMIT 1"
+    section_id = conn.execute(
+        "SELECT id FROM sections WHERE roll_id = 'r-1' ORDER BY start_s LIMIT 1"
     ).fetchone()["id"]
-    insert_annotation(conn, moment_id=moment_id, body="followup2", created_at=1700001100)
+    insert_annotation(conn, section_id=section_id, body="followup2", created_at=1700001100)
 
     # Should NOT raise ConflictError — the extra blank line is whitespace-only.
     result = publish(conn, roll_id="r-1", vault_root=vault_root, force=False)
@@ -438,13 +432,9 @@ def test_publish_frontmatter_survives_partner_with_colon(tmp_path: Path):
             result="unknown",
             created_at=1700000000,
         )
-        moments = insert_moments(
-            conn,
-            roll_id="r-yaml",
-            moments=[{"frame_idx": 1, "timestamp_s": 1.0, "pose_delta": 0.5}],
-        )
+        sec = insert_section(conn, roll_id="r-yaml", start_s=1.0, end_s=5.0, sample_interval_s=1.0)
         insert_annotation(
-            conn, moment_id=moments[0]["id"], body="note", created_at=1700000100
+            conn, section_id=sec["id"], body="note", created_at=1700000100
         )
 
         result = publish(conn, roll_id="r-yaml", vault_root=tmp_path)

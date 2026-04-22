@@ -37,3 +37,8 @@ def _reset_claude_limiter():
         summarise_mod._SUMMARY_LIMITER = None
     except Exception:
         pass
+    try:
+        import server.api.analyse as analyse_mod
+        analyse_mod._SECTION_LIMITER = None
+    except Exception:
+        pass

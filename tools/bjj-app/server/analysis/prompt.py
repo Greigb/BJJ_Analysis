@@ -74,3 +74,104 @@ def build_prompt(
         f"Image to analyse: @{frame_path}\n\n"
         f"{_SCHEMA_HINT}"
     )
+
+
+class SectionResponseError(Exception):
+    """Raised when Claude's section narrative output fails schema validation."""
+
+
+_SECTION_SCHEMA_HINT = (
+    'Output ONE JSON object and nothing else. No prose outside JSON. No markdown fences.\n'
+    '{\n'
+    '  "narrative": "<one paragraph, 2-5 sentences>",\n'
+    '  "coach_tip": "<one actionable sentence for player_a>"\n'
+    '}'
+)
+
+
+def build_section_prompt(
+    *,
+    start_s: float,
+    end_s: float,
+    frame_paths: list[Path],
+    timestamps: list[float],
+    player_a_name: str,
+    player_b_name: str,
+    player_a_description: str | None = None,
+    player_b_description: str | None = None,
+) -> str:
+    """Build the multi-image section narrative prompt.
+
+    Caller must have already written the frames to disk. `frame_paths` and
+    `timestamps` are parallel lists in chronological order.
+
+    `player_a_description` / `player_b_description`, when provided, are short
+    visual-identification hints (gi colour, hair, build) that help Claude
+    consistently tag the same person as player_a across frames.
+    """
+    if len(frame_paths) != len(timestamps):
+        raise ValueError(
+            f"frame_paths ({len(frame_paths)}) and timestamps "
+            f"({len(timestamps)}) must be same length"
+        )
+    if not frame_paths:
+        raise ValueError("build_section_prompt requires at least one frame")
+
+    duration_s = round(end_s - start_s, 2)
+    preamble = (
+        f"You are analysing a Brazilian Jiu-Jitsu sequence between "
+        f"{player_a_name} (player_a in output) and {player_b_name} (player_b in output)."
+    )
+
+    ident_lines: list[str] = []
+    a_desc = (player_a_description or "").strip()
+    b_desc = (player_b_description or "").strip()
+    if a_desc or b_desc:
+        ident_lines.append(
+            "Use these appearance hints to keep player tagging consistent across frames:"
+        )
+        if a_desc:
+            ident_lines.append(f"- player_a ({player_a_name}): {a_desc}")
+        if b_desc:
+            ident_lines.append(f"- player_b ({player_b_name}): {b_desc}")
+    identification = "\n".join(ident_lines)
+
+    intro = (
+        f"Below are {len(frame_paths)} chronologically ordered frames spanning "
+        f"{duration_s}s of footage. Review all frames as one continuous sequence "
+        f"and describe what happens."
+    )
+    frame_lines = [
+        f"Frame {i + 1} @t={timestamps[i]}s: @{frame_paths[i]}"
+        for i in range(len(frame_paths))
+    ]
+    guidance = (
+        "Describe the positions, transitions, who initiates what, and where the "
+        "sequence ends. Use standard BJJ vocabulary (e.g. \"closed guard bottom\", "
+        "\"passes half guard to side control\", \"triangle attempt\"). Follow with "
+        "one actionable coach tip directed at player_a."
+    )
+    parts = [preamble]
+    if identification:
+        parts.append(identification)
+    parts.extend([intro, "\n".join(frame_lines), guidance, _SECTION_SCHEMA_HINT])
+    return "\n\n".join(parts)
+
+
+def parse_section_response(raw: str) -> dict:
+    """Strict JSON parse + schema validation. Raises SectionResponseError on bad input."""
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise SectionResponseError(f"not valid JSON: {raw[:200]!r}") from exc
+    if not isinstance(data, dict):
+        raise SectionResponseError(
+            f"expected an object, got {type(data).__name__}"
+        )
+    for key in ("narrative", "coach_tip"):
+        if key not in data:
+            raise SectionResponseError(f"missing required key: {key}")
+        value = data[key]
+        if not isinstance(value, str) or not value.strip():
+            raise SectionResponseError(f"{key} must be a non-empty string")
+    return {"narrative": data["narrative"].strip(), "coach_tip": data["coach_tip"].strip()}

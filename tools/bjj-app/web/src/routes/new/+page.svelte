@@ -8,6 +8,8 @@
   let date = $state(today);
   let playerAName = $state('');
   let playerBName = $state('');
+  let playerADescription = $state('');
+  let playerBDescription = $state('');
   let file = $state<File | null>(null);
   let submitting = $state(false);
   let error = $state<string | null>(null);
@@ -28,6 +30,8 @@
         date,
         player_a_name: playerAName || undefined,
         player_b_name: playerBName || undefined,
+        player_a_description: playerADescription.trim() || undefined,
+        player_b_description: playerBDescription.trim() || undefined,
         video: file
       });
       await goto(`/review/${encodeURIComponent(roll.id)}`);
@@ -68,25 +72,55 @@
       />
     </label>
 
-    <label class="flex flex-col gap-1 text-xs text-white/70">
-      Player A
-      <input
-        type="text"
-        bind:value={playerAName}
-        placeholder="Player A"
-        class="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 text-sm text-white/90 placeholder:text-white/30"
-      />
-    </label>
+    <fieldset class="space-y-3 rounded-md border border-white/10 bg-white/[0.02] p-3">
+      <legend class="px-1 text-xs text-white/60">Player A</legend>
+      <label class="flex flex-col gap-1 text-xs text-white/70">
+        Name
+        <input
+          type="text"
+          bind:value={playerAName}
+          placeholder="Player A"
+          class="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 text-sm text-white/90 placeholder:text-white/30"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-xs text-white/70">
+        <span>
+          Appearance
+          <span class="text-white/40">(optional — helps Claude identify this player across frames)</span>
+        </span>
+        <textarea
+          bind:value={playerADescription}
+          rows="2"
+          placeholder="e.g. navy gi, bald, starts bottom of closed guard"
+          class="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 text-sm text-white/90 placeholder:text-white/30"
+        ></textarea>
+      </label>
+    </fieldset>
 
-    <label class="flex flex-col gap-1 text-xs text-white/70">
-      Player B
-      <input
-        type="text"
-        bind:value={playerBName}
-        placeholder="Player B"
-        class="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 text-sm text-white/90 placeholder:text-white/30"
-      />
-    </label>
+    <fieldset class="space-y-3 rounded-md border border-white/10 bg-white/[0.02] p-3">
+      <legend class="px-1 text-xs text-white/60">Player B</legend>
+      <label class="flex flex-col gap-1 text-xs text-white/70">
+        Name
+        <input
+          type="text"
+          bind:value={playerBName}
+          placeholder="Player B"
+          class="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 text-sm text-white/90 placeholder:text-white/30"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-xs text-white/70">
+        <span>
+          Appearance
+          <span class="text-white/40">(optional — helps Claude identify this player across frames)</span>
+        </span>
+        <textarea
+          bind:value={playerBDescription}
+          rows="2"
+          placeholder="e.g. white gi, long hair, taller"
+          class="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 text-sm text-white/90 placeholder:text-white/30"
+        ></textarea>
+      </label>
+    </fieldset>
 
     <label class="block space-y-1">
       <span class="text-sm text-white/70">Video file</span>
