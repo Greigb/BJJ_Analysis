@@ -5,7 +5,7 @@ import shutil
 import time
 import uuid
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile, status
 from pydantic import BaseModel
 
 from server.analysis.summarise import compute_distribution
@@ -15,6 +15,7 @@ from server.config import Settings, load_settings
 from server.db import (
     connect,
     create_roll,
+    delete_section_and_moments,
     get_analyses,
     get_moments,
     get_roll,
@@ -284,3 +285,32 @@ def get_roll_detail(
             for s in section_rows
         ],
     )
+
+
+@router.delete(
+    "/rolls/{roll_id}/sections/{section_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_section(
+    roll_id: str,
+    section_id: str,
+    settings: Settings = Depends(load_settings),
+) -> Response:
+    conn = connect(settings.db_path)
+    try:
+        if get_roll(conn, roll_id) is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found"
+            )
+        sections = get_sections_by_roll(conn, roll_id)
+        if not any(s["id"] == section_id for s in sections):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Section not found"
+            )
+        frames_dir = settings.project_root / "assets" / roll_id / "frames"
+        delete_section_and_moments(
+            conn, section_id=section_id, frames_dir=frames_dir
+        )
+    finally:
+        conn.close()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

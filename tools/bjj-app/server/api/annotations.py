@@ -1,4 +1,4 @@
-"""PATCH /api/rolls/:id/moments/:moment_id/annotations — append-only annotations."""
+"""PATCH /api/rolls/:id/sections/:section_id/annotations — append-only annotations."""
 from __future__ import annotations
 
 import time
@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from server.config import Settings, load_settings
-from server.db import connect, get_moments, get_roll, insert_annotation
+from server.db import connect, get_roll, get_sections_by_roll, insert_annotation
 
 router = APIRouter(prefix="/api", tags=["annotations"])
 
@@ -23,13 +23,13 @@ class _AnnotationOut(BaseModel):
 
 
 @router.patch(
-    "/rolls/{roll_id}/moments/{moment_id}/annotations",
+    "/rolls/{roll_id}/sections/{section_id}/annotations",
     response_model=_AnnotationOut,
     status_code=status.HTTP_201_CREATED,
 )
 def add_annotation(
     roll_id: str,
-    moment_id: str,
+    section_id: str,
     payload: _AnnotationIn,
     settings: Settings = Depends(load_settings),
 ) -> _AnnotationOut:
@@ -39,22 +39,20 @@ def add_annotation(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Annotation body must not be empty",
         )
-
     conn = connect(settings.db_path)
     try:
         if get_roll(conn, roll_id) is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Roll not found"
             )
-        moments = get_moments(conn, roll_id)
-        if not any(m["id"] == moment_id for m in moments):
+        sections = get_sections_by_roll(conn, roll_id)
+        if not any(s["id"] == section_id for s in sections):
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Moment not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Section not found"
             )
         row = insert_annotation(
-            conn, moment_id=moment_id, body=body, created_at=int(time.time())
+            conn, section_id=section_id, body=body, created_at=int(time.time())
         )
     finally:
         conn.close()
-
     return _AnnotationOut(id=row["id"], body=row["body"], created_at=row["created_at"])

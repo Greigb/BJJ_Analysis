@@ -57,3 +57,12 @@ def test_roll_detail_includes_sections(app_client):
     assert body["sections"][0]["start_s"] == 3.0
     assert body["sections"][0]["sample_interval_s"] == 1.0
     assert body["sections"][1]["start_s"] == 10.0
+
+
+def test_delete_section_removes_row_and_moments(app_client):
+    r0 = app_client.get("/api/rolls/r1").json()
+    section_id = r0["sections"][0]["id"]
+    r = app_client.delete(f"/api/rolls/r1/sections/{section_id}")
+    assert r.status_code == 204
+    r1 = app_client.get("/api/rolls/r1").json()
+    assert section_id not in {s["id"] for s in r1["sections"]}
