@@ -4,6 +4,7 @@
   import {
     analyseRoll,
     ApiError,
+    exportRollPdf,
     getGraph,
     getGraphPaths,
     getRoll,
@@ -30,6 +31,9 @@
   let conflictOpen = $state(false);
   let finalising = $state(false);
   let finaliseError = $state<string | null>(null);
+  let exporting = $state(false);
+  let exportConflictOpen = $state(false);
+  let exportError = $state<string | null>(null);
 
   let videoEl: HTMLVideoElement | undefined = $state();
   let graphTaxonomy = $state<GraphTaxonomy | null>(null);
@@ -196,6 +200,48 @@
 
   function onCancelConflict() {
     conflictOpen = false;
+  }
+
+  async function triggerDownload(blob: Blob, filename: string): Promise<void> {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  async function onExportClick(overwrite = false) {
+    if (!roll || exporting) return;
+    if (!roll.finalised_at) return;
+    exporting = true;
+    exportError = null;
+    try {
+      const result = await exportRollPdf(roll.id, overwrite);
+      // The download is user-facing. If this is the retry after Overwrite, the user
+      // already has the file — skip the second download so they don't get a duplicate.
+      if (!overwrite) {
+        await triggerDownload(result.blob, result.filename);
+      }
+      if (result.kind === 'conflict') {
+        exportConflictOpen = true;
+      }
+    } catch (err) {
+      exportError = err instanceof ApiError ? err.message : String(err);
+    } finally {
+      exporting = false;
+    }
+  }
+
+  function onExportOverwrite() {
+    exportConflictOpen = false;
+    onExportClick(true);
+  }
+
+  function onExportCancel() {
+    exportConflictOpen = false;
   }
 
   async function onFinaliseClick() {
@@ -386,14 +432,24 @@
           Not yet published to vault.
         {/if}
       </div>
-      <button
-        type="button"
-        onclick={() => onSaveToVault()}
-        disabled={publishing}
-        class="rounded-md border border-amber-400/40 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-100 hover:bg-amber-500/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        {publishing ? 'Publishing…' : 'Save to Vault'}
-      </button>
+      <div class="flex gap-2">
+        <button
+          type="button"
+          onclick={() => onExportClick()}
+          disabled={exporting || !roll.finalised_at}
+          class="rounded-md border border-violet-400/40 bg-violet-500/15 px-3 py-1.5 text-xs font-medium text-violet-100 hover:bg-violet-500/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {exporting ? 'Exporting…' : 'Export PDF'}
+        </button>
+        <button
+          type="button"
+          onclick={() => onSaveToVault()}
+          disabled={publishing}
+          class="rounded-md border border-amber-400/40 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-100 hover:bg-amber-500/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {publishing ? 'Publishing…' : 'Save to Vault'}
+        </button>
+      </div>
     </footer>
 
     {#if publishToast}
@@ -406,11 +462,21 @@
         {publishError}
       </div>
     {/if}
+    {#if exportError}
+      <div class="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+        {exportError}
+      </div>
+    {/if}
 
     <PublishConflictDialog
       open={conflictOpen}
       onOverwrite={onOverwrite}
       onCancel={onCancelConflict}
+    />
+    <PublishConflictDialog
+      open={exportConflictOpen}
+      onOverwrite={onExportOverwrite}
+      onCancel={onExportCancel}
     />
   </section>
 {/if}
