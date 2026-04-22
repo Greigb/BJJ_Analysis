@@ -28,6 +28,10 @@ export interface Section {
   start_s: number;
   end_s: number;
   sample_interval_s: number;
+  narrative: string | null;
+  coach_tip: string | null;
+  analysed_at: number | null;
+  annotations: Annotation[];
 }
 
 export type Moment = {
@@ -69,17 +73,11 @@ export type CreateRollInput = {
 };
 
 export type AnalyseEvent =
-  | { stage: 'frames'; pct: number; total?: number }
-  | {
-      stage: 'done';
-      total?: number;
-      moments: Array<{
-        id: string;
-        frame_idx: number;
-        timestamp_s: number;
-        section_id: string | null;
-      }>;
-    };
+  | { stage: 'section_started'; section_id: string; start_s: number; end_s: number; idx: number; total: number }
+  | { stage: 'section_queued'; section_id: string; retry_after_s: number }
+  | { stage: 'section_done'; section_id: string; start_s: number; end_s: number; narrative: string; coach_tip: string }
+  | { stage: 'section_error'; section_id: string; error: string }
+  | { stage: 'done'; total: number };
 
 export type AnalyseMomentEvent =
   | { stage: 'cache'; hit: boolean }
@@ -177,7 +175,7 @@ export type Scores = {
 };
 
 export type KeyMoment = {
-  moment_id: string;
+  section_id: string;
   note: string;
 };
 

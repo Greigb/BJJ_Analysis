@@ -1,5 +1,4 @@
 import type {
-  AnalyseMomentEvent,
   Annotation,
   CreateRollInput,
   ExportPdfResult,
@@ -62,7 +61,7 @@ export function createRoll(input: CreateRollInput): Promise<RollDetail> {
 export interface SectionInput {
   start_s: number;
   end_s: number;
-  sample_interval_s: number;
+  sample_interval_s?: number;
 }
 
 /**
@@ -83,72 +82,29 @@ export async function analyseRoll(
   });
 }
 
-/**
- * Analyse a single moment with Claude — async iterator over SSE events.
- *
- * Usage:
- *   for await (const event of analyseMoment(rollId, frameIdx)) { ... }
- *
- * Throws ApiError on non-streaming error statuses (e.g. 404, 429).
- */
-export async function* analyseMoment(
-  rollId: string,
-  frameIdx: number
-): AsyncIterator<AnalyseMomentEvent> {
-  const response = await fetch(
-    `/api/rolls/${encodeURIComponent(rollId)}/moments/${frameIdx}/analyse`,
-    { method: 'POST' }
-  );
-  if (!response.ok) {
-    // Try to surface the server's detail payload for 429 / 404.
-    let detail = `${response.status} ${response.statusText}`;
-    try {
-      const body = await response.json();
-      if (body?.detail) detail = body.detail;
-    } catch {
-      /* ignore */
-    }
-    throw new ApiError(response.status, detail);
-  }
-  if (!response.body) {
-    throw new Error('Analyse response has no body');
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const frames = buffer.split('\n\n');
-      buffer = frames.pop() ?? '';
-      for (const frame of frames) {
-        const dataLine = frame.split('\n').find((line) => line.startsWith('data: '));
-        if (!dataLine) continue;
-        yield JSON.parse(dataLine.slice(6)) as AnalyseMomentEvent;
-      }
-    }
-  } finally {
-    reader.releaseLock();
-  }
-}
-
 export function addAnnotation(
   rollId: string,
-  momentId: string,
-  body: string
+  sectionId: string,
+  body: string,
 ): Promise<Annotation> {
   return request<Annotation>(
-    `/api/rolls/${encodeURIComponent(rollId)}/moments/${encodeURIComponent(momentId)}/annotations`,
+    `/api/rolls/${encodeURIComponent(rollId)}/sections/${encodeURIComponent(sectionId)}/annotations`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ body })
-    }
+      body: JSON.stringify({ body }),
+    },
   );
+}
+
+export async function deleteSection(rollId: string, sectionId: string): Promise<void> {
+  const r = await fetch(
+    `/api/rolls/${encodeURIComponent(rollId)}/sections/${encodeURIComponent(sectionId)}`,
+    { method: 'DELETE' },
+  );
+  if (!r.ok) {
+    throw new ApiError(r.status, `${r.status} ${r.statusText}`);
+  }
 }
 
 /**
