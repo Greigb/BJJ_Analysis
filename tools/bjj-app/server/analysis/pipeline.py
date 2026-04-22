@@ -1,20 +1,60 @@
-"""M9 section-based analysis pipeline.
+"""M9b section-sequence analysis pipeline.
 
-Takes a list of user-picked sections, extracts frames at each section's
-requested interval, persists sections + moments in one transaction, and
-yields SSE-shaped events the caller feeds into a StreamingResponse.
+Per user-picked section: extract 1 fps frames (cap 8), persist section + moments,
+call Claude Opus with a multi-image narrative prompt, stream SSE progress events.
+Append semantics — a second Analyse click adds new sections rather than replacing
+prior ones.
 """
 from __future__ import annotations
 
+import asyncio
+import time
 from pathlib import Path
-from typing import Iterator
+from typing import AsyncIterator
 
+from server.analysis.claude_cli import (
+    ClaudeProcessError,
+    ClaudeResponseError,
+    RateLimitedError,
+    run_claude,
+)
 from server.analysis.frames import extract_frames_at_timestamps
-from server.analysis.sections import build_sample_timestamps
-from server.db import insert_moments, insert_section
+from server.analysis.prompt import (
+    SectionResponseError,
+    build_section_prompt,
+    parse_section_response,
+)
+from server.analysis.rate_limit import SlidingWindowLimiter
+from server.config import Settings
+from server.db import (
+    append_moments,
+    insert_section,
+    update_section_analysis,
+)
+
+_MAX_FRAMES_PER_SECTION = 8
+_MAX_RATE_LIMIT_RETRIES = 3
 
 
-def run_section_analysis(
+def _section_timestamps(start_s: float, end_s: float) -> list[float]:
+    """1 fps sampling, capped at _MAX_FRAMES_PER_SECTION, rounded to 3dp."""
+    duration = max(0.0, end_s - start_s)
+    n = min(_MAX_FRAMES_PER_SECTION, max(1, int(round(duration))))
+    if n <= 1:
+        return [round(start_s, 3)]
+    step = duration / n
+    return [round(start_s + i * step, 3) for i in range(n)]
+
+
+def _next_frame_idx(conn, roll_id: str) -> int:
+    row = conn.execute(
+        "SELECT COALESCE(MAX(frame_idx), -1) AS m FROM moments WHERE roll_id = ?",
+        (roll_id,),
+    ).fetchone()
+    return int(row["m"]) + 1
+
+
+async def run_section_analysis(
     *,
     conn,
     roll_id: str,
@@ -22,84 +62,123 @@ def run_section_analysis(
     frames_dir: Path,
     sections: list[dict],
     duration_s: float,
-) -> Iterator[dict]:
-    """Extract frames for each section, persist rows, yield progress events.
+    player_a_name: str,
+    player_b_name: str,
+    settings: Settings,
+    limiter: SlidingWindowLimiter,
+) -> AsyncIterator[dict]:
+    """Process each section sequentially. Yields SSE-shaped dicts.
 
-    Events:
-        {"stage": "frames", "pct": 0..100}
-        {"stage": "done", "total": int, "moments": [...]}
-
-    Each moment dict in the done event has `id`, `frame_idx`, `timestamp_s`,
-    and `section_id`.
-
-    Sections are validated by the caller (api/analyse.py) — this function
-    trusts the input shape.
+    Event shapes:
+      {"stage": "section_started", "section_id", "start_s", "end_s", "idx", "total"}
+      {"stage": "section_queued",  "section_id", "retry_after_s"}
+      {"stage": "section_done",    "section_id", "start_s", "end_s",
+                                   "narrative", "coach_tip"}
+      {"stage": "section_error",   "section_id", "error"}
+      {"stage": "done",            "total"}
     """
-    # Clear any sections (and their moments) from a prior analyse run.
-    # This intentionally mirrors insert_moments' "DELETE WHERE roll_id = ?"
-    # semantics — each Analyse click replaces prior state, not appends.
-    conn.execute("DELETE FROM moments WHERE roll_id = ?", (roll_id,))
-    conn.execute("DELETE FROM sections WHERE roll_id = ?", (roll_id,))
-    conn.commit()
+    total = len(sections)
+    for idx, sec_in in enumerate(sections):
+        start_s = float(sec_in["start_s"])
+        end_s = float(sec_in["end_s"])
+        timestamps = _section_timestamps(start_s, end_s)
 
-    # Insert section rows first so moments can reference them.
-    section_rows = [
-        insert_section(
+        start_index = _next_frame_idx(conn, roll_id)
+        frame_paths = extract_frames_at_timestamps(
+            video_path=video_path,
+            timestamps=timestamps,
+            out_dir=frames_dir,
+            start_index=start_index,
+        )
+
+        section_row = insert_section(
             conn,
             roll_id=roll_id,
-            start_s=s["start_s"],
-            end_s=s["end_s"],
-            sample_interval_s=s["sample_interval_s"],
+            start_s=start_s,
+            end_s=end_s,
+            sample_interval_s=1.0,
         )
-        for s in sections
-    ]
+        section_id = section_row["id"]
 
-    # Build a flat list of (timestamp, section_id), dedup by timestamp
-    # (first-wins), sort ascending.
-    pairs: dict[float, str] = {}
-    for section_row, section_in in zip(section_rows, sections):
-        for t in build_sample_timestamps(
-            section_in["start_s"],
-            section_in["end_s"],
-            section_in["sample_interval_s"],
-        ):
-            pairs.setdefault(t, section_row["id"])
-
-    ordered: list[tuple[float, str]] = sorted(pairs.items(), key=lambda x: x[0])
-    timestamps = [p[0] for p in ordered]
-    section_ids = [p[1] for p in ordered]
-
-    yield {"stage": "frames", "pct": 0}
-
-    # Extract frames.
-    total = len(timestamps)
-    if total > 0:
-        extract_frames_at_timestamps(
-            video_path, timestamps=timestamps, out_dir=frames_dir
+        append_moments(
+            conn,
+            roll_id=roll_id,
+            moments=[
+                {
+                    "frame_idx": start_index + i,
+                    "timestamp_s": timestamps[i],
+                    "pose_delta": None,
+                    "section_id": section_id,
+                }
+                for i in range(len(timestamps))
+            ],
         )
-    yield {"stage": "frames", "pct": 100, "total": total}
 
-    moment_inputs = [
-        {
-            "frame_idx": i,
-            "timestamp_s": timestamps[i],
-            "pose_delta": None,
-            "section_id": section_ids[i],
+        yield {
+            "stage": "section_started",
+            "section_id": section_id,
+            "start_s": start_s,
+            "end_s": end_s,
+            "idx": idx,
+            "total": total,
         }
-        for i in range(total)
-    ]
-    inserted_rows = insert_moments(conn, roll_id=roll_id, moments=moment_inputs)
 
-    yield {
-        "stage": "done",
-        "total": len(inserted_rows),
-        "moments": [
-            {
-                "id": r["id"],
-                "frame_idx": r["frame_idx"],
-                "timestamp_s": r["timestamp_s"],
-                "section_id": r["section_id"],
-            }
-            for r in inserted_rows
-        ],
-    }
+        prompt = build_section_prompt(
+            start_s=start_s,
+            end_s=end_s,
+            frame_paths=frame_paths,
+            timestamps=timestamps,
+            player_a_name=player_a_name,
+            player_b_name=player_b_name,
+        )
+
+        error_msg: str | None = None
+        raw: str | None = None
+        for attempt in range(_MAX_RATE_LIMIT_RETRIES):
+            try:
+                raw = await run_claude(prompt, settings=settings, limiter=limiter)
+                break
+            except RateLimitedError as exc:
+                if attempt == _MAX_RATE_LIMIT_RETRIES - 1:
+                    error_msg = f"rate-limited after {_MAX_RATE_LIMIT_RETRIES} retries"
+                    break
+                yield {
+                    "stage": "section_queued",
+                    "section_id": section_id,
+                    "retry_after_s": exc.retry_after_s,
+                }
+                await asyncio.sleep(exc.retry_after_s)
+            except (ClaudeProcessError, ClaudeResponseError) as exc:
+                error_msg = f"claude failed: {exc}"
+                break
+
+        if error_msg is None and raw is not None:
+            try:
+                parsed = parse_section_response(raw)
+            except SectionResponseError as exc:
+                error_msg = f"malformed output: {exc}"
+            else:
+                update_section_analysis(
+                    conn,
+                    section_id=section_id,
+                    narrative=parsed["narrative"],
+                    coach_tip=parsed["coach_tip"],
+                    analysed_at=int(time.time()),
+                )
+                yield {
+                    "stage": "section_done",
+                    "section_id": section_id,
+                    "start_s": start_s,
+                    "end_s": end_s,
+                    "narrative": parsed["narrative"],
+                    "coach_tip": parsed["coach_tip"],
+                }
+                continue
+
+        yield {
+            "stage": "section_error",
+            "section_id": section_id,
+            "error": error_msg or "unknown error",
+        }
+
+    yield {"stage": "done", "total": total}

@@ -292,6 +292,55 @@ def insert_moments(
     return [rows_by_id[i] for i in inserted_ids]
 
 
+def append_moments(
+    conn,
+    *,
+    roll_id: str,
+    moments: list[dict],
+) -> list[sqlite3.Row]:
+    """Append moments to a roll without deleting prior rows (append semantics).
+
+    Each moment dict must contain: frame_idx (int), timestamp_s (float),
+    pose_delta (float or None), and may include section_id (str or None).
+    Returns the newly inserted rows in insertion order.
+
+    Use this instead of insert_moments when prior moments must be preserved
+    (e.g. the M9b per-section pipeline where each section is a separate call).
+    """
+    inserted_ids: list[str] = []
+    for m in moments:
+        moment_id = uuid.uuid4().hex
+        conn.execute(
+            """
+            INSERT INTO moments (
+                id, roll_id, frame_idx, timestamp_s, pose_delta,
+                selected_for_analysis, section_id
+            )
+            VALUES (?, ?, ?, ?, ?, 0, ?)
+            """,
+            (
+                moment_id,
+                roll_id,
+                int(m["frame_idx"]),
+                float(m["timestamp_s"]),
+                None if m.get("pose_delta") is None else float(m["pose_delta"]),
+                m.get("section_id"),
+            ),
+        )
+        inserted_ids.append(moment_id)
+    conn.commit()
+
+    if not inserted_ids:
+        return []
+
+    cur = conn.execute(
+        f"SELECT * FROM moments WHERE id IN ({','.join('?' * len(inserted_ids))})",
+        inserted_ids,
+    )
+    rows_by_id = {r["id"]: r for r in cur.fetchall()}
+    return [rows_by_id[i] for i in inserted_ids]
+
+
 def get_moments(conn, roll_id: str) -> list[sqlite3.Row]:
     """Return all moments for a roll in timestamp order."""
     cur = conn.execute(
