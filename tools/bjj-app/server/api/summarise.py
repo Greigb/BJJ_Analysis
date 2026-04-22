@@ -24,7 +24,6 @@ from server.config import Settings, load_settings
 from server.db import (
     connect,
     get_analyses,
-    get_annotations_by_moment,
     get_moments,
     get_roll,
     set_summary_state,
@@ -75,10 +74,8 @@ async def summarise_roll(
         analyses_by_moment = {
             m["id"]: [dict(a) for a in get_analyses(conn, m["id"])] for m in moment_rows
         }
-        annotations_by_moment = {
-            m["id"]: [dict(a) for a in get_annotations_by_moment(conn, m["id"])]
-            for m in moment_rows
-        }
+        # Annotations are now section-scoped (M9b); moments carry no annotations.
+        annotations_by_moment = {m["id"]: [] for m in moment_rows}
     finally:
         conn.close()
 

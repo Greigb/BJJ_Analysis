@@ -16,7 +16,6 @@ from server.db import (
     connect,
     create_roll,
     get_analyses,
-    get_annotations_by_moment,
     get_moments,
     get_roll,
     get_sections_by_roll,
@@ -205,9 +204,8 @@ def get_roll_detail(
         analyses_by_moment: dict[str, list] = {
             m["id"]: get_analyses(conn, m["id"]) for m in moment_rows
         }
-        annotations_by_moment: dict[str, list] = {
-            m["id"]: get_annotations_by_moment(conn, m["id"]) for m in moment_rows
-        }
+        # Annotations are now section-scoped (M9b); moments carry no annotations.
+        annotations_by_moment: dict[str, list] = {m["id"]: [] for m in moment_rows}
         section_rows = get_sections_by_roll(conn, roll_id)
     finally:
         conn.close()
