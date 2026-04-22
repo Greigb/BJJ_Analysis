@@ -163,6 +163,61 @@ def test_parse_section_response_happy_path():
     assert out["coach_tip"] == "Stay heavy."
 
 
+def _fake_position(pid: str, name: str, how: str | None) -> dict:
+    return {
+        "position_id": pid,
+        "name": name,
+        "markdown": f"# {name}",
+        "vault_path": f"Positions/{name}.md",
+        "how_to_identify": how,
+    }
+
+
+def test_positions_reference_block_empty_list_returns_empty_string():
+    from server.analysis.prompt import _build_positions_reference_block
+    assert _build_positions_reference_block([]) == ""
+
+
+def test_positions_reference_block_includes_each_position_name_and_body():
+    from server.analysis.prompt import _build_positions_reference_block
+    out = _build_positions_reference_block([
+        _fake_position("closed_guard_bottom", "Closed Guard (Bottom)", "Ankles LOCKED."),
+        _fake_position("mount_top", "Mount (Top)", "Sitting astride torso."),
+    ])
+    assert "Closed Guard (Bottom)" in out
+    assert "Mount (Top)" in out
+    assert "Ankles LOCKED." in out
+    assert "Sitting astride torso." in out
+    assert "closed_guard_bottom" in out
+    assert "mount_top" in out
+
+
+def test_positions_reference_block_skips_positions_without_how_to_identify():
+    from server.analysis.prompt import _build_positions_reference_block
+    out = _build_positions_reference_block([
+        _fake_position("a", "A", "Has body."),
+        _fake_position("b", "B", None),
+        _fake_position("c", "C", "Also has body."),
+    ])
+    assert "Has body." in out
+    assert "Also has body." in out
+    # Only A and C produce bullets; B (no how_to_identify) must not appear
+    # as a bullet entry.
+    bullets = [line for line in out.splitlines() if line.startswith("- ")]
+    assert len(bullets) == 2
+    assert not any("(b):" in line for line in bullets)
+
+
+def test_positions_reference_block_preserves_input_order():
+    from server.analysis.prompt import _build_positions_reference_block
+    out = _build_positions_reference_block([
+        _fake_position("second", "Second", "Second cue."),
+        _fake_position("first", "First", "First cue."),
+    ])
+    # Second's cue appears before First's cue in output (input order preserved).
+    assert out.index("Second cue.") < out.index("First cue.")
+
+
 def test_parse_section_response_rejects_malformed_json():
     import pytest
     from server.analysis.prompt import parse_section_response, SectionResponseError
