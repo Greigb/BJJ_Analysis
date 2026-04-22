@@ -43,7 +43,7 @@ def _setup_roll(tmp_path, *, with_vault_file=True):
         roll_id=roll_id,
         scores_payload={
             "summary": "s",
-            "scores": {"position_control": 7, "submission_threat": 3, "defensive_resilience": 8},
+            "scores": {"guard_retention": 7, "positional_awareness": 3, "transition_quality": 8},
             "top_improvements": ["a"],
             "strengths": ["b"],
             "key_moments": [],
