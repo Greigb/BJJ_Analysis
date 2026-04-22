@@ -11,7 +11,6 @@ dependencies = [
     "python-multipart>=0.0.12",
     "pydantic>=2.9.0",
     "opencv-python-headless>=4.10.0",
-    "mediapipe>=0.10.18",
     "Pillow>=10.4.0",
     "weasyprint>=62.0",
     "jinja2>=3.1.0",
