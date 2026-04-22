@@ -104,7 +104,9 @@ def test_delete_section_and_moments_removes_both(tmp_path):
         )
         assert len(get_moments(conn, "r1")) == 2
 
-        delete_section_and_moments(conn, section_id=section_id)
+        frames_dir = tmp_path / "frames"
+        frames_dir.mkdir()
+        delete_section_and_moments(conn, section_id=section_id, frames_dir=frames_dir)
 
         assert get_sections_by_roll(conn, roll_id="r1") == []
         assert get_moments(conn, "r1") == []
@@ -198,5 +200,72 @@ def test_update_section_analysis_writes_narrative_and_tip(tmp_path):
         assert got["narrative"] == "Player A recovers guard."
         assert got["coach_tip"] == "Keep elbows tight."
         assert got["analysed_at"] == 1713700000
+    finally:
+        conn.close()
+
+
+def test_delete_section_and_moments_removes_frame_files(tmp_path):
+    from server.db import (
+        connect, create_roll, delete_section_and_moments,
+        get_moments, get_sections_by_roll, init_db, insert_moments, insert_section,
+    )
+
+    db = tmp_path / "db.sqlite"
+    init_db(db)
+    conn = connect(db)
+    try:
+        create_roll(
+            conn, id="r1", title="T", date="2026-04-22",
+            video_path="assets/r1/source.mp4", duration_s=10.0,
+            partner=None, result="unknown", created_at=1,
+        )
+        sec = insert_section(conn, roll_id="r1", start_s=0.0, end_s=2.0, sample_interval_s=1.0)
+        inserted = insert_moments(conn, roll_id="r1", moments=[
+            {"frame_idx": 0, "timestamp_s": 0.0, "pose_delta": None, "section_id": sec["id"]},
+            {"frame_idx": 1, "timestamp_s": 1.0, "pose_delta": None, "section_id": sec["id"]},
+        ])
+        assert len(inserted) == 2
+
+        frames_dir = tmp_path / "frames"
+        frames_dir.mkdir()
+        f0 = frames_dir / "frame_000000.jpg"
+        f1 = frames_dir / "frame_000001.jpg"
+        f0.write_bytes(b"x")
+        f1.write_bytes(b"y")
+
+        delete_section_and_moments(conn, section_id=sec["id"], frames_dir=frames_dir)
+
+        assert get_sections_by_roll(conn, "r1") == []
+        assert get_moments(conn, "r1") == []
+        assert not f0.exists()
+        assert not f1.exists()
+    finally:
+        conn.close()
+
+
+def test_delete_section_and_moments_tolerates_missing_frame_files(tmp_path):
+    """Deleting a section whose frame files were already removed must not raise."""
+    from server.db import (
+        connect, create_roll, delete_section_and_moments,
+        init_db, insert_moments, insert_section,
+    )
+
+    db = tmp_path / "db.sqlite"
+    init_db(db)
+    conn = connect(db)
+    try:
+        create_roll(
+            conn, id="r1", title="T", date="2026-04-22",
+            video_path="assets/r1/source.mp4", duration_s=10.0,
+            partner=None, result="unknown", created_at=1,
+        )
+        sec = insert_section(conn, roll_id="r1", start_s=0.0, end_s=1.0, sample_interval_s=1.0)
+        insert_moments(conn, roll_id="r1", moments=[
+            {"frame_idx": 0, "timestamp_s": 0.0, "pose_delta": None, "section_id": sec["id"]},
+        ])
+        frames_dir = tmp_path / "frames"
+        frames_dir.mkdir()
+        # No file on disk at all — helper must still complete.
+        delete_section_and_moments(conn, section_id=sec["id"], frames_dir=frames_dir)
     finally:
         conn.close()

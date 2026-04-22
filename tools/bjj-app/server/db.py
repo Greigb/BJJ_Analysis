@@ -555,11 +555,25 @@ def get_sections_by_roll(conn, roll_id: str) -> list[sqlite3.Row]:
     return cur.fetchall()
 
 
-def delete_section_and_moments(conn, *, section_id: str) -> None:
-    """Delete a section and all its moments in one transaction."""
+def delete_section_and_moments(conn, *, section_id: str, frames_dir: Path) -> None:
+    """Delete a section, all its moments, and their frame files on disk.
+
+    `frames_dir` is the directory that holds `frame_NNNNNN.jpg` files for the roll.
+    Missing files are tolerated silently (never leave a DB delete blocked on a
+    missing disk file).
+    """
+    rows = conn.execute(
+        "SELECT frame_idx FROM moments WHERE section_id = ?", (section_id,)
+    ).fetchall()
     conn.execute("DELETE FROM moments WHERE section_id = ?", (section_id,))
     conn.execute("DELETE FROM sections WHERE id = ?", (section_id,))
     conn.commit()
+    for row in rows:
+        path = frames_dir / f"frame_{int(row['frame_idx']):06d}.jpg"
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
 
 
 def update_section_analysis(
