@@ -154,6 +154,58 @@ def test_build_section_prompt_omits_identification_when_no_descriptions(tmp_path
     assert "appearance hints" not in prompt.lower()
 
 
+def test_build_section_prompt_omits_reference_block_when_positions_is_none(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+    frames = [tmp_path / "frame_000000.jpg"]
+    frames[0].write_bytes(b"x")
+    prompt = build_section_prompt(
+        start_s=0.0, end_s=1.0,
+        frame_paths=frames, timestamps=[0.0],
+        player_a_name="A", player_b_name="B",
+    )
+    assert "Canonical BJJ positions" not in prompt
+
+
+def test_build_section_prompt_includes_reference_block_when_positions_provided(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+    frames = [tmp_path / "frame_000000.jpg"]
+    frames[0].write_bytes(b"x")
+    prompt = build_section_prompt(
+        start_s=0.0, end_s=1.0,
+        frame_paths=frames, timestamps=[0.0],
+        player_a_name="A", player_b_name="B",
+        positions=[
+            _fake_position("closed_guard_bottom", "Closed Guard (Bottom)", "Ankles LOCKED."),
+            _fake_position("mount_top", "Mount (Top)", "Sitting astride torso."),
+        ],
+    )
+    assert "Closed Guard (Bottom)" in prompt
+    assert "Mount (Top)" in prompt
+    assert "Canonical BJJ positions" in prompt
+    # Schema hint must remain last so JSON adherence is unaffected.
+    assert prompt.rstrip().endswith("}")
+    schema_idx = prompt.index('"narrative"')
+    ref_idx = prompt.index("Canonical BJJ positions")
+    assert ref_idx < schema_idx, "reference block must precede schema hint"
+
+
+def test_build_section_prompt_reference_block_precedes_guidance(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+    frames = [tmp_path / "frame_000000.jpg"]
+    frames[0].write_bytes(b"x")
+    prompt = build_section_prompt(
+        start_s=0.0, end_s=1.0,
+        frame_paths=frames, timestamps=[0.0],
+        player_a_name="A", player_b_name="B",
+        positions=[_fake_position("a", "A Position", "Cue.")],
+    )
+    ref_idx = prompt.index("Canonical BJJ positions")
+    guidance_idx = prompt.index("standard BJJ vocabulary")
+    assert ref_idx < guidance_idx, (
+        "reference block must appear before the 'standard BJJ vocabulary' guidance"
+    )
+
+
 def test_parse_section_response_happy_path():
     from server.analysis.prompt import parse_section_response
 

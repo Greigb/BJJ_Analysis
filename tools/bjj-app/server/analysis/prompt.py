@@ -129,6 +129,7 @@ def build_section_prompt(
     player_b_name: str,
     player_a_description: str | None = None,
     player_b_description: str | None = None,
+    positions: list[PositionNote] | None = None,
 ) -> str:
     """Build the multi-image section narrative prompt.
 
@@ -138,6 +139,13 @@ def build_section_prompt(
     `player_a_description` / `player_b_description`, when provided, are short
     visual-identification hints (gi colour, hair, build) that help Claude
     consistently tag the same person as player_a across frames.
+
+    `positions`, when provided, is an ordered list of canonical BJJ positions
+    (typically taxonomy-category-ordered). Their `how_to_identify` bodies are
+    rendered into a reference block inserted BEFORE the guidance sentence so
+    Claude has the canonical vocabulary in front of it when the instruction
+    "use standard BJJ vocabulary" is given. `None` or `[]` means M9b behaviour
+    (no grounding block).
     """
     if len(frame_paths) != len(timestamps):
         raise ValueError(
@@ -184,7 +192,12 @@ def build_section_prompt(
     parts = [preamble]
     if identification:
         parts.append(identification)
-    parts.extend([intro, "\n".join(frame_lines), guidance, _SECTION_SCHEMA_HINT])
+    parts.extend([intro, "\n".join(frame_lines)])
+    if positions:
+        reference = _build_positions_reference_block(positions)
+        if reference:
+            parts.append(reference)
+    parts.extend([guidance, _SECTION_SCHEMA_HINT])
     return "\n\n".join(parts)
 
 
