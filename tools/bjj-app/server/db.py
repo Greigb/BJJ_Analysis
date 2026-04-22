@@ -213,7 +213,7 @@ def insert_moments(
     """Replace all moments for `roll_id` with the supplied list.
 
     Each moment dict must contain: frame_idx (int), timestamp_s (float),
-    pose_delta (float or None). `selected_for_analysis` defaults to 0.
+    pose_delta (float or None), and may include section_id (str or None).
     Returns the newly inserted rows in insertion order.
     """
     conn.execute("DELETE FROM moments WHERE roll_id = ?", (roll_id,))
@@ -223,9 +223,10 @@ def insert_moments(
         conn.execute(
             """
             INSERT INTO moments (
-                id, roll_id, frame_idx, timestamp_s, pose_delta, selected_for_analysis
+                id, roll_id, frame_idx, timestamp_s, pose_delta,
+                selected_for_analysis, section_id
             )
-            VALUES (?, ?, ?, ?, ?, 0)
+            VALUES (?, ?, ?, ?, ?, 0, ?)
             """,
             (
                 moment_id,
@@ -233,6 +234,7 @@ def insert_moments(
                 int(m["frame_idx"]),
                 float(m["timestamp_s"]),
                 None if m.get("pose_delta") is None else float(m["pose_delta"]),
+                m.get("section_id"),
             ),
         )
         inserted_ids.append(moment_id)
@@ -474,4 +476,46 @@ def set_vault_summary_hashes(
         "UPDATE rolls SET vault_summary_hashes = ? WHERE id = ?",
         (value, roll_id),
     )
+    conn.commit()
+
+
+def insert_section(
+    conn,
+    *,
+    roll_id: str,
+    start_s: float,
+    end_s: float,
+    sample_interval_s: float,
+) -> sqlite3.Row:
+    """Insert one section. Returns the full row."""
+    section_id = uuid.uuid4().hex
+    now = int(time.time())
+    conn.execute(
+        """
+        INSERT INTO sections (
+            id, roll_id, start_s, end_s, sample_interval_s, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (section_id, roll_id, float(start_s), float(end_s), float(sample_interval_s), now),
+    )
+    conn.commit()
+    row = conn.execute(
+        "SELECT * FROM sections WHERE id = ?", (section_id,)
+    ).fetchone()
+    return row
+
+
+def get_sections_by_roll(conn, roll_id: str) -> list[sqlite3.Row]:
+    """Return all sections for a roll, ordered by start_s ascending."""
+    cur = conn.execute(
+        "SELECT * FROM sections WHERE roll_id = ? ORDER BY start_s ASC, created_at ASC",
+        (roll_id,),
+    )
+    return cur.fetchall()
+
+
+def delete_section_and_moments(conn, *, section_id: str) -> None:
+    """Delete a section and all its moments in one transaction."""
+    conn.execute("DELETE FROM moments WHERE section_id = ?", (section_id,))
+    conn.execute("DELETE FROM sections WHERE id = ?", (section_id,))
     conn.commit()
