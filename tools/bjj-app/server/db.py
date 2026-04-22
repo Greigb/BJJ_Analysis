@@ -68,6 +68,15 @@ CREATE TABLE IF NOT EXISTS claude_cache (
     created_at INTEGER NOT NULL,
     PRIMARY KEY (prompt_hash, frame_hash)
 );
+
+CREATE TABLE IF NOT EXISTS sections (
+    id TEXT PRIMARY KEY,
+    roll_id TEXT NOT NULL REFERENCES rolls(id) ON DELETE CASCADE,
+    start_s REAL NOT NULL,
+    end_s REAL NOT NULL,
+    sample_interval_s REAL NOT NULL,
+    created_at INTEGER NOT NULL
+);
 """
 
 
@@ -120,6 +129,24 @@ def _backfill_default_player_names(conn: sqlite3.Connection) -> None:
     )
 
 
+def _migrate_moments_m9(conn: sqlite3.Connection) -> None:
+    """Idempotently add M9 fields to moments + create the unique index.
+
+    - Adds `section_id` column if missing.
+    - Creates `idx_moments_roll_frame` UNIQUE on (roll_id, frame_idx) if missing.
+    """
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(moments)").fetchall()}
+    if "section_id" not in existing:
+        conn.execute(
+            "ALTER TABLE moments ADD COLUMN section_id TEXT "
+            "REFERENCES sections(id) ON DELETE SET NULL"
+        )
+    conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS "
+        "idx_moments_roll_frame ON moments(roll_id, frame_idx)"
+    )
+
+
 def init_db(db_path: Path) -> None:
     """Create the schema if it doesn't already exist. Safe to call every startup."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -128,6 +155,7 @@ def init_db(db_path: Path) -> None:
         _migrate_rolls_m4(conn)
         _backfill_default_player_names(conn)
         _migrate_analyses_player_enum(conn)
+        _migrate_moments_m9(conn)
         conn.commit()
 
 
