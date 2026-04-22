@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS analyses (
 
 CREATE TABLE IF NOT EXISTS annotations (
     id TEXT PRIMARY KEY,
-    moment_id TEXT NOT NULL REFERENCES moments(id) ON DELETE CASCADE,
+    section_id TEXT NOT NULL REFERENCES sections(id) ON DELETE CASCADE,
     body TEXT NOT NULL,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
@@ -75,7 +75,10 @@ CREATE TABLE IF NOT EXISTS sections (
     start_s REAL NOT NULL,
     end_s REAL NOT NULL,
     sample_interval_s REAL NOT NULL,
-    created_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL,
+    narrative TEXT,
+    coach_tip TEXT,
+    analysed_at INTEGER
 );
 """
 
@@ -147,6 +150,42 @@ def _migrate_moments_m9(conn: sqlite3.Connection) -> None:
     )
 
 
+_SECTIONS_M9B_COLUMNS: tuple[tuple[str, str], ...] = (
+    ("narrative",   "TEXT"),
+    ("coach_tip",   "TEXT"),
+    ("analysed_at", "INTEGER"),
+)
+
+
+def _migrate_sections_m9b(conn: sqlite3.Connection) -> None:
+    """Idempotently add M9b columns to an existing sections table."""
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(sections)").fetchall()}
+    for name, sql_type in _SECTIONS_M9B_COLUMNS:
+        if name not in existing:
+            conn.execute(f"ALTER TABLE sections ADD COLUMN {name} {sql_type}")
+
+
+def _migrate_annotations_m9b(conn: sqlite3.Connection) -> None:
+    """Rebuild annotations with section_id FK if still on moment_id FK.
+
+    SQLite can't ALTER FK in place — recreate the table. Pre-M9b rows are
+    smoke-test-only, so the migration discards them (spec decision).
+    """
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)").fetchall()}
+    if "section_id" in cols and "moment_id" not in cols:
+        return  # already migrated
+    conn.execute("DROP TABLE IF EXISTS annotations")
+    conn.execute(
+        "CREATE TABLE annotations ("
+        "  id TEXT PRIMARY KEY, "
+        "  section_id TEXT NOT NULL REFERENCES sections(id) ON DELETE CASCADE, "
+        "  body TEXT NOT NULL, "
+        "  created_at INTEGER NOT NULL, "
+        "  updated_at INTEGER NOT NULL"
+        ")"
+    )
+
+
 def init_db(db_path: Path) -> None:
     """Create the schema if it doesn't already exist. Safe to call every startup."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -156,6 +195,8 @@ def init_db(db_path: Path) -> None:
         _backfill_default_player_names(conn)
         _migrate_analyses_player_enum(conn)
         _migrate_moments_m9(conn)
+        _migrate_sections_m9b(conn)
+        _migrate_annotations_m9b(conn)
         conn.commit()
 
 
