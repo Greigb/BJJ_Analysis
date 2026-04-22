@@ -234,3 +234,45 @@ async def test_rate_limit_retry_emits_queued_then_succeeds(tmp_path, monkeypatch
         assert "section_done" in stages
     finally:
         conn.close()
+
+
+@pytest.mark.asyncio
+async def test_pipeline_passes_positions_reference_to_claude_prompt(tmp_path, monkeypatch):
+    """The optional positions kwarg is threaded into build_section_prompt."""
+    captured: dict = {}
+
+    async def fake_run_claude(prompt, *, settings, limiter, stream_callback=None):
+        captured["prompt"] = prompt
+        return '{"narrative": "ok", "coach_tip": "tip"}'
+
+    monkeypatch.setattr("server.analysis.pipeline.run_claude", fake_run_claude)
+
+    db = tmp_path / "db.sqlite"
+    init_db(db)
+    conn = connect(db)
+    try:
+        _make_roll(conn)
+        fixture_position = {
+            "position_id": "fixture_pos",
+            "name": "Fixture Position",
+            "markdown": "# Fixture Position",
+            "vault_path": "Positions/Fixture Position.md",
+            "how_to_identify": "FIXTURE_GROUND_PHRASE_XYZ appears in prompt.",
+        }
+        await _drain(run_section_analysis(
+            conn=conn, roll_id="r1",
+            video_path=_short_video_path(),
+            frames_dir=tmp_path / "frames",
+            sections=[{"start_s": 0.0, "end_s": 1.0}],
+            duration_s=2.0,
+            player_a_name="A", player_b_name="B",
+            settings=_fake_settings(tmp_path),
+            limiter=SlidingWindowLimiter(max_calls=10, window_seconds=60),
+            positions=[fixture_position],
+        ))
+    finally:
+        conn.close()
+
+    assert "FIXTURE_GROUND_PHRASE_XYZ" in captured["prompt"]
+    assert "Fixture Position" in captured["prompt"]
+    assert "Canonical BJJ positions" in captured["prompt"]
