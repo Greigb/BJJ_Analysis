@@ -66,6 +66,27 @@ def get_position(
     return index.get(position_id)
 
 
+def ordered_positions_from_taxonomy(
+    *,
+    positions_index: dict[str, PositionNote],
+    taxonomy: dict,
+) -> list[PositionNote]:
+    """Return PositionNotes in the order they appear in `taxonomy["positions"]`.
+
+    Positions present in `taxonomy` but missing from `positions_index` are
+    silently dropped (no vault note → nothing to ground with). Positions in
+    `positions_index` but not in `taxonomy` are silently dropped too — the
+    taxonomy is the authoritative vocabulary. Used by the /analyse handler
+    to feed a stable, category-ordered grounding list into the pipeline.
+    """
+    out: list[PositionNote] = []
+    for p in taxonomy.get("positions", []):
+        entry = positions_index.get(p["id"])
+        if entry is not None:
+            out.append(entry)
+    return out
+
+
 def _extract_name(content: str, *, fallback: str) -> str:
     m = _H1_RE.search(content)
     return m.group(1) if m else fallback
