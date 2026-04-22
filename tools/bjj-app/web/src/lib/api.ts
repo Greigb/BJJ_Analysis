@@ -1,5 +1,4 @@
 import type {
-  AnalyseEvent,
   AnalyseMomentEvent,
   Annotation,
   CreateRollInput,
@@ -60,56 +59,28 @@ export function createRoll(input: CreateRollInput): Promise<RollDetail> {
   });
 }
 
+export interface SectionInput {
+  start_s: number;
+  end_s: number;
+  sample_interval_s: number;
+}
+
 /**
- * Analyse a roll — returns an async iterator of SSE events from the backend.
+ * Analyse a roll — POSTs sections config and returns the raw SSE Response.
+ * Callers are responsible for reading the body as an SSE stream.
  *
  * Usage:
- *   for await (const event of analyseRoll(id)) { ... }
+ *   const response = await analyseRoll(id, sections);
  */
-export async function* analyseRoll(id: string): AsyncIterator<AnalyseEvent> {
-  const response = await fetch(`/api/rolls/${encodeURIComponent(id)}/analyse`, {
-    method: 'POST'
+export async function analyseRoll(
+  rollId: string,
+  sections: SectionInput[],
+): Promise<Response> {
+  return fetch(`/api/rolls/${encodeURIComponent(rollId)}/analyse`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sections }),
   });
-  if (!response.ok) {
-    throw new ApiError(response.status, `${response.status} ${response.statusText}`);
-  }
-  if (!response.body) {
-    throw new Error('Analyse response has no body');
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-
-      // SSE frames are separated by blank lines.
-      const frames = buffer.split('\n\n');
-      buffer = frames.pop() ?? '';
-
-      for (const frame of frames) {
-        const dataLine = frame
-          .split('\n')
-          .find((line) => line.startsWith('data: '));
-        if (!dataLine) continue;
-        yield JSON.parse(dataLine.slice(6)) as AnalyseEvent;
-      }
-    }
-  } finally {
-    // Cancel drains any buffered body bytes and closes the underlying fetch
-    // so the server's TCP connection isn't held open if the iterator is
-    // abandoned (e.g. user navigates away mid-stream).
-    try {
-      await reader.cancel();
-    } catch {
-      /* already cancelled or errored — safe to ignore */
-    }
-    reader.releaseLock();
-  }
 }
 
 /**
