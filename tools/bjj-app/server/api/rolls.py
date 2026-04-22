@@ -19,6 +19,7 @@ from server.db import (
     get_annotations_by_moment,
     get_moments,
     get_roll,
+    get_sections_by_roll,
 )
 
 
@@ -61,11 +62,19 @@ class AnnotationOut(BaseModel):
     created_at: int
 
 
+class SectionOut(BaseModel):
+    id: str
+    start_s: float
+    end_s: float
+    sample_interval_s: float
+
+
 class MomentOut(BaseModel):
     id: str
     frame_idx: int
     timestamp_s: float
     pose_delta: float | None
+    section_id: str | None = None
     analyses: list[AnalysisOut] = []
     annotations: list[AnnotationOut] = []
 
@@ -88,6 +97,7 @@ class RollDetailOut(BaseModel):
     scores: dict | None = None
     distribution: dict | None = None
     moments: list[MomentOut] = []
+    sections: list[SectionOut] = []
 
 
 router = APIRouter(prefix="/api", tags=["rolls"])
@@ -172,6 +182,7 @@ async def upload_roll(
         scores=None,
         distribution=None,
         moments=[],
+        sections=[],
     )
 
 
@@ -197,6 +208,7 @@ def get_roll_detail(
         annotations_by_moment: dict[str, list] = {
             m["id"]: get_annotations_by_moment(conn, m["id"]) for m in moment_rows
         }
+        section_rows = get_sections_by_roll(conn, roll_id)
     finally:
         conn.close()
 
@@ -206,6 +218,7 @@ def get_roll_detail(
             frame_idx=m["frame_idx"],
             timestamp_s=m["timestamp_s"],
             pose_delta=m["pose_delta"],
+            section_id=m["section_id"],
             analyses=[
                 AnalysisOut(
                     id=a["id"],
@@ -263,4 +276,13 @@ def get_roll_detail(
         scores=scores,
         distribution=distribution,
         moments=moments_out,
+        sections=[
+            SectionOut(
+                id=s["id"],
+                start_s=s["start_s"],
+                end_s=s["end_s"],
+                sample_interval_s=s["sample_interval_s"],
+            )
+            for s in section_rows
+        ],
     )
