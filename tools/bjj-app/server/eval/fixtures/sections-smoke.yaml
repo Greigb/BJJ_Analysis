@@ -1,0 +1,12 @@
+# Sample section-eval fixture — one entry template.
+#
+# To use: replace roll_id + section_id with values from your local DB
+# (e.g. query `SELECT id, roll_id FROM sections LIMIT 5;` against
+# tools/bjj-app/bjj-app.db). The fixture references existing sections —
+# nothing gets re-extracted from video.
+
+sections: []
+  # Example (uncomment + fill in):
+  # - roll_id: "4402bdd5d8cd4c3cad09bb4585ca1375"
+  #   section_id: "abcd1234..."
+  #   note: "closed guard bottom → sweep attempt"
