@@ -118,6 +118,11 @@ def parse_section_judgement(raw: str) -> dict:
     data["overall"] = _clamp_score(data["overall"])
     if not isinstance(data["verdict"], str) or not data["verdict"].strip():
         raise JudgementError("verdict must be a non-empty string")
+    # Rationale is non-deterministic — Claude occasionally drops an axis.
+    # Backfill missing entries so the scores remain usable and downstream
+    # renderers never KeyError.
+    rationale = data["rationale"] if isinstance(data["rationale"], dict) else {}
+    data["rationale"] = {a: rationale.get(a, "(no rationale)") for a in _SECTION_JUDGE_AXES}
     return data
 
 
@@ -230,4 +235,6 @@ def parse_summary_judgement(raw: str) -> dict:
     data["overall"] = _clamp_score(data["overall"])
     if not isinstance(data["verdict"], str) or not data["verdict"].strip():
         raise JudgementError("verdict must be a non-empty string")
+    rationale = data["rationale"] if isinstance(data["rationale"], dict) else {}
+    data["rationale"] = {a: rationale.get(a, "(no rationale)") for a in _SUMMARY_JUDGE_AXES}
     return data

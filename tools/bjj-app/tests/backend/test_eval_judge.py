@@ -80,6 +80,16 @@ def test_parse_section_judgement_rejects_missing_score_axis():
         parse_section_judgement(json.dumps(payload))
 
 
+def test_parse_section_judgement_backfills_missing_rationale_axis():
+    """Claude's rationale is less reliable than scores — a missing axis
+    should backfill with a placeholder rather than raise or crash downstream."""
+    payload = json.loads(json.dumps(_VALID_SECTION_JUDGEMENT))
+    del payload["rationale"]["coach_tip"]
+    out = parse_section_judgement(json.dumps(payload))
+    assert out["rationale"]["coach_tip"] == "(no rationale)"
+    assert out["rationale"]["vocabulary"] == "Good canonical terms."
+
+
 def test_parse_section_judgement_clamps_scores():
     payload = json.loads(json.dumps(_VALID_SECTION_JUDGEMENT))
     payload["scores"]["vocabulary"] = 15      # → 10
