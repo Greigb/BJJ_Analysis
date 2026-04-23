@@ -21,7 +21,11 @@ import re
 import sys
 from pathlib import Path
 
+from server.analysis.claude_cli import (
+    ClaudeProcessError, ClaudeResponseError, RateLimitedError, run_claude,
+)
 from server.analysis.positions_vault import load_positions_index
+from server.analysis.rate_limit import SlidingWindowLimiter
 from server.config import load_settings
 
 
@@ -210,10 +214,164 @@ def frontmatter_phase(vault_root: Path, draft_dir: Path) -> None:
     )
 
 
+_HOW_TO_IDENTIFY_SECTION_RE = re.compile(
+    r"^##\s+How to Identify\s*\n", re.IGNORECASE | re.MULTILINE,
+)
+
+
+def _build_body_prompt(technique_name: str, position_contexts: list[dict]) -> str:
+    """Prompt Claude to draft a one-paragraph `## How to Identify` body.
+
+    `position_contexts` is a list of `{"name": str, "how_to_identify": str}`
+    for each position this technique is used from — gives Claude the visual
+    vocabulary to ground the description in.
+    """
+    position_lines = "\n".join(
+        f"- {p['name']}: {p['how_to_identify']}"
+        for p in position_contexts
+        if p.get("how_to_identify")
+    )
+    return (
+        f"You are writing a `## How to Identify` section for the BJJ technique "
+        f"\"{technique_name}\". This text will appear in an Obsidian vault note and "
+        f"will be injected into a video-analysis prompt to help Claude recognise the "
+        f"technique mid-execution.\n\n"
+        f"The technique is typically entered from these positions (each with its own "
+        f"visual cues):\n{position_lines}\n\n"
+        f"Write ONE paragraph of 2-4 sentences (~200-300 characters) describing the "
+        f"distinctive visual cues a coach would use to identify \"{technique_name}\" "
+        f"while it is being applied in video frames. Focus on what grips, limb "
+        f"positions, angles, or body-weight distribution signal this technique is "
+        f"happening NOW (not what to set up or how to finish). Use standard BJJ "
+        f"vocabulary. Plain text only — no markdown, no headers, no bullets, no "
+        f"surrounding quotes, no preamble like \"Here is...\". Just the paragraph."
+    )
+
+
+def _splice_how_to_identify_body(text: str, body: str) -> tuple[str, bool]:
+    """Insert `## How to Identify\\n\\n<body>\\n\\n` between `## Used from` and
+    the next `##` heading. Idempotent — no-op if section already exists."""
+    if _HOW_TO_IDENTIFY_SECTION_RE.search(text):
+        return text, False
+    # Find end of the `## Used from` block (first `\n## ` after "Used from").
+    used_from_match = _USED_FROM_RE.search(text)
+    if used_from_match is None:
+        return text, False
+    # The match captures the body up to (but not including) the next `## `.
+    # Insert the new section right after the Used from body.
+    insert_at = used_from_match.end()
+    block = f"\n## How to Identify\n\n{body.strip()}\n\n"
+    return text[:insert_at] + block + text[insert_at:], True
+
+
 async def bodies_phase(vault_root: Path, draft_dir: Path) -> None:
-    # Task 2 of the M12 plan — implemented after Task 1 lands.
-    raise NotImplementedError(
-        "bodies phase lands in Task 2; re-run with --frontmatter-only for Task 1"
+    """Draft `## How to Identify` bodies for each technique via Claude CLI.
+
+    Idempotent: skips techniques that already have the section. Writes drafts
+    into Techniques.draft/<name>.md — same location the frontmatter phase uses,
+    so a single apply_technique_drafts.py run ships both.
+    """
+    techniques_dir = vault_root / "Techniques"
+    if not techniques_dir.is_dir():
+        print(f"ERROR: {techniques_dir} not found.", file=sys.stderr)
+        sys.exit(2)
+
+    positions_index = load_positions_index(vault_root)
+    name_to_pid = _build_name_to_pid(positions_index)
+    # Reverse lookup: pid → {name, how_to_identify}.
+    pid_to_context = {pid: note for pid, note in positions_index.items()}
+
+    settings = load_settings()
+    limiter = SlidingWindowLimiter(
+        max_calls=settings.claude_max_calls,
+        window_seconds=settings.claude_window_seconds,
+    )
+
+    draft_dir.mkdir(parents=True, exist_ok=True)
+
+    diffs: list[str] = []
+    written_count = 0
+    skipped_existing = 0
+    errors: list[str] = []
+
+    files = sorted(techniques_dir.glob("*.md"))
+    print(f"Drafting ## How to Identify for {len(files)} techniques…", file=sys.stderr)
+    for idx, md_path in enumerate(files, 1):
+        # Work against the draft (which already has technique_id frontmatter)
+        # if it exists; otherwise against the live vault file.
+        source_path = draft_dir / md_path.name
+        if not source_path.exists():
+            source_path = md_path
+        original = source_path.read_text()
+
+        if _HOW_TO_IDENTIFY_SECTION_RE.search(original):
+            skipped_existing += 1
+            # Still make sure the draft reflects the source.
+            (draft_dir / md_path.name).write_text(original)
+            continue
+
+        # Build position context from `## Used from` wikilinks.
+        contexts: list[dict] = []
+        for wl in _collect_wikilinks(original):
+            pid = name_to_pid.get(wl)
+            if pid is None:
+                continue
+            p = pid_to_context.get(pid)
+            if p is None:
+                continue
+            contexts.append({
+                "name": p["name"],
+                "how_to_identify": (p.get("how_to_identify") or "").strip(),
+            })
+
+        if not contexts:
+            errors.append(f"{md_path.name}: no resolvable positions, skipped")
+            (draft_dir / md_path.name).write_text(original)
+            continue
+
+        technique_name = md_path.stem
+        prompt = _build_body_prompt(technique_name, contexts)
+
+        try:
+            body = await run_claude(prompt, settings=settings, limiter=limiter)
+        except (RateLimitedError, ClaudeProcessError, ClaudeResponseError) as exc:
+            errors.append(f"{md_path.name}: {type(exc).__name__}: {exc}")
+            (draft_dir / md_path.name).write_text(original)
+            continue
+
+        # Strip surrounding quotes or stray leading "Here is..." if Claude
+        # slipped outside the instructions.
+        body = body.strip().strip('"').strip("'")
+
+        new_text, changed = _splice_how_to_identify_body(original, body)
+        (draft_dir / md_path.name).write_text(new_text)
+        if changed:
+            written_count += 1
+            diff = "".join(difflib.unified_diff(
+                original.splitlines(keepends=True),
+                new_text.splitlines(keepends=True),
+                fromfile=f"a/Techniques/{md_path.name}",
+                tofile=f"b/Techniques/{md_path.name}",
+            ))
+            diffs.append(diff)
+
+        if idx % 10 == 0:
+            print(f"  [{idx}/{len(files)}] drafted {written_count}, "
+                  f"skipped {skipped_existing}, errors {len(errors)}", file=sys.stderr)
+
+    (draft_dir / "bodies_diff.md").write_text(
+        "# `## How to Identify` body drafts\n\n"
+        f"Wrote bodies for {written_count} techniques, "
+        f"skipped {skipped_existing} already-populated, "
+        f"encountered {len(errors)} errors.\n\n"
+        "## Errors\n\n"
+        + ("\n".join(f"- {e}" for e in errors) if errors else "_(none)_")
+        + "\n\n## Diffs\n\n```diff\n" + "\n".join(diffs) + "\n```\n"
+    )
+    print(
+        f"Done — drafted {written_count}, skipped {skipped_existing}, "
+        f"errors {len(errors)}. See {draft_dir}/bodies_diff.md",
+        file=sys.stderr,
     )
 
 
