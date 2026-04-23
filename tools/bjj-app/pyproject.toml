@@ -10,6 +10,7 @@ dependencies = [
     "python-frontmatter>=1.1.0",
     "python-multipart>=0.0.12",
     "pydantic>=2.9.0",
+    "pyyaml>=6.0",
     "opencv-python-headless>=4.10.0",
     "Pillow>=10.4.0",
     "weasyprint>=62.0",

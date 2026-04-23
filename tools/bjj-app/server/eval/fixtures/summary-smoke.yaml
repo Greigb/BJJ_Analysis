@@ -1,0 +1,6 @@
+# Sample summary-eval fixture — one entry template.
+
+rolls: []
+  # Example (uncomment + fill in):
+  # - roll_id: "4402bdd5d8cd4c3cad09bb4585ca1375"
+  #   note: "first M9b smoke upload — verify faithfulness"
