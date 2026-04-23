@@ -12,7 +12,7 @@ tags: [position, leg-entanglement]
 
 ## How to Identify
 
-Attacker is BEHIND the opponent's leg (facing the back of the knee). The attacker's body is oriented towards the opponent's back/rear. The trapped leg goes behind the attacker. Often used to attack the heel hook from a rear angle.
+Attacker is positioned BEHIND the opponent's trapped leg, chest facing the BACK of the opponent's knee/hamstring rather than the front. Opponent's single leg is trapped in an ashi-style frame, but the attacker's body is oriented towards the opponent's REAR side, with the trapped leg passing behind the attacker's own body. **Disambiguator vs `straight_ashi` / `outside_ashi`:** attacker's chest is parallel to the opponent's HAMSTRING, not the shin — attacker is facing the wrong way. **vs `backside_fifty_fifty`:** only ONE opponent leg trapped (not two mirror-locked). Sets up rear-angle heel hook — the trapped heel is exposed on the far side of the attacker.
 
 ## Techniques from here
 - [[Straight ankle lock]]

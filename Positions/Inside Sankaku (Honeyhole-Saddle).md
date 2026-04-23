@@ -12,7 +12,7 @@ tags: [position, leg-entanglement]
 
 ## How to Identify
 
-Attacker has BOTH LEGS TRIANGLED (crossed/locked like a triangle) around the opponent's SINGLE LEG. The trapped leg goes BETWEEN the attacker's thighs. The attacker's legs form a triangle (figure-four) grip. This is the strongest heel hook position. The heel is typically being exposed/attacked.
+Attacker's legs form a FIGURE-FOUR (triangle lock) around the opponent's SINGLE trapped leg — opponent's leg passes BETWEEN the attacker's thighs, and the attacker's top foot hooks BEHIND their own bottom foot, locking the triangle. **Disambiguator vs `straight_ashi` / `outside_ashi`:** opponent's leg is BETWEEN attacker's thighs (not beside, either inside or outside). **vs `fifty_fifty`:** only ONE opponent leg trapped (not two mirror-locked). **vs `cross_ashi`:** attacker's own legs are locked figure-four around the trapped leg (not just crossing the body). The trapped heel is typically visible past the attacker's armpit, pointing up/away — this is the strongest heel-hook finishing position.
 
 ## Techniques from here
 - [[Inside heel hook]]
