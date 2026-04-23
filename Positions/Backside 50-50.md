@@ -12,7 +12,7 @@ tags: [position, leg-entanglement]
 
 ## How to Identify
 
-Like 50/50 but one person has rotated so they face AWAY from the other (back-to-back relative to the entangled legs). One person faces the opponent's feet, the other faces away. Asymmetric advantage.
+Legs remain in a 50/50 entanglement but ONE player has rotated their shoulders/hips AWAY — they now face backward relative to the opponent, so the two players are back-to-back at the shoulder line (legs still intertwined). **Disambiguator vs `fifty_fifty`:** one player's chest/shoulders point AWAY from the opponent. **vs `ushiro_ashi`:** both players still have their legs mutually trapped (50/50 pattern), not a single opponent leg isolated. The rotated (back-turned) player has exposed their heel past their own hip — that heel is the target of a heel hook from behind.
 
 ## Techniques from here
 - [[Heel hook]]

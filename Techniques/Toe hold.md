@@ -18,7 +18,7 @@ technique_id: toe_hold
 
 ## How to Identify
 
-Attacker controls the opponent's foot with a figure-four grip, one hand clamping the toes/forefoot and the opposite forearm bracing the shin or ankle, palm rotating the foot inward toward the pinky side. The opponent's trapped leg is isolated by a leg-entanglement (ashi, 50/50, or sankaku), and the attacker's chest or shoulder leans into the shin to immobilize the knee while the wrists twist the foot medially. Look for the curled-fist grip on the metatarsals and the inward rotation of the sole.
+Attacker controls the opponent's foot with a figure-four grip — one hand clamping the TOES/forefoot, the opposite forearm bracing the shin or ankle, palm rotating the foot INWARD toward the pinky side. Opponent's trapped leg is isolated by a leg-entanglement (ashi, 50/50, or sankaku); attacker's chest or shoulder leans into the shin to immobilize the knee while the wrists twist the foot medially. Look for the curled-fist grip on the METATARSALS and the inward rotation of the sole. **Disambiguator vs `heel_hook`:** grip is on the TOP of the foot (toes/metatarsals), NOT around the heel. **vs `straight_ankle_lock`:** no armpit-trap of the foot — both hands are on the foot itself, twisting rather than hyperextending the ankle joint.
 
 
 ## Description

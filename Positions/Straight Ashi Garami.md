@@ -12,7 +12,7 @@ tags: [position, leg-entanglement]
 
 ## How to Identify
 
-Attacker is on their back/side with the opponent's leg trapped between their legs. Both of attacker's legs are on the SAME SIDE of the opponent's trapped leg. The attacker's hips are next to the opponent's knee. Basic outside leg position.
+Attacker on their back or hip with opponent's ONE leg trapped between the attacker's legs — BOTH of attacker's feet are on the SAME SIDE of the trapped leg (outside the opponent's knee), with the outside foot resting on the opponent's HIP. **Disambiguator vs `outside_ashi`:** attacker's outside foot stays on/beside the hip — it does NOT cross over the opponent's body. **vs `inside_sankaku`:** opponent's leg is BESIDE the attacker's thighs (outside), not between them. **vs `single_leg_x`:** the opponent is flat or sitting (not still standing/kneeling). Basic outside-ashi — entry point into inside sankaku or outside ashi; straight ankle lock is the native submission, heel hooks require a transition first.
 
 ## Techniques from here
 - [[Straight ankle lock]]

@@ -12,7 +12,7 @@ technique_id: calf_slicer
 
 ## How to Identify
 
-The attacker's shin is wedged behind the opponent's knee with the lower leg folded tightly over it, and the knee closes as they pull the foot toward their chest or squeeze their triangled legs, driving the calf into the shin fulcrum. The trapped leg bends to near-full flexion while the attacker extends their hips or leans back to crank the compression.
+Attacker's shin is wedged BEHIND the opponent's knee with the lower leg folded tightly over it, and the knee closes as they pull the foot toward their chest or squeeze their triangled legs, driving the calf into the shin fulcrum. The trapped leg bends to NEAR-FULL FLEXION while the attacker extends their hips or leans back to crank the compression. Often seen from `inside_sankaku`, `backside_fifty_fifty`, or back mount. **Disambiguator vs `kneebar`:** opponent's knee is BENT sharply (full flexion), not extended — attacker squeezes rather than hyperextends. **vs `heel_hook`:** no armpit-on-heel and no rotational torque — just pure compression on the calf muscle. Watch for the attacker's shin INSIDE the crease of the opponent's knee, not near the heel.
 
 
 ## Description
