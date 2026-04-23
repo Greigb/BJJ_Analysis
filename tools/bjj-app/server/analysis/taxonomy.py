@@ -23,6 +23,12 @@ class Position(TypedDict):
     category: str
 
 
+class Technique(TypedDict):
+    id: str
+    name: str
+    category: str
+
+
 class Transition(TypedDict):
     from_: str  # serialised as "from" in JSON
     to: str
@@ -31,6 +37,7 @@ class Transition(TypedDict):
 class Taxonomy(TypedDict):
     categories: list[Category]
     positions: list[Position]
+    techniques: list[Technique]
     transitions: list[dict]  # {"from": str, "to": str}
 
 
@@ -70,10 +77,16 @@ def load_taxonomy(path: Path) -> Taxonomy:
         for p in raw["positions"]
     ]
 
+    techniques: list[Technique] = [
+        {"id": t["id"], "name": t["name"], "category": t["category"]}
+        for t in raw.get("techniques", [])
+    ]
+
     transitions = [{"from": f, "to": t} for f, t in raw["valid_transitions"]]
 
     return {
         "categories": categories,
         "positions": positions,
+        "techniques": techniques,
         "transitions": transitions,
     }

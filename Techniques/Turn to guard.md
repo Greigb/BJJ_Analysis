@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: turn_to_guard
 ---
 
 # Turn to guard

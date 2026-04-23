@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: kimura_counter
 ---
 
 # Kimura counter

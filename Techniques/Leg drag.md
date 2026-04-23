@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: leg_drag
 ---
 
 # Leg drag

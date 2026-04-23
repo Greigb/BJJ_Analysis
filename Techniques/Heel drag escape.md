@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: heel_drag_escape
 ---
 
 # Heel drag escape

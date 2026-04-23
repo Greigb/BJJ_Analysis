@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: harness_control
 ---
 
 # Harness control

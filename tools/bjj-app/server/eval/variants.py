@@ -13,6 +13,7 @@ from typing import Callable, TypedDict
 from server.analysis.positions_vault import PositionNote
 from server.analysis.prompt import build_section_prompt
 from server.analysis.summarise import build_summary_prompt
+from server.analysis.techniques_vault import TechniqueNote
 
 
 class SectionEvalContext(TypedDict):
@@ -25,6 +26,7 @@ class SectionEvalContext(TypedDict):
     player_a_description: str | None
     player_b_description: str | None
     positions: list[PositionNote]
+    techniques: list[TechniqueNote]
 
 
 class SummaryEvalContext(TypedDict):
@@ -61,9 +63,39 @@ def _m10_grounded(ctx: SectionEvalContext) -> str:
     )
 
 
+def _m10_techniques_names(ctx: SectionEvalContext) -> str:
+    """M12: positions + techniques (names only, nested under each position)."""
+    return build_section_prompt(
+        start_s=ctx["start_s"], end_s=ctx["end_s"],
+        frame_paths=ctx["frame_paths"], timestamps=ctx["timestamps"],
+        player_a_name=ctx["player_a_name"], player_b_name=ctx["player_b_name"],
+        player_a_description=ctx.get("player_a_description"),
+        player_b_description=ctx.get("player_b_description"),
+        positions=ctx.get("positions") or None,
+        techniques=ctx.get("techniques") or None,
+        techniques_mode="names",
+    )
+
+
+def _m10_techniques_bodies(ctx: SectionEvalContext) -> str:
+    """M12: positions + techniques (nested names + full detail block)."""
+    return build_section_prompt(
+        start_s=ctx["start_s"], end_s=ctx["end_s"],
+        frame_paths=ctx["frame_paths"], timestamps=ctx["timestamps"],
+        player_a_name=ctx["player_a_name"], player_b_name=ctx["player_b_name"],
+        player_a_description=ctx.get("player_a_description"),
+        player_b_description=ctx.get("player_b_description"),
+        positions=ctx.get("positions") or None,
+        techniques=ctx.get("techniques") or None,
+        techniques_mode="names+bodies",
+    )
+
+
 SECTION_VARIANTS: dict[str, SectionVariant] = {
     "m9b-baseline": _m9b_baseline,
     "m10-grounded": _m10_grounded,
+    "m10-techniques-names": _m10_techniques_names,
+    "m10-techniques-bodies": _m10_techniques_bodies,
 }
 
 

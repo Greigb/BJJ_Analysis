@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: backstep_to_leg_lock
 ---
 
 # Backstep to leg lock

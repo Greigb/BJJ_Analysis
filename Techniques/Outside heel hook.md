@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: outside_heel_hook
 ---
 
 # Outside heel hook

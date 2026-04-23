@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: transition_to_outside_sankaku
 ---
 
 # Transition to outside sankaku

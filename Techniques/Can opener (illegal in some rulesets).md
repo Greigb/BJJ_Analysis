@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: can_opener
 ---
 
 # Can opener (illegal in some rulesets)

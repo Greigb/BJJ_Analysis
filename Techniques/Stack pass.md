@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: stack_pass
 ---
 
 # Stack pass

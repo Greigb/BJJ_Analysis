@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: seatbelt_back_take
 ---
 
 # Seatbelt → back take

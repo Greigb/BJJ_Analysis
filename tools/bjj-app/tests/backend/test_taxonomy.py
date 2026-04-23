@@ -44,7 +44,10 @@ def test_tints_cover_all_canonical_categories():
 
 def test_load_taxonomy_returns_categories_positions_transitions(tiny_taxonomy: Path):
     tax = load_taxonomy(tiny_taxonomy)
-    assert set(tax.keys()) == {"categories", "positions", "transitions"}
+    assert set(tax.keys()) == {"categories", "positions", "techniques", "transitions"}
+    # `techniques` key is new in M12; absent in a taxonomy without that key,
+    # it round-trips as an empty list.
+    assert tax["techniques"] == []
 
 
 def test_load_taxonomy_attaches_tint_to_each_category(tiny_taxonomy: Path):

@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: transition_to_cross_ashi
 ---
 
 # Transition to cross ashi

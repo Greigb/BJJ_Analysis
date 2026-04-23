@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from server.analysis.pipeline import run_section_analysis
 from server.analysis.positions_vault import ordered_positions_from_taxonomy
 from server.analysis.rate_limit import SlidingWindowLimiter
+from server.analysis.techniques_vault import techniques_for_positions
 from server.config import Settings, load_settings
 from server.db import connect, get_roll
 
@@ -101,15 +102,29 @@ async def analyse_roll(
         player_b_description = None
     limiter = _get_limiter(settings)
 
-    # M10: vault-grounded positions reference. Read from app.state set up at
+    # M10 / M12: vault-grounded reference. Read from app.state set up at
     # startup; empty dict / empty taxonomy → empty list → no grounding (M9b
-    # behaviour). Note: the index is built once at create_app(); editing a
-    # vault position note requires a backend restart to take effect.
+    # behaviour). The index is built once at create_app(); editing a vault
+    # position or technique note requires a backend restart to take effect.
     positions_index = getattr(request.app.state, "positions_index", {}) or {}
+    techniques_index = getattr(request.app.state, "techniques_index", {}) or {}
     taxonomy = getattr(request.app.state, "taxonomy", {"positions": []}) or {"positions": []}
-    positions = ordered_positions_from_taxonomy(
-        positions_index=positions_index, taxonomy=taxonomy
-    )
+
+    if settings.grounding_mode == "off":
+        positions = None
+        techniques = None
+    else:
+        positions = ordered_positions_from_taxonomy(
+            positions_index=positions_index, taxonomy=taxonomy
+        )
+        if settings.grounding_mode == "positions+techniques":
+            techniques = techniques_for_positions(
+                techniques_index=techniques_index,
+                position_ids={p["position_id"] for p in positions},
+                taxonomy=taxonomy,
+            )
+        else:
+            techniques = None
 
     async def event_stream() -> AsyncIterator[bytes]:
         conn2 = connect(settings.db_path)
@@ -128,6 +143,8 @@ async def analyse_roll(
                 settings=settings,
                 limiter=limiter,
                 positions=positions,
+                techniques=techniques,
+                techniques_mode="names",
             ):
                 yield f"data: {json.dumps(event)}\n\n".encode("utf-8")
         except Exception:

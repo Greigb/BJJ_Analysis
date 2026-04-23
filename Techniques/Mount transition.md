@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: mount_transition
 ---
 
 # Mount transition

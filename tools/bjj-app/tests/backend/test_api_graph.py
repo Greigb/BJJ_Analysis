@@ -60,7 +60,7 @@ async def test_get_graph_returns_taxonomy_shape(
 
     assert response.status_code == 200
     body = response.json()
-    assert set(body.keys()) == {"categories", "positions", "transitions"}
+    assert set(body.keys()) == {"categories", "positions", "techniques", "transitions"}
     assert len(body["positions"]) == 2
     assert body["transitions"] == [{"from": "standing_neutral", "to": "closed_guard_bottom"}]
     # Every category has a tint

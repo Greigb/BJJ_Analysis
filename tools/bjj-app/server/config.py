@@ -4,6 +4,11 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
+
+
+GroundingMode = Literal["off", "positions", "positions+techniques"]
+_VALID_GROUNDING_MODES = ("off", "positions", "positions+techniques")
 
 
 def _project_root() -> Path:
@@ -24,6 +29,8 @@ class Settings:
     claude_max_calls: int
     claude_window_seconds: float
     taxonomy_path: Path
+    # Prompt grounding mode (M10 + M12)
+    grounding_mode: GroundingMode
 
 
 def load_settings() -> Settings:
@@ -50,4 +57,15 @@ def load_settings() -> Settings:
         claude_max_calls=int(os.getenv("BJJ_CLAUDE_MAX_CALLS", "10")),
         claude_window_seconds=float(os.getenv("BJJ_CLAUDE_WINDOW_SECONDS", "300")),
         taxonomy_path=project_root / "tools" / "taxonomy.json",
+        grounding_mode=_parse_grounding_mode(),
     )
+
+
+def _parse_grounding_mode() -> GroundingMode:
+    raw = os.getenv("BJJ_GROUNDING_MODE", "positions").strip()
+    if raw not in _VALID_GROUNDING_MODES:
+        raise ValueError(
+            f"BJJ_GROUNDING_MODE={raw!r} invalid. "
+            f"Choose one of: {_VALID_GROUNDING_MODES}"
+        )
+    return raw  # type: ignore[return-value]

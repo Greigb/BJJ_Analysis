@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: kiss_of_the_dragon
 ---
 
 # Kiss of the dragon

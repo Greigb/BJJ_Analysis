@@ -37,6 +37,7 @@ def _fake_settings(tmp_path):
         claude_max_calls=100,
         claude_window_seconds=60.0,
         taxonomy_path=tmp_path / "taxonomy.json",
+        grounding_mode="positions",
     )
 
 

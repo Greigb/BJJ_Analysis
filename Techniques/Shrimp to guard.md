@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: shrimp_to_guard
 ---
 
 # Shrimp to guard

@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: knee_slide_pass
 ---
 
 # Knee slide pass

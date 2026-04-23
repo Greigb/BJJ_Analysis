@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: trap_roll
 ---
 
 # Trap & roll (upa)

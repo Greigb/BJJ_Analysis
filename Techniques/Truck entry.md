@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: truck_entry
 ---
 
 # Truck entry

@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: imanari_roll_entry
 ---
 
 # Imanari roll entry

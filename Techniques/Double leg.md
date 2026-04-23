@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: double_leg
 ---
 
 # Double leg

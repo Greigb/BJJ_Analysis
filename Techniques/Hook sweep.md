@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: hook_sweep
 ---
 
 # Hook sweep

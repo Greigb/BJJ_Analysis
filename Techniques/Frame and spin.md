@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: frame_and_spin
 ---
 
 # Frame and spin

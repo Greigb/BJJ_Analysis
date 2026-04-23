@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: shrimp_to_half_guard
 ---
 
 # Shrimp to half guard

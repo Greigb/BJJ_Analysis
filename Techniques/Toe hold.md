@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: toe_hold
 ---
 
 # Toe hold

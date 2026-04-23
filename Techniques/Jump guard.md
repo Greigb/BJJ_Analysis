@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: jump_guard
 ---
 
 # Jump guard

@@ -31,6 +31,11 @@ from server.analysis.positions_vault import (
 from server.analysis.prompt import SectionResponseError, parse_section_response
 from server.analysis.rate_limit import SlidingWindowLimiter
 from server.analysis.taxonomy import load_taxonomy
+from server.analysis.techniques_vault import (
+    TechniqueNote,
+    load_techniques_index,
+    techniques_for_positions,
+)
 from server.config import Settings
 from server.db import connect, get_moments, get_roll, get_sections_by_roll
 from server.eval.fixtures import SectionFixtureEntry
@@ -72,13 +77,19 @@ async def evaluate_section_variants(
             )
 
     positions_index = load_positions_index(settings.vault_root)
+    techniques_index = load_techniques_index(settings.vault_root, positions_index)
     taxonomy = (
         load_taxonomy(settings.taxonomy_path)
         if settings.taxonomy_path.exists()
-        else {"positions": []}
+        else {"positions": [], "techniques": []}
     )
     positions = ordered_positions_from_taxonomy(
         positions_index=positions_index, taxonomy=taxonomy
+    )
+    techniques = techniques_for_positions(
+        techniques_index=techniques_index,
+        position_ids={p["position_id"] for p in positions},
+        taxonomy=taxonomy,
     )
 
     results: list[SectionEvalResult] = []
@@ -91,6 +102,7 @@ async def evaluate_section_variants(
                 section_id=entry["section_id"],
                 settings=settings,
                 positions=positions,
+                techniques=techniques,
             )
             if ctx is None:
                 for name in variant_names:
@@ -120,6 +132,7 @@ def _build_section_context(
     section_id: str,
     settings: Settings,
     positions: list[PositionNote],
+    techniques: list[TechniqueNote],
 ) -> SectionEvalContext | None:
     roll = get_roll(conn, roll_id)
     if roll is None:
@@ -156,6 +169,7 @@ def _build_section_context(
         "player_a_description": a_desc,
         "player_b_description": b_desc,
         "positions": positions,
+        "techniques": techniques,
     }
 
 

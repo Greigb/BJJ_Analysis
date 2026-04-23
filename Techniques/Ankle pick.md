@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: ankle_pick
 ---
 
 # Ankle pick

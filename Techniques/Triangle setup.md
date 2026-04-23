@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: triangle_setup
 ---
 
 # Triangle setup

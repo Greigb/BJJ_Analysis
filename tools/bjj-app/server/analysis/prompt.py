@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 
 from server.analysis.positions_vault import PositionNote
+from server.analysis.techniques_vault import TechniqueNote
 
 
 def _system_preamble(player_a_name: str, player_b_name: str) -> str:
@@ -91,32 +92,85 @@ _SECTION_SCHEMA_HINT = (
 )
 
 
-_POSITIONS_REFERENCE_HEADER = (
+_GROUNDING_HEADER_POSITIONS_ONLY = (
     "Canonical BJJ positions — use this exact vocabulary and these visual cues "
     "when identifying what you see in the frames:"
 )
 
+_GROUNDING_HEADER_WITH_TECHNIQUES = (
+    "Canonical BJJ positions — use this exact vocabulary when identifying "
+    "what you see in the frames. Techniques commonly seen from each position "
+    "are listed inline under their source position:"
+)
 
-def _build_positions_reference_block(positions: list[PositionNote]) -> str:
-    """Render an ordered position-reference block for the section prompt.
+_TECHNIQUE_DETAIL_HEADER = (
+    "Technique detail — how to recognise each mid-execution:"
+)
 
-    Preserves input order (caller controls taxonomy sort). Positions whose
-    `how_to_identify` is missing or empty are silently skipped. Returns
-    empty string when nothing would be rendered — caller uses that as the
-    signal to omit the whole block from the prompt.
+
+def _build_grounding_block(
+    positions: list[PositionNote],
+    techniques: list[TechniqueNote] | None = None,
+    techniques_mode: str = "names",
+) -> str:
+    """Render a combined positions + techniques reference block for the section prompt.
+
+    Positions preserve input order (caller controls taxonomy sort). Each
+    position bullet optionally gets a nested sub-line listing technique names
+    whose `used_from_position_ids` contains that position. Empty `positions`
+    with no renderable `how_to_identify` returns an empty string — caller uses
+    that as the signal to omit the whole block.
+
+    `techniques_mode="names"` emits only the inline names sub-line.
+    `techniques_mode="names+bodies"` appends a second block with each
+    technique's `how_to_identify` body (heavier token cost; used by the eval
+    harness's m10-techniques-bodies variant).
     """
-    lines: list[str] = []
+    techniques = techniques or []
+
+    # Index techniques by position for O(1) lookup per bullet.
+    by_position: dict[str, list[TechniqueNote]] = {}
+    for t in techniques:
+        for pid in t["used_from_position_ids"]:
+            by_position.setdefault(pid, []).append(t)
+
+    position_bullets: list[str] = []
     for p in positions:
         body = (p.get("how_to_identify") or "").strip()
         if not body:
             continue
-        # Flatten whitespace so each position fits on one bullet line — the
-        # section prompt is long enough without double newlines inside it.
         flat = " ".join(body.split())
-        lines.append(f"- {p['name']} ({p['position_id']}): {flat}")
-    if not lines:
+        position_bullets.append(f"- {p['name']} ({p['position_id']}): {flat}")
+        nested = by_position.get(p["position_id"], [])
+        if nested:
+            names = ", ".join(t["name"] for t in nested)
+            position_bullets.append(f"  Techniques from here: {names}")
+
+    if not position_bullets:
         return ""
-    return _POSITIONS_REFERENCE_HEADER + "\n" + "\n".join(lines)
+
+    header = (
+        _GROUNDING_HEADER_WITH_TECHNIQUES if any(by_position.values())
+        else _GROUNDING_HEADER_POSITIONS_ONLY
+    )
+    parts = [header + "\n" + "\n".join(position_bullets)]
+
+    if techniques_mode == "names+bodies" and techniques:
+        detail_lines: list[str] = []
+        seen: set[str] = set()
+        for t in techniques:
+            if t["technique_id"] in seen:
+                continue
+            body = (t.get("how_to_identify") or "").strip()
+            if not body:
+                continue
+            seen.add(t["technique_id"])
+            flat = " ".join(body.split())
+            detail_lines.append(f"- {t['name']} ({t['technique_id']}): {flat}")
+        if detail_lines:
+            parts.append(_TECHNIQUE_DETAIL_HEADER + "\n" + "\n".join(detail_lines))
+
+    return "\n\n".join(parts)
 
 
 def build_section_prompt(
@@ -130,6 +184,8 @@ def build_section_prompt(
     player_a_description: str | None = None,
     player_b_description: str | None = None,
     positions: list[PositionNote] | None = None,
+    techniques: list[TechniqueNote] | None = None,
+    techniques_mode: str = "names",
 ) -> str:
     """Build the multi-image section narrative prompt.
 
@@ -194,7 +250,7 @@ def build_section_prompt(
         parts.append(identification)
     parts.extend([intro, "\n".join(frame_lines)])
     if positions:
-        reference = _build_positions_reference_block(positions)
+        reference = _build_grounding_block(positions, techniques, techniques_mode)
         if reference:
             parts.append(reference)
     parts.extend([guidance, _SECTION_SCHEMA_HINT])

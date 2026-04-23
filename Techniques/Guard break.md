@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: guard_break
 ---
 
 # Guard break
