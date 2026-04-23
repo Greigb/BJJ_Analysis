@@ -17,12 +17,35 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+import asyncio
+import logging
+
 from server.analysis.claude_cli import (
     ClaudeProcessError,
     ClaudeResponseError,
     RateLimitedError,
     run_claude,
 )
+
+logger = logging.getLogger(__name__)
+
+
+async def _run_claude_paced(prompt, *, settings, limiter) -> str:
+    """run_claude wrapper that sleeps + retries on RateLimitedError.
+
+    The eval harness fires (fixture × variant × 2) calls in a tight loop —
+    at the default limiter (10 / 300s) a 5-entry, 4-variant run fills the
+    window within seconds and the remaining calls would error if we treated
+    rate-limit as terminal. Unbounded retry is safe here because the
+    limiter's retry_after_s guarantees progress each iteration.
+    """
+    while True:
+        try:
+            return await run_claude(prompt, settings=settings, limiter=limiter)
+        except RateLimitedError as exc:
+            wait = max(1.0, exc.retry_after_s)
+            logger.info("rate-limited, sleeping %.1fs before retry", wait)
+            await asyncio.sleep(wait)
 from server.analysis.positions_vault import (
     PositionNote,
     load_positions_index,
@@ -186,9 +209,9 @@ async def _run_one_section_variant(
 
     # Generation
     try:
-        raw = await run_claude(prompt, settings=settings, limiter=limiter)
+        raw = await _run_claude_paced(prompt, settings=settings, limiter=limiter)
         parsed = parse_section_response(raw)
-    except (SectionResponseError, RateLimitedError, ClaudeProcessError,
+    except (SectionResponseError, ClaudeProcessError,
             ClaudeResponseError) as exc:
         return SectionEvalResult(
             roll_id=entry["roll_id"], section_id=entry["section_id"],
@@ -206,9 +229,9 @@ async def _run_one_section_variant(
         generated_coach_tip=parsed["coach_tip"],
     )
     try:
-        raw_j = await run_claude(judge_prompt, settings=settings, limiter=limiter)
+        raw_j = await _run_claude_paced(judge_prompt, settings=settings, limiter=limiter)
         judgement = parse_section_judgement(raw_j)
-    except (JudgementError, RateLimitedError, ClaudeProcessError,
+    except (JudgementError, ClaudeProcessError,
             ClaudeResponseError) as exc:
         return SectionEvalResult(
             roll_id=entry["roll_id"], section_id=entry["section_id"],
@@ -327,9 +350,9 @@ async def _run_one_summary_variant(
     valid_section_ids = {s["id"] for s in ctx["sections"]}
 
     try:
-        raw = await run_claude(prompt, settings=settings, limiter=limiter)
+        raw = await _run_claude_paced(prompt, settings=settings, limiter=limiter)
         payload = parse_summary_response(raw, valid_section_ids)
-    except (SummaryResponseError, RateLimitedError, ClaudeProcessError,
+    except (SummaryResponseError, ClaudeProcessError,
             ClaudeResponseError) as exc:
         return SummaryEvalResult(
             roll_id=entry["roll_id"], note=entry["note"], variant=variant_name,
@@ -343,9 +366,9 @@ async def _run_one_summary_variant(
         generated_summary=payload,
     )
     try:
-        raw_j = await run_claude(judge_prompt, settings=settings, limiter=limiter)
+        raw_j = await _run_claude_paced(judge_prompt, settings=settings, limiter=limiter)
         judgement = parse_summary_judgement(raw_j)
-    except (JudgementError, RateLimitedError, ClaudeProcessError,
+    except (JudgementError, ClaudeProcessError,
             ClaudeResponseError) as exc:
         return SummaryEvalResult(
             roll_id=entry["roll_id"], note=entry["note"], variant=variant_name,

@@ -151,6 +151,52 @@ async def test_evaluate_section_variants_rejects_unknown_variant_name(
 
 
 @pytest.mark.asyncio
+async def test_evaluate_section_variants_retries_on_rate_limit(
+    tmp_path, monkeypatch,
+):
+    """A 5-entry × 4-variant eval fills the default limiter window within
+    seconds — the runner must sleep + retry on RateLimitedError instead of
+    marking the call a terminal error (the bug that produced 15/20 errors
+    in the first M12 techniques-compare run)."""
+    from server.analysis.claude_cli import RateLimitedError
+
+    roll_id, section_id = _seed_one_analysed_section(tmp_path)
+
+    call_count = {"n": 0}
+
+    async def fake_run_claude(prompt, *, settings, limiter, stream_callback=None):
+        call_count["n"] += 1
+        # First call (generation) rate-limits once then succeeds on retry.
+        if call_count["n"] == 1:
+            raise RateLimitedError(retry_after_s=0.01)
+        if call_count["n"] == 2:
+            return json.dumps({"narrative": "ok", "coach_tip": "tip"})
+        # Judgement succeeds.
+        return json.dumps({
+            "scores": {"vocabulary": 7, "accuracy": 8, "specificity": 6, "coach_tip": 7},
+            "rationale": {"vocabulary": ".", "accuracy": ".", "specificity": ".", "coach_tip": "."},
+            "overall": 7,
+            "verdict": ".",
+        })
+
+    monkeypatch.setattr("server.eval.runner.run_claude", fake_run_claude)
+
+    results = await evaluate_section_variants(
+        fixture_entries=[{
+            "roll_id": roll_id, "section_id": section_id, "note": None,
+        }],
+        variant_names=["m9b-baseline"],
+        settings=_fake_settings(tmp_path),
+        limiter=SlidingWindowLimiter(max_calls=100, window_seconds=60),
+    )
+    assert len(results) == 1
+    assert results[0].error is None
+    assert results[0].narrative == "ok"
+    # Verify the retry actually happened — 3 calls total = 1 retry + gen + judge.
+    assert call_count["n"] == 3
+
+
+@pytest.mark.asyncio
 async def test_evaluate_section_variants_records_error_on_malformed_generation(
     tmp_path, monkeypatch,
 ):
