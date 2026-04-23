@@ -62,7 +62,12 @@ def load_settings() -> Settings:
 
 
 def _parse_grounding_mode() -> GroundingMode:
-    raw = os.getenv("BJJ_GROUNDING_MODE", "positions").strip()
+    # Default flipped to positions+techniques after the M12 4-way eval
+    # (tools/bjj-app/server/eval/reports/2026-04-23-1606-techniques-compare-v3.md)
+    # showed techniques-names/-bodies beat M10 on accuracy + overall (n=5).
+    # Fallback to "positions" via env if the extra ~500-1k tokens per call
+    # aren't worth it on a specific deployment.
+    raw = os.getenv("BJJ_GROUNDING_MODE", "positions+techniques").strip()
     if raw not in _VALID_GROUNDING_MODES:
         raise ValueError(
             f"BJJ_GROUNDING_MODE={raw!r} invalid. "
