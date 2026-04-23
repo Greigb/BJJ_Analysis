@@ -225,49 +225,156 @@ def _fake_position(pid: str, name: str, how: str | None) -> dict:
     }
 
 
-def test_positions_reference_block_empty_list_returns_empty_string():
-    from server.analysis.prompt import _build_positions_reference_block
-    assert _build_positions_reference_block([]) == ""
+def test_grounding_block_empty_list_returns_empty_string():
+    from server.analysis.prompt import _build_grounding_block
+    assert _build_grounding_block([], None) == ""
 
 
-def test_positions_reference_block_includes_each_position_name_and_body():
-    from server.analysis.prompt import _build_positions_reference_block
-    out = _build_positions_reference_block([
-        _fake_position("closed_guard_bottom", "Closed Guard (Bottom)", "Ankles LOCKED."),
-        _fake_position("mount_top", "Mount (Top)", "Sitting astride torso."),
-    ])
+def test_grounding_block_positions_only_matches_m10_shape():
+    from server.analysis.prompt import _build_grounding_block
+    out = _build_grounding_block(
+        [
+            _fake_position("closed_guard_bottom", "Closed Guard (Bottom)", "Ankles LOCKED."),
+            _fake_position("mount_top", "Mount (Top)", "Sitting astride torso."),
+        ],
+        None,
+    )
     assert "Closed Guard (Bottom)" in out
     assert "Mount (Top)" in out
     assert "Ankles LOCKED." in out
     assert "Sitting astride torso." in out
     assert "closed_guard_bottom" in out
     assert "mount_top" in out
+    # Pre-M12 shape — no technique sub-lines.
+    assert "Techniques from here" not in out
 
 
-def test_positions_reference_block_skips_positions_without_how_to_identify():
-    from server.analysis.prompt import _build_positions_reference_block
-    out = _build_positions_reference_block([
-        _fake_position("a", "A", "Has body."),
-        _fake_position("b", "B", None),
-        _fake_position("c", "C", "Also has body."),
-    ])
+def test_grounding_block_skips_positions_without_how_to_identify():
+    from server.analysis.prompt import _build_grounding_block
+    out = _build_grounding_block(
+        [
+            _fake_position("a", "A", "Has body."),
+            _fake_position("b", "B", None),
+            _fake_position("c", "C", "Also has body."),
+        ],
+        None,
+    )
     assert "Has body." in out
     assert "Also has body." in out
-    # Only A and C produce bullets; B (no how_to_identify) must not appear
-    # as a bullet entry.
     bullets = [line for line in out.splitlines() if line.startswith("- ")]
     assert len(bullets) == 2
     assert not any("(b):" in line for line in bullets)
 
 
-def test_positions_reference_block_preserves_input_order():
-    from server.analysis.prompt import _build_positions_reference_block
-    out = _build_positions_reference_block([
-        _fake_position("second", "Second", "Second cue."),
-        _fake_position("first", "First", "First cue."),
-    ])
-    # Second's cue appears before First's cue in output (input order preserved).
+def test_grounding_block_preserves_input_order():
+    from server.analysis.prompt import _build_grounding_block
+    out = _build_grounding_block(
+        [
+            _fake_position("second", "Second", "Second cue."),
+            _fake_position("first", "First", "First cue."),
+        ],
+        None,
+    )
     assert out.index("Second cue.") < out.index("First cue.")
+
+
+def _fake_technique(tid: str, name: str, used_from: list[str], how: str | None = None) -> dict:
+    return {
+        "technique_id": tid,
+        "name": name,
+        "markdown": f"# {name}",
+        "vault_path": f"Techniques/{name}.md",
+        "how_to_identify": how,
+        "used_from_position_ids": used_from,
+    }
+
+
+def test_grounding_block_techniques_names_renders_nested_sub_line():
+    from server.analysis.prompt import _build_grounding_block
+    out = _build_grounding_block(
+        positions=[
+            _fake_position("closed_guard_bottom", "Closed Guard (Bottom)", "Ankles LOCKED."),
+            _fake_position("mount_top", "Mount (Top)", "Astride."),
+        ],
+        techniques=[
+            _fake_technique("armbar", "Armbar", ["closed_guard_bottom", "mount_top"]),
+            _fake_technique("triangle", "Triangle", ["closed_guard_bottom"]),
+            _fake_technique("americana", "Americana", ["mount_top"]),
+        ],
+        techniques_mode="names",
+    )
+    # Armbar appears under BOTH positions; Triangle only under guard; Americana only under mount.
+    cg_idx = out.index("Closed Guard (Bottom)")
+    mt_idx = out.index("Mount (Top)")
+    # Sub-line for closed guard mentions Armbar + Triangle but not Americana.
+    cg_block = out[cg_idx:mt_idx]
+    assert "Techniques from here:" in cg_block
+    assert "Armbar" in cg_block
+    assert "Triangle" in cg_block
+    assert "Americana" not in cg_block
+    # Sub-line for mount mentions Armbar + Americana.
+    mt_block = out[mt_idx:]
+    assert "Armbar" in mt_block
+    assert "Americana" in mt_block
+    assert "Triangle" not in mt_block
+
+
+def test_grounding_block_techniques_bodies_emits_second_block():
+    from server.analysis.prompt import _build_grounding_block
+    out = _build_grounding_block(
+        positions=[_fake_position("cgb", "Closed Guard", "Ankles LOCKED.")],
+        techniques=[
+            _fake_technique("armbar", "Armbar", ["cgb"], how="Isolate arm, break grip."),
+        ],
+        techniques_mode="names+bodies",
+    )
+    # Nested line still present.
+    assert "Techniques from here:" in out
+    # Second block present.
+    assert "Technique detail" in out
+    assert "Isolate arm, break grip." in out
+
+
+def test_grounding_block_techniques_names_mode_omits_bodies_block():
+    from server.analysis.prompt import _build_grounding_block
+    out = _build_grounding_block(
+        positions=[_fake_position("cgb", "Closed Guard", "Ankles LOCKED.")],
+        techniques=[
+            _fake_technique("armbar", "Armbar", ["cgb"], how="Isolate arm."),
+        ],
+        techniques_mode="names",
+    )
+    assert "Technique detail" not in out
+    assert "Isolate arm." not in out
+
+
+def test_grounding_block_techniques_skipped_when_none_match_position():
+    from server.analysis.prompt import _build_grounding_block
+    out = _build_grounding_block(
+        positions=[_fake_position("cgb", "Closed Guard", "Ankles LOCKED.")],
+        techniques=[
+            _fake_technique("armbar", "Armbar", ["different_position"]),
+        ],
+        techniques_mode="names",
+    )
+    # No position-linked techniques → no sub-line under the bullet.
+    assert "Techniques from here:" not in out
+
+
+def test_build_section_prompt_threads_techniques(tmp_path):
+    from server.analysis.prompt import build_section_prompt
+    frame = tmp_path / "frame_000000.jpg"
+    frame.write_bytes(b"x")
+    prompt = build_section_prompt(
+        start_s=0.0, end_s=1.0,
+        frame_paths=[frame], timestamps=[0.0],
+        player_a_name="A", player_b_name="B",
+        positions=[_fake_position("cgb", "Closed Guard", "Ankles LOCKED.")],
+        techniques=[_fake_technique("armbar", "Armbar", ["cgb"])],
+        techniques_mode="names",
+    )
+    assert "Techniques from here:" in prompt
+    assert "Armbar" in prompt
 
 
 def test_parse_section_response_rejects_malformed_json():
