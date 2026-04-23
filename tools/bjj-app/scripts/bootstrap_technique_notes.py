@@ -332,13 +332,33 @@ async def bodies_phase(vault_root: Path, draft_dir: Path) -> None:
         technique_name = md_path.stem
         prompt = _build_body_prompt(technique_name, contexts)
 
-        try:
-            body = await run_claude(prompt, settings=settings, limiter=limiter)
-        except (RateLimitedError, ClaudeProcessError, ClaudeResponseError) as exc:
-            errors.append(f"{md_path.name}: {type(exc).__name__}: {exc}")
+        # RateLimitedError is expected across a 115-call batch — sleep + retry
+        # rather than abandon. Mirrors server/analysis/pipeline.py:144-160, but
+        # unbounded since the batch is paced, not failing.
+        body: str | None = None
+        error_msg: str | None = None
+        while True:
+            try:
+                body = await run_claude(prompt, settings=settings, limiter=limiter)
+                break
+            except RateLimitedError as exc:
+                wait = max(1.0, exc.retry_after_s)
+                print(
+                    f"  [{idx}/{len(files)}] rate-limited on {md_path.name}, "
+                    f"sleeping {wait:.1f}s…",
+                    file=sys.stderr,
+                )
+                await asyncio.sleep(wait)
+            except (ClaudeProcessError, ClaudeResponseError) as exc:
+                error_msg = f"{type(exc).__name__}: {exc}"
+                break
+
+        if error_msg is not None:
+            errors.append(f"{md_path.name}: {error_msg}")
             (draft_dir / md_path.name).write_text(original)
             continue
 
+        assert body is not None  # unreachable — loop sets body or error_msg
         # Strip surrounding quotes or stray leading "Here is..." if Claude
         # slipped outside the instructions.
         body = body.strip().strip('"').strip("'")
