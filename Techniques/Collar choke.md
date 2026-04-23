@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: collar_choke
 ---
 
 # Collar choke

@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: granby_roll
 ---
 
 # Granby roll

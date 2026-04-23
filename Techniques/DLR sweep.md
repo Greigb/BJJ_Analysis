@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: dlr_sweep
 ---
 
 # DLR sweep

@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: scissor_sweep
 ---
 
 # Scissor sweep

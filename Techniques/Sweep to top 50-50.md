@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: sweep_to_top_50_50
 ---
 
 # Sweep to top 50/50

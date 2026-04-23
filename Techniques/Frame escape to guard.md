@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: frame_escape_to_guard
 ---
 
 # Frame escape to guard

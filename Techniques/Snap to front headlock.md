@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: snap_to_front_headlock
 ---
 
 # Snap to front headlock

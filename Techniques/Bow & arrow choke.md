@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: bow_arrow_choke
 ---
 
 # Bow & arrow choke

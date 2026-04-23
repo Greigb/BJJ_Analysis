@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: inside_trip
 ---
 
 # Inside trip

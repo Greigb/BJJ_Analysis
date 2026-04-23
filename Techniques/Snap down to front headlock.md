@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: snap_down_to_front_headlock
 ---
 
 # Snap down to front headlock

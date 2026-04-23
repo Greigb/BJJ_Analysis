@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: pendulum_sweep
 ---
 
 # Pendulum sweep

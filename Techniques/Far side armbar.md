@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: far_side_armbar
 ---
 
 # Far side armbar

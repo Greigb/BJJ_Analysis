@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: north_south_transition
 ---
 
 # North-south transition

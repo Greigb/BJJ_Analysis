@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: lasso_transition
 ---
 
 # Lasso transition

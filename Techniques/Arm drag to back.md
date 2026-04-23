@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: arm_drag_to_back
 ---
 
 # Arm drag to back

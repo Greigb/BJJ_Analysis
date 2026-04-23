@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: elbow_knee_escape
 ---
 
 # Elbow-knee escape

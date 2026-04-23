@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: clock_choke
 ---
 
 # Clock choke

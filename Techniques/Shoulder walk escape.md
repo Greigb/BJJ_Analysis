@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: shoulder_walk_escape
 ---
 
 # Shoulder walk escape

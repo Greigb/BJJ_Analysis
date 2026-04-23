@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: heel_hook
 ---
 
 # Heel hook

@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: electric_chair
 ---
 
 # Electric chair

@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: rear_naked_choke
 ---
 
 # Rear naked choke

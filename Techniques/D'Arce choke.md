@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: d_arce_choke
 ---
 
 # D'Arce choke

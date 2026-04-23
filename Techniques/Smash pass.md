@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: smash_pass
 ---
 
 # Smash pass

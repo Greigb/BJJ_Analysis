@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: body_lock_takedown
 ---
 
 # Body lock takedown

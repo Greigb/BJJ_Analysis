@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: straight_ankle_lock
 ---
 
 # Straight ankle lock

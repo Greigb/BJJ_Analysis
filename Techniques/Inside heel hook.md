@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: inside_heel_hook
 ---
 
 # Inside heel hook

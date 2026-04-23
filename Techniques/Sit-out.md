@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: sit_out
 ---
 
 # Sit-out

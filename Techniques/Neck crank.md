@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: neck_crank
 ---
 
 # Neck crank

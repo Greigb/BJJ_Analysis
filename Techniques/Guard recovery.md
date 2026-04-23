@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: guard_recovery
 ---
 
 # Guard recovery

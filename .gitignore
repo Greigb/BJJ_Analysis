@@ -39,3 +39,6 @@ tools/bjj-app/**/*.egg-info/
 tools/bjj-app/bjj-app.db
 tools/bjj-app/bjj-app.db.broken.*
 tools/bjj-app/.pytest_cache/
+
+# M12 vault-bootstrap scratch output
+Techniques.draft/

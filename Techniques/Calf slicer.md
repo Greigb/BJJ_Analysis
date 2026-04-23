@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: calf_slicer
 ---
 
 # Calf slicer

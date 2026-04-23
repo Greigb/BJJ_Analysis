@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: short_choke
 ---
 
 # Short choke

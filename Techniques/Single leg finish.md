@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: single_leg_finish
 ---
 
 # Single leg finish

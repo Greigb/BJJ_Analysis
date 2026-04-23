@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: seated_guard_pull
 ---
 
 # Seated guard pull

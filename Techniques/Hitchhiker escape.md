@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: hitchhiker_escape
 ---
 
 # Hitchhiker escape

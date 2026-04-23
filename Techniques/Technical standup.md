@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: technical_standup
 ---
 
 # Technical standup

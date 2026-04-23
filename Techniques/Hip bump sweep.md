@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: hip_bump_sweep
 ---
 
 # Hip bump sweep

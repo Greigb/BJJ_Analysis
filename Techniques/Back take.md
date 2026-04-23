@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: back_take
 ---
 
 # Back take

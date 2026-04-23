@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: arm_triangle
 ---
 
 # Arm triangle

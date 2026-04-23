@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: anaconda_choke
 ---
 
 # Anaconda choke

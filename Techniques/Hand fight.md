@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: hand_fight
 ---
 
 # Hand fight

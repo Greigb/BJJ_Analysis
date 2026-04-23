@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: log_splitter
 ---
 
 # Log splitter

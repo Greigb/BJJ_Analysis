@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: snap_down
 ---
 
 # Snap down

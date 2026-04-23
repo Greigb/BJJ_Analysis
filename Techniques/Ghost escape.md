@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: ghost_escape
 ---
 
 # Ghost escape

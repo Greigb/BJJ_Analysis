@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: x_guard_entry
 ---
 
 # X-guard entry

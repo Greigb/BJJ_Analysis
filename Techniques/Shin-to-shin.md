@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: shin_to_shin
 ---
 
 # Shin-to-shin

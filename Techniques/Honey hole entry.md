@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: honey_hole_entry
 ---
 
 # Honey hole entry

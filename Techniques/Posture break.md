@@ -1,5 +1,6 @@
 ---
 tags: [technique]
+technique_id: posture_break
 ---
 
 # Posture break
