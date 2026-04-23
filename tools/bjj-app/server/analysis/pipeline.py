@@ -20,6 +20,7 @@ from server.analysis.claude_cli import (
 )
 from server.analysis.frames import extract_frames_at_timestamps
 from server.analysis.positions_vault import PositionNote
+from server.analysis.techniques_vault import TechniqueNote
 from server.analysis.prompt import (
     SectionResponseError,
     build_section_prompt,
@@ -70,6 +71,8 @@ async def run_section_analysis(
     player_a_description: str | None = None,
     player_b_description: str | None = None,
     positions: list[PositionNote] | None = None,
+    techniques: list[TechniqueNote] | None = None,
+    techniques_mode: str = "names",
 ) -> AsyncIterator[dict]:
     """Process each section sequentially. Yields SSE-shaped dicts.
 
@@ -137,6 +140,8 @@ async def run_section_analysis(
             player_a_description=player_a_description,
             player_b_description=player_b_description,
             positions=positions,
+            techniques=techniques,
+            techniques_mode=techniques_mode,
         )
 
         error_msg: str | None = None

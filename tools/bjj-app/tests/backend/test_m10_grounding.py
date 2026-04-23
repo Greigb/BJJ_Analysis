@@ -36,6 +36,7 @@ def _fake_settings(tmp_path: Path):
         claude_max_calls=100,
         claude_window_seconds=60.0,
         taxonomy_path=_REPO_ROOT / "tools" / "taxonomy.json",
+        grounding_mode="positions",
     )
 
 
