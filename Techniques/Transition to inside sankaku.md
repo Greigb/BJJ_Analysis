@@ -13,6 +13,11 @@ technique_id: transition_to_inside_sankaku
 - [[Straight Ashi Garami]]
 - [[Ushiro Ashi Garami (Rear Ashi)]]
 
+## How to Identify
+
+The attacker's legs are rotating around the opponent's trapped leg, with the top leg swinging over the thigh as the lower leg threads inside to form a figure-four. The attacker's hips turn toward the opponent's back and the shin drops across the top of the thigh while the ankles cross behind the opposite knee.
+
+
 ## Description
 
 <!-- How to execute this technique -->
