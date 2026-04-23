@@ -210,3 +210,136 @@ async def _run_one_section_variant(
         narrative=parsed["narrative"], coach_tip=parsed["coach_tip"],
         judgement=judgement, error=None,
     )
+
+
+# ---------- summary runner ----------
+
+
+from server.analysis.summarise import (  # noqa: E402
+    SummaryResponseError, parse_summary_response,
+)
+from server.db import get_annotations_by_section  # noqa: E402
+from server.eval.fixtures import SummaryFixtureEntry  # noqa: E402
+from server.eval.judge import (  # noqa: E402
+    build_summary_judge_prompt, parse_summary_judgement,
+)
+from server.eval.variants import SUMMARY_VARIANTS, SummaryEvalContext  # noqa: E402
+
+
+@dataclass
+class SummaryEvalResult:
+    roll_id: str
+    note: str | None
+    variant: str
+    summary_payload: dict | None
+    judgement: dict | None
+    error: str | None
+
+
+async def evaluate_summary_variants(
+    *,
+    fixture_entries: list[SummaryFixtureEntry],
+    variant_names: list[str],
+    settings: Settings,
+    limiter: SlidingWindowLimiter,
+) -> list[SummaryEvalResult]:
+    """For each (entry, variant), regenerate the summary from the roll's
+    currently-persisted sections + annotations, then judge it."""
+    for name in variant_names:
+        if name not in SUMMARY_VARIANTS:
+            raise ValueError(
+                f"unknown summary variant: {name!r}. "
+                f"Known: {sorted(SUMMARY_VARIANTS)}"
+            )
+
+    results: list[SummaryEvalResult] = []
+    conn = connect(settings.db_path)
+    try:
+        for entry in fixture_entries:
+            ctx = _build_summary_context(conn=conn, roll_id=entry["roll_id"])
+            if ctx is None:
+                for name in variant_names:
+                    results.append(SummaryEvalResult(
+                        roll_id=entry["roll_id"], note=entry["note"],
+                        variant=name, summary_payload=None, judgement=None,
+                        error="roll not found in local DB",
+                    ))
+                continue
+            if not any(s.get("narrative") for s in ctx["sections"]):
+                for name in variant_names:
+                    results.append(SummaryEvalResult(
+                        roll_id=entry["roll_id"], note=entry["note"],
+                        variant=name, summary_payload=None, judgement=None,
+                        error="roll has no analysed sections",
+                    ))
+                continue
+            for name in variant_names:
+                results.append(await _run_one_summary_variant(
+                    ctx=ctx, entry=entry, variant_name=name,
+                    settings=settings, limiter=limiter,
+                ))
+    finally:
+        conn.close()
+    return results
+
+
+def _build_summary_context(*, conn, roll_id: str) -> SummaryEvalContext | None:
+    roll = get_roll(conn, roll_id)
+    if roll is None:
+        return None
+    sections = [dict(s) for s in get_sections_by_roll(conn, roll_id)]
+    annotations_by_section = {
+        s["id"]: [dict(a) for a in get_annotations_by_section(conn, s["id"])]
+        for s in sections
+    }
+    return {
+        "roll_row": dict(roll),
+        "sections": sections,
+        "annotations_by_section": annotations_by_section,
+    }
+
+
+async def _run_one_summary_variant(
+    *,
+    ctx: SummaryEvalContext,
+    entry: SummaryFixtureEntry,
+    variant_name: str,
+    settings: Settings,
+    limiter: SlidingWindowLimiter,
+) -> SummaryEvalResult:
+    variant = SUMMARY_VARIANTS[variant_name]
+    prompt = variant(ctx)
+
+    valid_section_ids = {s["id"] for s in ctx["sections"]}
+
+    try:
+        raw = await run_claude(prompt, settings=settings, limiter=limiter)
+        payload = parse_summary_response(raw, valid_section_ids)
+    except (SummaryResponseError, RateLimitedError, ClaudeProcessError,
+            ClaudeResponseError) as exc:
+        return SummaryEvalResult(
+            roll_id=entry["roll_id"], note=entry["note"], variant=variant_name,
+            summary_payload=None, judgement=None,
+            error=f"generation failed: {type(exc).__name__}: {exc}",
+        )
+
+    judge_prompt = build_summary_judge_prompt(
+        roll_row=ctx["roll_row"],
+        sections=ctx["sections"],
+        generated_summary=payload,
+    )
+    try:
+        raw_j = await run_claude(judge_prompt, settings=settings, limiter=limiter)
+        judgement = parse_summary_judgement(raw_j)
+    except (JudgementError, RateLimitedError, ClaudeProcessError,
+            ClaudeResponseError) as exc:
+        return SummaryEvalResult(
+            roll_id=entry["roll_id"], note=entry["note"], variant=variant_name,
+            summary_payload=payload, judgement=None,
+            error=f"judgement failed: {type(exc).__name__}: {exc}",
+        )
+
+    return SummaryEvalResult(
+        roll_id=entry["roll_id"], note=entry["note"], variant=variant_name,
+        summary_payload=payload, judgement=judgement, error=None,
+    )
