@@ -25,6 +25,53 @@ from server.analysis.positions_vault import load_positions_index
 from server.config import load_settings
 
 
+_CATEGORY_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
+    # Order matters — first match wins. Most distinctive keywords first.
+    ("submission", (
+        "choke", "strangle", "lock", "armbar", "triangle", "kimura", "americana",
+        "omoplata", "ezekiel", "slicer", "bar trap", "bow & arrow", "gogoplata",
+        "baratoplata", "arm triangle", "heel hook", "toe hold", "wrist lock",
+        "head and arm", "crucifix choke", "rear naked", "guillotine",
+    )),
+    ("sweep", (
+        "sweep", "berimbolo", "balloon", "tornado", "roll", "hook sweep",
+        "scissor", "pendulum", "x-guard entry",
+    )),
+    ("pass", (
+        "pass", "knee cut", "leg drag", "torreando", "toreando", "stack",
+        "smash pass", "over under", "double under", "x-pass", "long step",
+        "knee slice", "hip switch",
+    )),
+    ("escape", (
+        "escape", "shrimp", "elbow escape", "bridge and roll", "upa", "hip bump escape",
+    )),
+    ("takedown", (
+        "takedown", "single leg", "double leg", "body lock takedown", "snap down",
+        "duck under", "ankle pick", "collar drag", "arm drag to back", "foot sweep",
+        "fireman", "clinch",
+    )),
+    ("control", (
+        "control", "grip", "back take", "mount transition", "cross face",
+        "underhook", "back step", "boot scoot", "hip switch", "entry",
+    )),
+]
+
+
+def categorize_technique(name: str) -> str:
+    """Heuristic category from the technique filename. Falls back to 'control'.
+
+    The emitted taxonomy_techniques_proposal.json is a *proposal* — the user is
+    expected to hand-tune obvious mis-categorisations before pasting into
+    taxonomy.json.
+    """
+    lower = name.lower()
+    for category, keywords in _CATEGORY_KEYWORDS:
+        for kw in keywords:
+            if kw in lower:
+                return category
+    return "control"
+
+
 _WIKILINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]")
 _USED_FROM_RE = re.compile(
     r"^##\s+Used from\s*\n+(.+?)(?=\n##\s|\Z)",
@@ -123,6 +170,24 @@ def frontmatter_phase(vault_root: Path, draft_dir: Path) -> None:
         "already having `technique_id`).\n\n"
         "```diff\n" + "\n".join(diffs) + "\n```\n"
     )
+    # Taxonomy proposal — category-grouped, alphabetical within.
+    proposal: list[dict] = []
+    for md_path in sorted(techniques_dir.glob("*.md")):
+        stem = md_path.stem
+        proposal.append({
+            "id": slugify(stem),
+            "name": stem,
+            "category": categorize_technique(stem),
+        })
+    # Re-sort: category → name
+    _CATEGORY_ORDER = ["submission", "sweep", "pass", "escape", "takedown", "control"]
+    proposal.sort(key=lambda e: (_CATEGORY_ORDER.index(e["category"]), e["name"].lower()))
+
+    import json as _json
+    (draft_dir / "taxonomy_techniques_proposal.json").write_text(
+        _json.dumps(proposal, indent=2) + "\n"
+    )
+
     (draft_dir / "wikilink_report.md").write_text(
         "# Wikilink resolution report\n\n"
         f"**Total unique wikilink targets in `## Used from`:** {len(per_wikilink)}  \n"

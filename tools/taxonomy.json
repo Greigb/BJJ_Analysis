@@ -332,6 +332,583 @@
       "visual_cues": "Frame is too blurry, dark, obstructed, or zoomed out to determine any position. Cannot see enough detail to classify."
     }
   ],
+  "techniques": [
+    {
+      "id": "americana",
+      "name": "Americana",
+      "category": "submission"
+    },
+    {
+      "id": "anaconda_choke",
+      "name": "Anaconda choke",
+      "category": "submission"
+    },
+    {
+      "id": "arm_triangle",
+      "name": "Arm triangle",
+      "category": "submission"
+    },
+    {
+      "id": "armbar",
+      "name": "Armbar",
+      "category": "submission"
+    },
+    {
+      "id": "backstep_to_leg_lock",
+      "name": "Backstep to leg lock",
+      "category": "submission"
+    },
+    {
+      "id": "baseball_choke",
+      "name": "Baseball choke",
+      "category": "submission"
+    },
+    {
+      "id": "body_lock_takedown",
+      "name": "Body lock takedown",
+      "category": "submission"
+    },
+    {
+      "id": "bow_arrow_choke",
+      "name": "Bow & arrow choke",
+      "category": "submission"
+    },
+    {
+      "id": "calf_slicer",
+      "name": "Calf slicer",
+      "category": "submission"
+    },
+    {
+      "id": "clock_choke",
+      "name": "Clock choke",
+      "category": "submission"
+    },
+    {
+      "id": "collar_choke",
+      "name": "Collar choke",
+      "category": "submission"
+    },
+    {
+      "id": "d_arce_choke",
+      "name": "D'Arce choke",
+      "category": "submission"
+    },
+    {
+      "id": "far_side_armbar",
+      "name": "Far side armbar",
+      "category": "submission"
+    },
+    {
+      "id": "front_headlock",
+      "name": "Front headlock",
+      "category": "submission"
+    },
+    {
+      "id": "guillotine",
+      "name": "Guillotine",
+      "category": "submission"
+    },
+    {
+      "id": "guillotine_choke",
+      "name": "Guillotine choke",
+      "category": "submission"
+    },
+    {
+      "id": "heel_hook",
+      "name": "Heel hook",
+      "category": "submission"
+    },
+    {
+      "id": "inside_heel_hook",
+      "name": "Inside heel hook",
+      "category": "submission"
+    },
+    {
+      "id": "kimura",
+      "name": "Kimura",
+      "category": "submission"
+    },
+    {
+      "id": "kimura_counter",
+      "name": "Kimura counter",
+      "category": "submission"
+    },
+    {
+      "id": "lockdown",
+      "name": "Lockdown",
+      "category": "submission"
+    },
+    {
+      "id": "omoplata",
+      "name": "Omoplata",
+      "category": "submission"
+    },
+    {
+      "id": "outside_heel_hook",
+      "name": "Outside heel hook",
+      "category": "submission"
+    },
+    {
+      "id": "rear_naked_choke",
+      "name": "Rear naked choke",
+      "category": "submission"
+    },
+    {
+      "id": "short_choke",
+      "name": "Short choke",
+      "category": "submission"
+    },
+    {
+      "id": "snap_down_to_front_headlock",
+      "name": "Snap down to front headlock",
+      "category": "submission"
+    },
+    {
+      "id": "snap_to_front_headlock",
+      "name": "Snap to front headlock",
+      "category": "submission"
+    },
+    {
+      "id": "straight_ankle_lock",
+      "name": "Straight ankle lock",
+      "category": "submission"
+    },
+    {
+      "id": "toe_hold",
+      "name": "Toe hold",
+      "category": "submission"
+    },
+    {
+      "id": "triangle",
+      "name": "Triangle",
+      "category": "submission"
+    },
+    {
+      "id": "triangle_setup",
+      "name": "Triangle setup",
+      "category": "submission"
+    },
+    {
+      "id": "balloon_sweep",
+      "name": "Balloon sweep",
+      "category": "sweep"
+    },
+    {
+      "id": "berimbolo",
+      "name": "Berimbolo",
+      "category": "sweep"
+    },
+    {
+      "id": "dlr_sweep",
+      "name": "DLR sweep",
+      "category": "sweep"
+    },
+    {
+      "id": "granby_roll",
+      "name": "Granby roll",
+      "category": "sweep"
+    },
+    {
+      "id": "hip_bump_sweep",
+      "name": "Hip bump sweep",
+      "category": "sweep"
+    },
+    {
+      "id": "hook_sweep",
+      "name": "Hook sweep",
+      "category": "sweep"
+    },
+    {
+      "id": "imanari_roll_entry",
+      "name": "Imanari roll entry",
+      "category": "sweep"
+    },
+    {
+      "id": "pendulum_sweep",
+      "name": "Pendulum sweep",
+      "category": "sweep"
+    },
+    {
+      "id": "scissor_sweep",
+      "name": "Scissor sweep",
+      "category": "sweep"
+    },
+    {
+      "id": "sweep",
+      "name": "Sweep",
+      "category": "sweep"
+    },
+    {
+      "id": "sweep_to_top_50_50",
+      "name": "Sweep to top 50-50",
+      "category": "sweep"
+    },
+    {
+      "id": "trap_roll",
+      "name": "Trap & roll (upa)",
+      "category": "sweep"
+    },
+    {
+      "id": "underhook_sweep",
+      "name": "Underhook sweep",
+      "category": "sweep"
+    },
+    {
+      "id": "x_guard_entry",
+      "name": "X-guard entry",
+      "category": "sweep"
+    },
+    {
+      "id": "knee_slide_pass",
+      "name": "Knee slide pass",
+      "category": "pass"
+    },
+    {
+      "id": "leg_drag",
+      "name": "Leg drag",
+      "category": "pass"
+    },
+    {
+      "id": "long_step",
+      "name": "Long step",
+      "category": "pass"
+    },
+    {
+      "id": "smash_pass",
+      "name": "Smash pass",
+      "category": "pass"
+    },
+    {
+      "id": "stack_defence",
+      "name": "Stack defence",
+      "category": "pass"
+    },
+    {
+      "id": "stack_pass",
+      "name": "Stack pass",
+      "category": "pass"
+    },
+    {
+      "id": "toreando",
+      "name": "Toreando",
+      "category": "pass"
+    },
+    {
+      "id": "toreando_pass",
+      "name": "Toreando pass",
+      "category": "pass"
+    },
+    {
+      "id": "elbow_knee_escape",
+      "name": "Elbow-knee escape",
+      "category": "escape"
+    },
+    {
+      "id": "frame_escape_to_guard",
+      "name": "Frame escape to guard",
+      "category": "escape"
+    },
+    {
+      "id": "ghost_escape",
+      "name": "Ghost escape",
+      "category": "escape"
+    },
+    {
+      "id": "heel_drag_escape",
+      "name": "Heel drag escape",
+      "category": "escape"
+    },
+    {
+      "id": "hitchhiker_escape",
+      "name": "Hitchhiker escape",
+      "category": "escape"
+    },
+    {
+      "id": "shoulder_walk_escape",
+      "name": "Shoulder walk escape",
+      "category": "escape"
+    },
+    {
+      "id": "shrimp_to_guard",
+      "name": "Shrimp to guard",
+      "category": "escape"
+    },
+    {
+      "id": "shrimp_to_half_guard",
+      "name": "Shrimp to half guard",
+      "category": "escape"
+    },
+    {
+      "id": "underhook_escape",
+      "name": "Underhook escape",
+      "category": "escape"
+    },
+    {
+      "id": "ankle_pick",
+      "name": "Ankle pick",
+      "category": "takedown"
+    },
+    {
+      "id": "arm_drag_to_back",
+      "name": "Arm drag to back",
+      "category": "takedown"
+    },
+    {
+      "id": "collar_drag",
+      "name": "Collar drag",
+      "category": "takedown"
+    },
+    {
+      "id": "double_leg",
+      "name": "Double leg",
+      "category": "takedown"
+    },
+    {
+      "id": "single_leg",
+      "name": "Single leg",
+      "category": "takedown"
+    },
+    {
+      "id": "single_leg_counter",
+      "name": "Single leg counter",
+      "category": "takedown"
+    },
+    {
+      "id": "single_leg_finish",
+      "name": "Single leg finish",
+      "category": "takedown"
+    },
+    {
+      "id": "snap_down",
+      "name": "Snap down",
+      "category": "takedown"
+    },
+    {
+      "id": "arm_drag",
+      "name": "Arm drag",
+      "category": "control"
+    },
+    {
+      "id": "back_take",
+      "name": "Back take",
+      "category": "control"
+    },
+    {
+      "id": "boot_scoot",
+      "name": "Boot scoot",
+      "category": "control"
+    },
+    {
+      "id": "can_opener",
+      "name": "Can opener (illegal in some rulesets)",
+      "category": "control"
+    },
+    {
+      "id": "crossface",
+      "name": "Crossface",
+      "category": "control"
+    },
+    {
+      "id": "dogfight",
+      "name": "Dogfight",
+      "category": "control"
+    },
+    {
+      "id": "electric_chair",
+      "name": "Electric chair",
+      "category": "control"
+    },
+    {
+      "id": "frame_and_reguard",
+      "name": "Frame and reguard",
+      "category": "control"
+    },
+    {
+      "id": "frame_and_spin",
+      "name": "Frame and spin",
+      "category": "control"
+    },
+    {
+      "id": "go_behind",
+      "name": "Go-behind",
+      "category": "control"
+    },
+    {
+      "id": "guard_break",
+      "name": "Guard break",
+      "category": "control"
+    },
+    {
+      "id": "guard_recovery",
+      "name": "Guard recovery",
+      "category": "control"
+    },
+    {
+      "id": "hand_fight",
+      "name": "Hand fight",
+      "category": "control"
+    },
+    {
+      "id": "harness_control",
+      "name": "Harness control",
+      "category": "control"
+    },
+    {
+      "id": "honey_hole_entry",
+      "name": "Honey hole entry",
+      "category": "control"
+    },
+    {
+      "id": "inside_trip",
+      "name": "Inside trip",
+      "category": "control"
+    },
+    {
+      "id": "inversion",
+      "name": "Inversion",
+      "category": "control"
+    },
+    {
+      "id": "jump_guard",
+      "name": "Jump guard",
+      "category": "control"
+    },
+    {
+      "id": "kiss_of_the_dragon",
+      "name": "Kiss of the dragon",
+      "category": "control"
+    },
+    {
+      "id": "knee_shield",
+      "name": "Knee shield",
+      "category": "control"
+    },
+    {
+      "id": "knee_slide",
+      "name": "Knee slide",
+      "category": "control"
+    },
+    {
+      "id": "knee_tap",
+      "name": "Knee tap",
+      "category": "control"
+    },
+    {
+      "id": "kneebar",
+      "name": "Kneebar",
+      "category": "control"
+    },
+    {
+      "id": "lasso_transition",
+      "name": "Lasso transition",
+      "category": "control"
+    },
+    {
+      "id": "leg_weave",
+      "name": "Leg weave",
+      "category": "control"
+    },
+    {
+      "id": "log_splitter",
+      "name": "Log splitter",
+      "category": "control"
+    },
+    {
+      "id": "mount_transition",
+      "name": "Mount transition",
+      "category": "control"
+    },
+    {
+      "id": "neck_crank",
+      "name": "Neck crank",
+      "category": "control"
+    },
+    {
+      "id": "north_south_transition",
+      "name": "North-south transition",
+      "category": "control"
+    },
+    {
+      "id": "posture_break",
+      "name": "Posture break",
+      "category": "control"
+    },
+    {
+      "id": "re_shot",
+      "name": "Re-shot",
+      "category": "control"
+    },
+    {
+      "id": "seatbelt_back_take",
+      "name": "Seatbelt → back take",
+      "category": "control"
+    },
+    {
+      "id": "seated_guard_pull",
+      "name": "Seated guard pull",
+      "category": "control"
+    },
+    {
+      "id": "shin_to_shin",
+      "name": "Shin-to-shin",
+      "category": "control"
+    },
+    {
+      "id": "sit_out",
+      "name": "Sit-out",
+      "category": "control"
+    },
+    {
+      "id": "sprawl",
+      "name": "Sprawl",
+      "category": "control"
+    },
+    {
+      "id": "technical_standup",
+      "name": "Technical standup",
+      "category": "control"
+    },
+    {
+      "id": "transition_to_backside_50_50",
+      "name": "Transition to backside 50-50",
+      "category": "control"
+    },
+    {
+      "id": "transition_to_cross_ashi",
+      "name": "Transition to cross ashi",
+      "category": "control"
+    },
+    {
+      "id": "transition_to_inside_sankaku",
+      "name": "Transition to inside sankaku",
+      "category": "control"
+    },
+    {
+      "id": "transition_to_outside_ashi",
+      "name": "Transition to outside ashi",
+      "category": "control"
+    },
+    {
+      "id": "transition_to_outside_sankaku",
+      "name": "Transition to outside sankaku",
+      "category": "control"
+    },
+    {
+      "id": "truck_entry",
+      "name": "Truck entry",
+      "category": "control"
+    },
+    {
+      "id": "turn_to_guard",
+      "name": "Turn to guard",
+      "category": "control"
+    },
+    {
+      "id": "underhook_denial",
+      "name": "Underhook denial",
+      "category": "control"
+    }
+  ],
   "valid_transitions": [
     ["standing_neutral", "standing_clinch"],
     ["standing_neutral", "closed_guard_bottom"],
