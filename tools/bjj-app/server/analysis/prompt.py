@@ -108,6 +108,35 @@ _TECHNIQUE_DETAIL_HEADER = (
 )
 
 
+_LEG_ENTANGLEMENT_POSITION_IDS = frozenset({
+    "fifty_fifty", "eighty_twenty", "backside_fifty_fifty",
+    "cross_ashi", "outside_ashi", "straight_ashi",
+    "single_leg_x", "ushiro_ashi", "inside_sankaku",
+})
+
+
+# Appended when any leg-entanglement position is in the grounded list. Gives
+# the VLM a decision tree for picking between visually-similar positions —
+# the single biggest source of accuracy loss on real footage per user review
+# of M12-grounded narratives (50/50 vs 80/20, ashi variants, etc).
+_LEG_ENTANGLEMENT_DISAMBIGUATOR = (
+    "When the legs are tangled between the two players, disambiguate in this order before naming the position:\n"
+    "1. Count trapped legs. TWO legs mirror-trapped (one from each player, intertwined at the knees) = 50/50 family "
+    "(`fifty_fifty` / `eighty_twenty` / `backside_fifty_fifty`). ONE opponent leg isolated between the attacker's legs "
+    "= Ashi family (`straight_ashi` / `outside_ashi` / `cross_ashi` / `inside_sankaku` / `single_leg_x` / `ushiro_ashi`).\n"
+    "2. If the opponent's leg passes BETWEEN the attacker's thighs with the attacker's own feet figure-foured (triangle lock) "
+    "→ `inside_sankaku` (saddle / honey hole) — the strongest heel-hook position.\n"
+    "3. If the attacker's outside foot is ACROSS the opponent's body/hip → `eighty_twenty` (in 50/50 family) or "
+    "`outside_ashi` (in Ashi family). If the outside foot stays on the same side / at hip level → `fifty_fifty` or `straight_ashi`.\n"
+    "4. If one player is rotated back-to-back relative to the other → `backside_fifty_fifty` (50/50 family) or "
+    "`ushiro_ashi` (Ashi family).\n"
+    "5. If the opponent is still standing or kneeling with the attacker's feet forming a V around ONE of the opponent's legs "
+    "(one foot on the hip, the other hooking behind the knee) → `single_leg_x`.\n"
+    "Then state whose heel is exposed past the opponent's hip line — that is the threatened heel. A straight, non-rotated knee "
+    "means no heel-hook pressure is being applied yet (it may be a straight ankle lock, kneebar, or just a control position)."
+)
+
+
 def _build_grounding_block(
     positions: list[PositionNote],
     techniques: list[TechniqueNote] | None = None,
@@ -169,6 +198,9 @@ def _build_grounding_block(
             detail_lines.append(f"- {t['name']} ({t['technique_id']}): {flat}")
         if detail_lines:
             parts.append(_TECHNIQUE_DETAIL_HEADER + "\n" + "\n".join(detail_lines))
+
+    if any(p["position_id"] in _LEG_ENTANGLEMENT_POSITION_IDS for p in positions):
+        parts.append(_LEG_ENTANGLEMENT_DISAMBIGUATOR)
 
     return "\n\n".join(parts)
 

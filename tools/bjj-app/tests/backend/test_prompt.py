@@ -348,6 +348,37 @@ def test_grounding_block_techniques_names_mode_omits_bodies_block():
     assert "Isolate arm." not in out
 
 
+def test_grounding_block_appends_leg_entanglement_disambiguator_when_relevant():
+    """When any leg-entanglement position is in the grounded list, the
+    prompt must include a decision-tree block the VLM can follow to pick
+    between visually-similar positions (50/50 vs 80/20, ashi variants)."""
+    from server.analysis.prompt import _build_grounding_block
+    out = _build_grounding_block(
+        positions=[
+            _fake_position("fifty_fifty", "50/50", "Both legs mirror-trapped."),
+            _fake_position("inside_sankaku", "Inside Sankaku", "Figure-four."),
+        ],
+        techniques=None,
+    )
+    assert "disambiguate" in out.lower()
+    assert "Count trapped legs" in out
+    assert "inside_sankaku" in out
+    assert "heel is exposed past" in out.lower()
+
+
+def test_grounding_block_omits_leg_disambiguator_when_no_leg_entanglement():
+    """No leg-entanglement positions grounded → no disambiguator overhead."""
+    from server.analysis.prompt import _build_grounding_block
+    out = _build_grounding_block(
+        positions=[
+            _fake_position("closed_guard_bottom", "Closed Guard (Bottom)", "Ankles LOCKED."),
+            _fake_position("mount_top", "Mount (Top)", "Astride."),
+        ],
+        techniques=None,
+    )
+    assert "Count trapped legs" not in out
+
+
 def test_grounding_block_techniques_skipped_when_none_match_position():
     from server.analysis.prompt import _build_grounding_block
     out = _build_grounding_block(
